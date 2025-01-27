@@ -1,11 +1,17 @@
 package com.ll.nbe342team8.domain.book.category.entity;
 
+import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.global.jpa.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,6 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category extends BaseEntity {
+    private String category;
 
-    private String category; // 카테고리 종류 ex) 국내도서 > 경제/경영 > 재테크/금융 > 재테크 > 부자되는법
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Book> books = new ArrayList<>();
 }
