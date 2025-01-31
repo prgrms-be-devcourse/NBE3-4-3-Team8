@@ -21,9 +21,36 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public void updateProduct(Cart cart, int quantity) {
+    public void updateCartItem(Cart cart, int quantity) {
         cart.updateCart(quantity);
         cartRepository.save(cart);
+    }
+
+    public void updateCartItems(Member member, CartRequestDto cartRequestDto) {
+        for (CartItemRequestDto cartItemRequestDto : cartRequestDto.cartItems()) {
+            Book book = bookService.getBookById(cartItemRequestDto.bookId());
+            Cart cart = findCartByBook(member, cartItemRequestDto.bookId());
+
+            if (cart != null) {
+                cart.updateCart(cartItemRequestDto.quantity());
+            } else {
+                cart = Cart.builder()
+                        .member(member)
+                        .book(book)
+                        .quantity(cartItemRequestDto.quantity())
+                        .build();
+            }
+            cartRepository.save(cart);
+        }
+    }
+
+    private Cart findCartByBook(Member member, Long bookId) {
+        for (Cart cart : member.getCart()) {
+            if (cart.getBook().getId().equals(bookId)) {
+                return cart;
+            }
+        }
+        return null;
     }
 
     public void deleteProduct(Member member, CartRequestDto cartRequestDto) {

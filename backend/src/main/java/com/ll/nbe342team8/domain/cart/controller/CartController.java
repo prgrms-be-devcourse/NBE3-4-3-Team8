@@ -2,7 +2,6 @@ package com.ll.nbe342team8.domain.cart.controller;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
-import com.ll.nbe342team8.domain.cart.dto.CartItemRequestDto;
 import com.ll.nbe342team8.domain.cart.dto.CartRequestDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.service.CartService;
@@ -38,19 +37,31 @@ public class CartController {
     }
 
     @PutMapping("/{book-id}/{member-id}")
-    public void updateBook(@PathVariable("book-id") long bookId,
-                           @PathVariable("member-id") long memberId,
-                           @RequestParam("quantity") int quantity) {
+    public void updateCartItem(@PathVariable("book-id") long bookId,
+                               @PathVariable("member-id") long memberId,
+                               @RequestParam("quantity") int quantity) {
 
         Member member = memberService.getMemberById(memberId);
 
         Cart cartItem = member.getCart().stream()
-                .filter(cart -> cart.getBook().getId().equals(bookId))
+                .filter(cart -> cart.getId().equals(bookId))
                 .findFirst()
                 .orElse(null);
 
-        cartService.updateProduct(cartItem, quantity);
+        cartService.updateCartItem(cartItem, quantity);
     }
+
+    @PostMapping("/{member-id}")
+    public void updateCartItems(@PathVariable("member-id") long memberId,
+                                @RequestBody CartRequestDto cartRequestDto){
+
+        Member member = memberService.getMemberById(memberId);
+        if (cartRequestDto != null) {
+            cartService.updateCartItems(member, cartRequestDto);
+        }
+    }
+
+
 
     @DeleteMapping("/{member-id}")
     public void deleteBook(@PathVariable("member-id") long memberId,

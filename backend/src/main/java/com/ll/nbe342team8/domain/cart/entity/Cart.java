@@ -3,9 +3,7 @@ package com.ll.nbe342team8.domain.cart.entity;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.global.jpa.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
