@@ -1,5 +1,7 @@
 package com.ll.nbe342team8.domain.book.category.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.global.jpa.entity.BaseEntity;
 import jakarta.persistence.CascadeType;

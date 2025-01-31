@@ -1,15 +1,17 @@
 package com.ll.nbe342team8.domain.book.book.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ll.nbe342team8.domain.book.category.entity.Category;
+import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,23 +20,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Book extends BaseTime {
 
-    @Column(name="title" ,nullable = true,length = 100)
+    @Column(length = 100)
     private String title;      // 제목
 
-    @Column(name = "author", nullable = true)
     private String author;     // 저자
 
-    @Column(name = "price", nullable = true)
     private int price;         // 가격
 
-    @Column(name = "stock", nullable = true)
     private int stock;         // 재고
 
-    @Column(name = "rating", nullable = true)
     private float rating;      // 평점
 
     private String image;      // 이미지 URL
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category; // 카테고리
+
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    private List<Review> review;
 }

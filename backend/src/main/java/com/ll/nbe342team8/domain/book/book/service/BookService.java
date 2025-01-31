@@ -24,14 +24,18 @@ public class BookService {
     }
 
     public Book getBookById(Long id){
-        return bookRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        if (id == null) {
+            throw new IllegalArgumentException("ID 값이 null입니다.");
+        }
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + id + ")의 책을 찾을 수 없습니다."));
     }
 
     public long count() {
         return bookRepository.count();
     }
 
-    public void create(Book book) {
-        bookRepository.save(book);
+    public Book create(Book book) {
+        return bookRepository.save(book);
     }
 }
