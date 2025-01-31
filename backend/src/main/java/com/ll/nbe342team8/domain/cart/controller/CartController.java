@@ -2,18 +2,14 @@ package com.ll.nbe342team8.domain.cart.controller;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
+import com.ll.nbe342team8.domain.cart.dto.CartItemRequestDto;
 import com.ll.nbe342team8.domain.cart.dto.CartRequestDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.service.CartService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,5 +50,16 @@ public class CartController {
                 .orElse(null);
 
         cartService.updateProduct(cartItem, quantity);
+    }
+
+    @DeleteMapping("/{member-id}")
+    public void deleteBook(@PathVariable("member-id") long memberId,
+                           @RequestBody CartRequestDto cartRequestDto) {
+
+        Member member = memberService.getMemberById(memberId);
+
+        if (cartRequestDto != null) {
+            cartService.deleteProduct(member, cartRequestDto);
+        }
     }
 }
