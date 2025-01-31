@@ -37,4 +37,17 @@ public class ReviewController {
                 .map(ReviewResponseDto::from)
                 .collect(Collectors.toList());
     }
+
+    @DeleteMapping("/{review-id}")
+    public void deleteReview(@PathVariable("review-id") Long reviewId) {
+        reviewService.deleteReview(reviewId);
+    }
+
+    @PostMapping("/{review-id}")
+    public void updateReview(@PathVariable("review-id") Long reviewId,
+                             @RequestParam(name = "content") String content,
+                             @RequestParam(name = "rating") float rating) {
+
+        reviewService.updateReview(reviewId, content, rating);
+    }
 }

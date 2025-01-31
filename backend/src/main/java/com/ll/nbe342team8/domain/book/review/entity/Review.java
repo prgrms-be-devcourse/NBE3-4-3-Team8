@@ -6,10 +6,7 @@ import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -28,5 +25,8 @@ public class Review extends BaseTime {
 
     float rating;
 
-
+    public void update(String content, float rating){
+        this.content = content;
+        this.rating = rating;
+    }
 }
