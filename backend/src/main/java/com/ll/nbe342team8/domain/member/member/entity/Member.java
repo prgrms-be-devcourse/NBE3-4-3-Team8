@@ -1,7 +1,9 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
+import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -40,4 +44,8 @@ public class Member extends BaseTime {
     @JsonIgnoreProperties({"member"})
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Review> review;
+
+//    @JsonIgnoreProperties({"member"})
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private Set<Cart> cart;
 }

@@ -22,4 +22,8 @@ public class Cart extends BaseEntity {
     private Book book;
 
     private int quantity;
+
+    public void updateCart(int quantity) {
+        this.quantity = quantity;
+    }
 }
