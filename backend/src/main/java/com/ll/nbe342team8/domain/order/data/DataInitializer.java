@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.domain.order.order.data;
+package com.ll.nbe342team8.domain.order.data;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.repository.BookRepository;

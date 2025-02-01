@@ -15,9 +15,9 @@ public class OrderController {
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
-
+    //주문조회
     @GetMapping("/my/orders")
-    public ResponseEntity<List<OrderDTO>> getOrders(@RequestParam Long memberId) {
+    public ResponseEntity<List<OrderDTO>> getOrders(@RequestParam Long memberId) {// 추후 변경
         List<OrderDTO> orders = orderService.getOrdersByMemberId(memberId);
         return ResponseEntity.ok(orders);
     }
