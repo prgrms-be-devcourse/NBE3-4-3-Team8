@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Configuration
@@ -66,18 +67,22 @@ public class BaseInitData {
     @Transactional
     public void makeSampleBooks() throws IOException {
         if (bookService.count() > 0) return;
+        LocalDateTime date = LocalDateTime.of(2024, 12, 1, 0, 0);
 
         for (int i = 1; i < 30; i++) {
             Category category = Category.builder()
                     .category("Default Category")
                     .build();
             categoryRepository.save(category);
+
             Book book = Book.builder()
                     .title("title")
                     .author("author")
                     .price(10000)
                     .stock(100)
                     .image("img src")
+                    .pubDate(date.plusDays(i))
+                    .rating(0.1f * i)
                     .category(category)
                     .build();
 

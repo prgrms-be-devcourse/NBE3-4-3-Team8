@@ -3,11 +3,10 @@ package com.ll.nbe342team8.domain.book.book.type;
 import org.springframework.data.domain.Sort;
 
 public enum SortType {
-    VIEWS_DESC("views", Sort.Direction.DESC),          // 조회순
-    RECENT("createDate", Sort.Direction.DESC),         // 최근등록순
-    OLDEST("createDate", Sort.Direction.ASC),          // 나중등록순
-    PRICE_DESC("price", Sort.Direction.DESC),          // 가격높은순
-    PRICE_ASC("price", Sort.Direction.ASC);            // 가격낮은순
+    PUBLISHED_DATE("pubDate", Sort.Direction.DESC),       // 출간일순
+    SALES_COUNT("salesCount", Sort.Direction.ASC),              // 판매량순
+    RATING("rating", Sort.Direction.DESC),                      // 평점순
+    REVIEW_COUNT("reviewCount", Sort.Direction.DESC);           // 리뷰 많은순
 
     private final String field;
     private final Sort.Direction direction;

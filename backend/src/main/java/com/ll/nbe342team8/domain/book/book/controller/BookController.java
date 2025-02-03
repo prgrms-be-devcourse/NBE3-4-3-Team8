@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
 import com.ll.nbe342team8.domain.book.book.type.SortType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,14 +18,13 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public List<BookResponseDto> getAllBooks(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "10") int pageSize,
-                               @RequestParam(defaultValue = "RECENT") SortType sortType) {
+    public Page<BookResponseDto> getAllBooks(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int pageSize,
+                                             @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType) {
 
-        List<Book> books = bookService.getAllBooks();
-        return books.stream()
-                .map(BookResponseDto::from)
-                .collect(Collectors.toList());
+        Page<Book> books = bookService.getAllBooks(page, pageSize, sortType);
+
+        return books.map(BookResponseDto::from);
     }
 
     @GetMapping("/{book-id}")

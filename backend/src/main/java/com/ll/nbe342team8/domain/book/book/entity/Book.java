@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,8 @@ public class Book extends BaseTime {
     private float rating;      // 평점
 
     private String image;      // 이미지 URL
+
+    private LocalDateTime pubDate;      //출판일
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
