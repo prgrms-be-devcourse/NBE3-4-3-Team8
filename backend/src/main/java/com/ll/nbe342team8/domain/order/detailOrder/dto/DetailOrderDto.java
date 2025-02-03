@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.order.detailOrder.dto;
 
 
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder.DeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +11,7 @@ public class DetailOrderDto {
     private Long orderId;
     private Long bookId;
     private int bookQuantity;
-    private int deliveryStatus;
+    private DeliveryStatus deliveryStatus;
 
 
     

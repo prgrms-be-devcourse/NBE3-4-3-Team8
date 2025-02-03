@@ -63,7 +63,7 @@ public class DataInitializer {
             Member member2 = memberRepository.findById(2L).orElseThrow();
             Member member3 = memberRepository.findById(3L).orElseThrow();
 
-            Order order1 = new Order(member1, Order.OrderStatus.ORDERED, 2500);
+            Order order1 = new Order(member1, Order.OrderStatus.COMPLETE, 2500);
             Order order2 = new Order(member2, Order.OrderStatus.ORDERED, 4500);
             Order order3 = new Order(member3, Order.OrderStatus.ORDERED, 3500);
             orderRepository.save(order1);
@@ -74,9 +74,9 @@ public class DataInitializer {
             Book book1 = bookRepository.findById(1L).orElseThrow();  // 이미 초기화된 상품을 가져옴
             Book book2 = bookRepository.findById(2L).orElseThrow();
 
-            DetailOrder detailOrder1 = new DetailOrder(order1, book1, 2, 0);  // deliveryStatus = 0 (주문 대기 중)
-            DetailOrder detailOrder2 = new DetailOrder(order2, book2, 3, 0);
-            DetailOrder detailOrder3 = new DetailOrder(order3, book1, 1, 0);
+            DetailOrder detailOrder1 = new DetailOrder(order1, book1, 2, DetailOrder.DeliveryStatus.PENDING);
+            DetailOrder detailOrder2 = new DetailOrder(order2, book2, 3, DetailOrder.DeliveryStatus.PENDING);
+            DetailOrder detailOrder3 = new DetailOrder(order3, book1, 1, DetailOrder.DeliveryStatus.PENDING);
             detailOrderRepository.save(detailOrder1);
             detailOrderRepository.save(detailOrder2);
             detailOrderRepository.save(detailOrder3);
