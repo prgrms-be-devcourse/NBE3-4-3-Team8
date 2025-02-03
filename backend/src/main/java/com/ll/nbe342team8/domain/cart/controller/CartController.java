@@ -27,27 +27,6 @@ public class CartController {
     private final BookService bookService;
     private final MemberService memberService;
 
-//    @Operation(summary = "장바구니 추가")
-//    @PostMapping("/{book-id}/{member-id}")
-//    public void addCart(@PathVariable("book-id") long bookId,
-//                        @PathVariable("member-id") long memberId,
-//                        @RequestParam("quantity") int quantity) {
-//
-//        Book book = bookService.getBookById(bookId);
-//        Member member = memberService.getMemberById(memberId);
-//
-//
-//
-//        //TODO: KAKAO 로그인 연동시 member 부분 수정 필요
-//
-//        Cart cart = Cart.builder()
-//                .member(member)
-//                .book(book)
-//                .quantity(quantity)
-//                .build();
-//        cartService.addProduct(cart);
-//    }
-
     @Operation(summary = "장바구니 추가")
     @PostMapping("/{book-id}/{member-id}")
     public void addCart(@PathVariable("book-id") long bookId,

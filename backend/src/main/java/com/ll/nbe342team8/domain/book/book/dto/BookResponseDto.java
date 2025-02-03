@@ -1,10 +1,6 @@
 package com.ll.nbe342team8.domain.book.book.dto;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 public record BookResponseDto(Long id,
                               String title,
@@ -13,7 +9,7 @@ public record BookResponseDto(Long id,
                               int stock,
                               float rating,
                               String image,
-                              String category) {
+                              Integer categoryId) {
 
     public static BookResponseDto from(Book book){
         return new BookResponseDto(
@@ -23,8 +19,8 @@ public record BookResponseDto(Long id,
                 book.getPrice(),
                 book.getStock(),
                 book.getRating(),
-                book.getImage(),
-                book.getCategory().getCategory()
+                book.getCoverImage(),
+                book.getCategoryId().getCategoryId()
         );
     }
 }

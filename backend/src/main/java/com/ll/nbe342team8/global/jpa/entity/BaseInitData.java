@@ -71,7 +71,7 @@ public class BaseInitData {
 
         for (int i = 1; i < 30; i++) {
             Category category = Category.builder()
-                    .category("Default Category")
+                    .categoryId(0)
                     .build();
             categoryRepository.save(category);
 
@@ -80,10 +80,10 @@ public class BaseInitData {
                     .author("author")
                     .price(10000)
                     .stock(100)
-                    .image("img src")
+                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
                     .rating(0.1f * i)
-                    .category(category)
+                    .categoryId(category)
                     .build();
 
             bookService.create(book);
