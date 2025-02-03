@@ -10,6 +10,8 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -32,7 +34,7 @@ public class CartService {
             Cart cart = findCartByBook(member, cartItemRequestDto.bookId());
 
             if (cart != null) {
-                cart.updateCart(cartItemRequestDto.quantity());
+                cart.updateCart(cart.getQuantity() + cartItemRequestDto.quantity());
             } else {
                 cart = Cart.builder()
                         .member(member)
@@ -63,5 +65,9 @@ public class CartService {
                             .orElseThrow(() -> new IllegalArgumentException("장바구니에 없음"));
                     cartRepository.delete(cartItem);
                 });
+    }
+
+    public List<Cart> findCartByMember(Member member) {
+        return cartRepository.findAllByMember(member);
     }
 }

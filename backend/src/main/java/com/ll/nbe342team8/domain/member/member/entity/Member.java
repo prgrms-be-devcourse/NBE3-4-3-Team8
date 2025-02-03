@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
@@ -41,11 +42,9 @@ public class Member extends BaseTime {
         ADMIN
     }
 
-    @JsonIgnoreProperties({"member"})
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Review> review;
 
-//    @JsonIgnoreProperties({"member"})
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private Set<Cart> cart;
 }

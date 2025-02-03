@@ -8,12 +8,15 @@ import com.ll.nbe342team8.domain.book.review.service.ReviewService;
 import com.ll.nbe342team8.domain.book.review.type.SortType;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Review", description = "Review API")
 @RequestMapping("/reviews")
 public class ReviewController {
 
@@ -22,6 +25,7 @@ public class ReviewController {
     private final MemberService memberService;
 
     @GetMapping
+    @Operation(summary = "전체 리뷰 조회")
     public Page<ReviewResponseDto> getAllReviews(@RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "10") int pageSize,
                                                  @RequestParam(defaultValue = "CREATE_AT_DESC") SortType sortType) {
@@ -30,8 +34,8 @@ public class ReviewController {
         return reviews.map(ReviewResponseDto::from);
     }
 
-    // 특정 도서 리뷰 조회
     @GetMapping("/{book-id}")
+    @Operation(summary = "특정 도서 리뷰 조회")
     public Page<ReviewResponseDto> getReviewsById(@PathVariable("book-id") Long bookId,
                                                   @RequestParam(defaultValue = "0") int page,
                                                   @RequestParam(defaultValue = "10") int pageSize,
@@ -42,6 +46,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{review-id}")
+    @Operation(summary = "리뷰 삭제")
     public void deleteReview(@PathVariable("review-id") Long reviewId) {
         Book book = reviewService.getReviewById(reviewId).getBook();
         reviewService.deleteReview(reviewId);
@@ -49,6 +54,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{review-id}")
+    @Operation(summary = "리뷰 수정")
     public void updateReview(@PathVariable("review-id") Long reviewId,
                              @RequestParam(name = "content") String content,
                              @RequestParam(name = "rating") float rating) {
@@ -57,6 +63,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{book-id}/{member-id}")
+    @Operation(summary = "리뷰 등록")
     public void createReview(@PathVariable("book-id") Long bookId,
                              @PathVariable("member-id") Long memberId,
                              @RequestParam(name = "content") String content,

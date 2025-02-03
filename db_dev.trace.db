@@ -1,0 +1,3 @@
+2025-02-03 14:08:22.385605+09:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "delete [*]* FROM CART"; expected "identifier"; SQL statement:
+delete * FROM CART [42001-232]
