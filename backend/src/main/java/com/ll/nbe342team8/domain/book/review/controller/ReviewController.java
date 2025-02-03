@@ -1,19 +1,16 @@
 package com.ll.nbe342team8.domain.book.review.controller;
 
-import com.ll.nbe342team8.domain.book.book.dto.BookResponseDto;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
 import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
-import com.ll.nbe342team8.domain.book.review.repository.ReviewRepository;
 import com.ll.nbe342team8.domain.book.review.service.ReviewService;
+import com.ll.nbe342team8.domain.book.review.type.SortType;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,23 +21,24 @@ public class ReviewController {
     private final BookService bookService;
     private final MemberService memberService;
 
-    // 전체 리뷰 조회
     @GetMapping
-    public List<ReviewResponseDto> getAllReviews() {
-        List<Review> reviews = reviewService.getAllReviews();
-        return reviews.stream()
-                .map(ReviewResponseDto::from)
-                .collect(Collectors.toList());
+    public Page<ReviewResponseDto> getAllReviews(@RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int pageSize,
+                                                 @RequestParam(defaultValue = "CREATE_AT_DESC") SortType sortType) {
+        Page<Review> reviews = reviewService.getAllReviews(page, pageSize, sortType);
+
+        return reviews.map(ReviewResponseDto::from);
     }
 
     // 특정 도서 리뷰 조회
     @GetMapping("/{book-id}")
-    public List<ReviewResponseDto> getReviewsById(@PathVariable("book-id") Long bookId) {
-        List<Review> reviews = reviewService.getReviewsById(bookId);
+    public Page<ReviewResponseDto> getReviewsById(@PathVariable("book-id") Long bookId,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int pageSize,
+                                                  @RequestParam(defaultValue = "CREATE_AT_DESC") SortType sortType) {
+        Page<Review> reviews = reviewService.getReviewsById(bookId, page, pageSize, sortType);
 
-        return reviews.stream()
-                .map(ReviewResponseDto::from)
-                .collect(Collectors.toList());
+        return reviews.map(ReviewResponseDto::from);
     }
 
     @DeleteMapping("/{review-id}")
