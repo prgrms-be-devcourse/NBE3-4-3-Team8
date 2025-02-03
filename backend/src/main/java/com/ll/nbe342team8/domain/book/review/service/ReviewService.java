@@ -46,6 +46,7 @@ public class ReviewService {
         Review review = getReviewById(reviewId);
         reviewRepository.delete(review);
     }
+
     public long count() {
         return reviewRepository.count();
     }

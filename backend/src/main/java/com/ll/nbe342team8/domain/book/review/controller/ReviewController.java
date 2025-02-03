@@ -45,7 +45,9 @@ public class ReviewController {
 
     @DeleteMapping("/{review-id}")
     public void deleteReview(@PathVariable("review-id") Long reviewId) {
+        Book book = reviewService.getReviewById(reviewId).getBook();
         reviewService.deleteReview(reviewId);
+        bookService.decreaseReviewCount(book);
     }
 
     @PutMapping("/{review-id}")
@@ -73,5 +75,6 @@ public class ReviewController {
                 .build();
 
         reviewService.create(review);
+        bookService.increaseReviewCount(book);
     }
 }

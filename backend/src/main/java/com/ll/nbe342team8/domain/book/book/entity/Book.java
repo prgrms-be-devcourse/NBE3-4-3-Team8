@@ -36,10 +36,22 @@ public class Book extends BaseTime {
 
     private LocalDateTime pubDate;      //출판일
 
+    private long salesCount;
+
+    private long reviewCount;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category; // 카테고리
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private List<Review> review;
+
+    public void increaseReviewCount() {
+        this.reviewCount++;
+    }
+
+    public void decreaseReviewCount() {
+        this.reviewCount--;
+    }
 }

@@ -43,4 +43,14 @@ public class BookService {
     public Book create(Book book) {
         return bookRepository.save(book);
     }
+
+    public Book increaseReviewCount(Book book) {
+        book.increaseReviewCount();
+        return bookRepository.save(book);
+    }
+
+    public Book decreaseReviewCount(Book book) {
+        book.decreaseReviewCount();
+        return bookRepository.save(book);
+    }
 }
