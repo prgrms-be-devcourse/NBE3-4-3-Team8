@@ -25,6 +25,9 @@ public class OrderService {
 
     public List<OrderDTO> getOrdersByMemberId(Long memberId) {
         List<Order> orders = orderRepository.findByMemberId(memberId);
+        if (orders.isEmpty()) {
+            throw new IllegalArgumentException("회원이 존재하지 않습니다.");
+        }
         return orders.stream()
                 .map(order -> new OrderDTO(order.getMember().getId(),
                         order.getOrderStatus().name(),

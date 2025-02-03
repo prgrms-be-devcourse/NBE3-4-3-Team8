@@ -18,7 +18,7 @@ public class OrderController {
 
     //주문조회
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getOrders(@RequestParam Long memberId) {// 추후 변경
+    public ResponseEntity<List<OrderDTO>> getOrders(@RequestParam Long memberId) { // 추후 변경
         List<OrderDTO> orders = orderService.getOrdersByMemberId(memberId);
         return ResponseEntity.ok(orders);
     }
@@ -26,15 +26,7 @@ public class OrderController {
     //주문삭제
     @DeleteMapping("/{orderId}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long orderId) {
-        try {
-            orderService.deleteOrder(orderId);
-            return ResponseEntity.ok("주문 삭제 완료");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body("주문이 존재하지 않습니다.");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(400).body("주문이 완료되지 않아 삭제할 수 없습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("서버 오류가 발생했습니다.");
-        }
+        orderService.deleteOrder(orderId);
+        return ResponseEntity.ok("주문 삭제 완료");
     }
 }
