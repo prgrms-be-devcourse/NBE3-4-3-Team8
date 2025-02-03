@@ -34,13 +34,13 @@ public class OrderService {
 
     @Transactional
     public void deleteOrder(Long orderId){
-        detailOrderRepository.deleteByOrderId(orderId);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
 
         if (order.getOrderStatus() != OrderStatus.COMPLETE){
             throw new IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.");
         }
+        detailOrderRepository.deleteByOrderId(orderId);
         orderRepository.delete(order);
     }
 }
