@@ -28,7 +28,7 @@ public class BookService {
         return bookRepository.findAll(pageable);
     }
 
-    public Book getBookById(Long id){
+    public Book getBookById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("ID 값이 null입니다.");
         }
@@ -44,13 +44,13 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Book increaseReviewCount(Book book) {
-        book.increaseReviewCount();
+    public Book createReview(Book book, float rating) {
+        book.createReview(rating);
         return bookRepository.save(book);
     }
 
-    public Book decreaseReviewCount(Book book) {
-        book.decreaseReviewCount();
+    public Book deleteReview(Book book, float rating) {
+        book.deleteReview(rating);
         return bookRepository.save(book);
     }
 }

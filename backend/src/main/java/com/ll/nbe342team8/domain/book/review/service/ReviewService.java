@@ -44,12 +44,19 @@ public class ReviewService {
         return reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException());
     }
 
-    public Review create(Review review) {
+    public Review create(Review review, float rating) {
+        bookService.createReview(review.getBook(), rating);
         return reviewRepository.save(review);
     }
 
     public ReviewResponseDto updateReview(Long reviewId, String content, float rating) {
+
+        Book book = getReviewById(reviewId).getBook();
         Review review = getReviewById(reviewId);
+
+        bookService.deleteReview(book, review.getRating());
+        bookService.createReview(book, rating);
+
         review.update(content, rating);
         Review updatedReview = reviewRepository.save(review);
 
@@ -57,13 +64,14 @@ public class ReviewService {
     }
 
     public void deleteReview(Long reviewId){
+        Book book = getReviewById(reviewId).getBook();
         Review review = getReviewById(reviewId);
+
+        bookService.deleteReview(book, review.getRating());
         reviewRepository.delete(review);
     }
 
     public long count() {
         return reviewRepository.count();
     }
-
-
 }

@@ -82,7 +82,6 @@ public class BaseInitData {
                     .stock(100)
                     .coverImage("img src")
                     .pubDate(date.plusDays(i))
-                    .rating(0.1f * i)
                     .categoryId(category)
                     .build();
 
@@ -110,7 +109,7 @@ public class BaseInitData {
                         .content("review content " + j)
                         .rating(rating)
                         .build();
-                reviewService.create(review);
+                reviewService.create(review, rating);
             }
         }
     }

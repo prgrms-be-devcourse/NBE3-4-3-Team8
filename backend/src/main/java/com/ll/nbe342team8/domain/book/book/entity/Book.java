@@ -67,11 +67,13 @@ public class Book extends BaseTime {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private List<Review> review;
 
-    public void increaseReviewCount() {
+    public void createReview(float rating) {
         this.reviewCount++;
+        this.rating += rating;
     }
 
-    public void decreaseReviewCount() {
+    public void deleteReview(float rating) {
         this.reviewCount--;
+        this.rating -= rating;
     }
 }
