@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image"; // Next.js 이미지 컴포넌트
 import { fetchBookById, addToCart } from "@/utils/api.js";
 
 interface BookInfoProps {
@@ -9,7 +10,7 @@ interface BookInfoProps {
 
 export const BookInfo: React.FC<BookInfoProps> = ({ bookId }) => {
     const router = useRouter();
-    const [book, setBook] = useState(null);
+    const [book, setBook] = useState<any>(null);
 
     useEffect(() => {
         const loadBook = async () => {
@@ -20,9 +21,12 @@ export const BookInfo: React.FC<BookInfoProps> = ({ bookId }) => {
                 // 백엔드에서 가져온 데이터를 변환하여 저장
                 const formattedBook = {
                     ...bookData,
-                    originalPrice: bookData.price, // price를 originalPrice로 사용
-                    salePrice: bookData.price, // 할인 기능 없으면 동일하게
-                    rating: bookData.reviewCount > 0 ? (bookData.rating / bookData.reviewCount).toFixed(1) : "N/A", // 평점 평균
+                    originalPrice: bookData.price,
+                    salePrice: bookData.price,
+                    rating:
+                        bookData.reviewCount > 0
+                            ? (bookData.rating / bookData.reviewCount).toFixed(1)
+                            : "N/A",
                 };
 
                 setBook(formattedBook);
@@ -37,7 +41,7 @@ export const BookInfo: React.FC<BookInfoProps> = ({ bookId }) => {
 
     const handleAddToCart = async () => {
         try {
-            await addToCart(book.id, 1, 1);
+            await addToCart(book.id, 1, 1); // TODO bookid, memberid, quantity인데 member 값 보고 수정해야댐
             router.push("/cart");
         } catch (error) {
             console.error("장바구니 추가 실패");
@@ -46,9 +50,18 @@ export const BookInfo: React.FC<BookInfoProps> = ({ bookId }) => {
 
     return (
         <div className="flex gap-8 my-8">
-            {/* 책 이미지 */}
-            <div className="w-80 h-96 border border-black flex items-center justify-center bg-gray-100">
-                <img src={book.image || "/default-book.png"} alt={book.title} className="w-full h-full object-cover"/>
+            {/* 책 이미지 영역 */}
+            <div className="w-80 h-96 border border-black flex items-center justify-center bg-gray-100 relative">
+                <Image
+                    src={book.coverImage ?? "/default-book.png"}
+                    alt={book.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 768px) 100vw,
+                 (max-width: 1024px) 50vw,
+                 33vw"
+                    priority
+                />
             </div>
 
             {/* 책 정보 */}
@@ -63,15 +76,23 @@ export const BookInfo: React.FC<BookInfoProps> = ({ bookId }) => {
                     <p>정가: {book.originalPrice.toLocaleString()}원</p>
                     <p>판매가: {book.salePrice.toLocaleString()}원</p>
                     <p>배송료: 무료</p>
-                    <p>평점: {book.rating}점 리뷰({book.reviewCount})</p> {/* 평점 평균 & 리뷰 개수 표시 */}
+                    <p>
+                        평점: {book.rating}점 리뷰({book.reviewCount})
+                    </p>
                 </div>
 
                 {/* 장바구니 담기 / 바로구매 버튼 */}
                 <div className="flex gap-4 mt-6">
-                    <button className="px-4 py-2 bg-gray-200 border border-gray-600" onClick={handleAddToCart}>
+                    <button
+                        className="px-4 py-2 bg-gray-200 border border-gray-600"
+                        onClick={handleAddToCart}
+                    >
                         장바구니 담기
                     </button>
-                    <button className="px-4 py-2 bg-gray-200 border border-gray-600" onClick={() => router.push("/cart")}>
+                    <button
+                        className="px-4 py-2 bg-gray-200 border border-gray-600"
+                        onClick={() => router.push("/cart")}
+                    >
                         바로구매
                     </button>
                 </div>

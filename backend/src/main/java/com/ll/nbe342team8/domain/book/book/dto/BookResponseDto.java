@@ -10,6 +10,7 @@ public record BookResponseDto(Long id,
                               float rating,
                               String coverImage,
                               Integer categoryId,
+                              long reviewCount,
                               long salesPoint) {
 
     public static BookResponseDto from(Book book){
@@ -22,6 +23,7 @@ public record BookResponseDto(Long id,
                 book.getRating(),
                 book.getCoverImage(),
                 book.getCategoryId().getCategoryId(),
+                book.getReviewCount(),
                 book.getSalesPoint()
         );
     }
