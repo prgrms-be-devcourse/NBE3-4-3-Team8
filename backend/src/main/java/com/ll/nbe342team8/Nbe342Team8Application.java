@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
+@EnableJpaAuditing
 public class Nbe342Team8Application {
 
     public static void main(String[] args) {
