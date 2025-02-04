@@ -84,4 +84,18 @@ export const removeCartItems = async (memberId, cartItems) => {
     }
 };
 
+// 📌 도서 이름 검색 (fetchSearchBooks)
+export const fetchSearchBooks = async (page = 0, pageSize = 10, sortType = "PUBLISHED_DATE", title) => {
+    try {
+        const response = await api.get(`/books/search`, {
+            params: { page, pageSize, sortType, title },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("도서 검색 중 오류 발생:", error);
+        throw error;
+    }
+};
+
 export default api;
+
