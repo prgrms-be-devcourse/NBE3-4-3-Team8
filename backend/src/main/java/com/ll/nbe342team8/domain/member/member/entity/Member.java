@@ -1,15 +1,7 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
-<<<<<<< HEAD
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
-=======
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ll.nbe342team8.domain.book.book.entity.Book;
-import com.ll.nbe342team8.domain.book.review.entity.Review;
-import com.ll.nbe342team8.domain.cart.entity.Cart;
->>>>>>> dev
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,21 +13,10 @@ import lombok.Setter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 @Entity
 @Getter
-<<<<<<< HEAD
-<<<<<<< HEAD
-@Builder
-=======
 @Setter
->>>>>>> origin/feature-order-search
-=======
 @Builder
->>>>>>> dev
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member extends BaseTime {
@@ -62,7 +43,6 @@ public class Member extends BaseTime {
         ADMIN
     }
 
-<<<<<<< HEAD
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryInformation> deliveryInformations;
 
@@ -84,11 +64,4 @@ public class Member extends BaseTime {
     public void deleteDeliveryInformaiton(Long id) {
         deliveryInformations.removeIf(deliveryInfo -> deliveryInfo.getId().equals(id));
     }
-=======
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<Review> review;
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private Set<Cart> cart;
->>>>>>> dev
 }

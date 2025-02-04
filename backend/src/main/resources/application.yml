@@ -2,32 +2,31 @@ spring:
   profiles:
     active: dev
   datasource:
-<<<<<<< HEAD
+
     url: jdbc:mysql://localhost:3306/test_db
     username: root
-    password: lldj123414
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   output:
     ansi:
       enabled: always #색깔
-=======
+
     url: jdbc:h2:./db_dev;MODE=MySQL
     driver-class-name: org.h2.Driver
     username: sa
     password:
->>>>>>> dev
+
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-<<<<<<< HEAD
+
         format_sql: true
         default_batch_fetch_size: 100
         highlight-sql: true
 
 
-=======
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true  # SQL 쿼리 로그를 출력
   h2:
@@ -36,5 +35,5 @@ spring:
       path: /h2-console  # H2 콘솔 경로 (기본값: /h2-console)
 
 aladin:
-  ttbkey: ttbcameogu1634001
->>>>>>> dev
+  ttbkey:
+

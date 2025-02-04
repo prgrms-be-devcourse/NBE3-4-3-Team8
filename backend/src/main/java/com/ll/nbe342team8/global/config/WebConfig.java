@@ -1,19 +1,11 @@
 package com.ll.nbe342team8.global.config;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> dev
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 요청에 대해
@@ -22,8 +14,4 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*") // 모든 헤더를 허용
                 .allowCredentials(true); // 인증 정보 포함 허용
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dev
