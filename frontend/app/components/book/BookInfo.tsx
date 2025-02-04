@@ -1,81 +1,77 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchBookById, addToCart } from "@/utils/api.js";
 
 interface BookInfoProps {
-    title: string;
-    author: string;
-    publisher: string;
-    originalPrice: number;
-    salePrice: number;
-    rating: number;
-    reviewCount: number;
+    bookId: string;
 }
 
-export const BookInfo: React.FC<BookInfoProps> = ({
-                                                      title,
-                                                      author,
-                                                      publisher,
-                                                      originalPrice,
-                                                      salePrice,
-                                                      rating,
-                                                      reviewCount,
-                                                  }) => {
+export const BookInfo: React.FC<BookInfoProps> = ({ bookId }) => {
     const router = useRouter();
+    const [book, setBook] = useState(null);
 
-    // 장바구니 버튼 클릭 시
-    const handleAddToCart = () => {
-        router.push("/cart");
-    };
+    useEffect(() => {
+        const loadBook = async () => {
+            try {
+                const bookData = await fetchBookById(bookId);
+                console.log("📌 가져온 도서 데이터:", bookData);
 
-    // 바로구매 버튼 클릭 시
-    const handlePurchase = () => {
-        router.push("/cart");
+                // 백엔드에서 가져온 데이터를 변환하여 저장
+                const formattedBook = {
+                    ...bookData,
+                    originalPrice: bookData.price, // price를 originalPrice로 사용
+                    salePrice: bookData.price, // 할인 기능 없으면 동일하게
+                    rating: bookData.reviewCount > 0 ? (bookData.rating / bookData.reviewCount).toFixed(1) : "N/A", // 평점 평균
+                };
+
+                setBook(formattedBook);
+            } catch (error) {
+                console.error("도서 정보를 불러오지 못했습니다.");
+            }
+        };
+        loadBook();
+    }, [bookId]);
+
+    if (!book) return <p>📌 도서 정보를 불러오는 중...</p>;
+
+    const handleAddToCart = async () => {
+        try {
+            await addToCart(book.id, 1, 1);
+            router.push("/cart");
+        } catch (error) {
+            console.error("장바구니 추가 실패");
+        }
     };
 
     return (
         <div className="flex gap-8 my-8">
-            {/* 책 이미지 영역 */}
+            {/* 책 이미지 */}
             <div className="w-80 h-96 border border-black flex items-center justify-center bg-gray-100">
-                Book Image
+                <img src={book.image || "/default-book.png"} alt={book.title} className="w-full h-full object-cover"/>
             </div>
 
-            {/* 책 정보 영역 */}
+            {/* 책 정보 */}
             <div className="flex-1">
-                <div className="border-b border-black pb-4">
-                    <h1 className="text-2xl font-bold mb-2">{title}</h1>
-                    <p className="text-sm text-gray-600">
-                        {author} &gt; {publisher} &gt; 소설
-                    </p>
-                </div>
+                <h1 className="text-2xl font-bold mb-2">{book.title}</h1>
+                <p className="text-sm text-gray-600">
+                    {book.author} &gt; {book.publisher || "출판사 미정"} &gt; 소설
+                </p>
 
-                {/* 가격, 평점, 수량 선택 등 */}
+                {/* 가격 정보 */}
                 <div className="mt-4">
-                    <p>정가: {originalPrice.toLocaleString()}원</p>
-                    <p>
-                        판매가: {salePrice.toLocaleString()}원 (
-                        {(((originalPrice - salePrice) / originalPrice) * 100).toFixed(0)}%
-                        할인)
-                    </p>
+                    <p>정가: {book.originalPrice.toLocaleString()}원</p>
+                    <p>판매가: {book.salePrice.toLocaleString()}원</p>
                     <p>배송료: 무료</p>
-                    <p>
-                        평점: {rating}점 &nbsp; 리뷰({reviewCount})
-                    </p>
-                    {/* 수량 선택 UI는 상황에 맞춰 추가 */}
+                    <p>평점: {book.rating}점 리뷰({book.reviewCount})</p> {/* 평점 평균 & 리뷰 개수 표시 */}
                 </div>
 
                 {/* 장바구니 담기 / 바로구매 버튼 */}
                 <div className="flex gap-4 mt-6">
-                    <button
-                        className="px-4 py-2 bg-gray-200 border border-gray-600"
-                        onClick={handleAddToCart}
-                    >
+                    <button className="px-4 py-2 bg-gray-200 border border-gray-600" onClick={handleAddToCart}>
                         장바구니 담기
                     </button>
-                    <button
-                        className="px-4 py-2 bg-gray-200 border border-gray-600"
-                        onClick={handlePurchase}
-                    >
+                    <button className="px-4 py-2 bg-gray-200 border border-gray-600" onClick={() => router.push("/cart")}>
                         바로구매
                     </button>
                 </div>
