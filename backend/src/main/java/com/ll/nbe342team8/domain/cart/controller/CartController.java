@@ -31,11 +31,9 @@ public class CartController {
     @PostMapping("/{book-id}/{member-id}")
     public void addCart(@PathVariable("book-id") long bookId,
                         @PathVariable("member-id") long memberId,
-                        @RequestParam("quantity") int quantity) {
+                        @RequestBody CartItemRequestDto cartItemRequestDto) {
 
-        CartItemRequestDto cartItemRequestDto = new CartItemRequestDto(bookId, quantity);
         CartRequestDto cartRequestDto = new CartRequestDto(List.of(cartItemRequestDto));
-
         updateCartItems(memberId, cartRequestDto);
     }
 

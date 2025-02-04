@@ -1,29 +1,48 @@
 // components/book/BookInfo.tsx
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import type { Book } from '@/types/book';
 import { addToCart } from '@/utils/api';
+import { getMemberId, isLoggedIn } from '@/utils/auth';
+import { AddToCartButton } from '@/app/components/common/AddToCartButton';
 
 interface BookInfoProps {
   book: Book;
 }
 
 export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
+  const [quantity, setQuantity] = useState(1); // 수량 상태 추가
   const router = useRouter();
+
+  // 수량 변경 핸들러
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (value > 0) {
+      setQuantity(value);
+    }
+  };
 
   const handleAddToCart = async () => {
     try {
-      await addToCart(book.id, 1, 1);
-      router.push('/cart');
+      if (isLoggedIn()) {
+        const memberId = getMemberId();
+        if (!memberId) throw new Error('로그인 정보가 없습니다');
+        await addToCart(book.id, memberId, 1);
+      } else {
+        await addToCart(book.id, 1, 1);
+      }
     } catch (error) {
       console.error('장바구니 추가 실패', error);
+      alert(error instanceof Error ? error.message : '장바구니 추가에 실패했습니다');
     }
   };
 
   const averageRating =
     book.reviewCount > 0 ? (book.rating / book.reviewCount).toFixed(1) : '평점 없음';
+
+  const totalPrice = book.priceSales * quantity;
 
   return (
     <div className="max-w-[800px] mx-auto px-4 py-8">
@@ -63,13 +82,32 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
               평점: {averageRating} ({book.reviewCount}개 리뷰)
             </p>
           </div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="quantity" className="text-sm font-medium">
+                수량
+              </label>
+              <input
+                id="quantity"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={handleQuantityChange}
+                className="w-20 px-2 py-1 border rounded text-center"
+              />
+            </div>
+            <div className="flex-1 text-right">
+              <span className="text-sm text-gray-600">총 상품금액</span>
+              <p className="text-lg font-bold text-red-600">{totalPrice.toLocaleString()}원</p>
+            </div>
+          </div>
           <div className="flex flex-col gap-2">
-            <button
-              className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              onClick={handleAddToCart}
-            >
-              장바구니 담기
-            </button>
+            <AddToCartButton
+              bookId={book.id}
+              memberId={isLoggedIn() ? Number(getMemberId()) : 0}
+              quantity={quantity}
+              className="w-full py-3"
+            />
             <button
               className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600"
               onClick={() => router.push('/cart')}

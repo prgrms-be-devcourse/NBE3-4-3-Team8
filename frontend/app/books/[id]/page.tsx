@@ -5,7 +5,7 @@ import { BookTabs } from '@/app/components/book/BookTabs';
 import type { Book } from '@/types/book';
 
 interface BookDetailPageProps {
-  params: Promise<{ id: string }>; // 1. Promise 타입으로 변경
+  params: Promise<{ id: string }>;
 }
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
