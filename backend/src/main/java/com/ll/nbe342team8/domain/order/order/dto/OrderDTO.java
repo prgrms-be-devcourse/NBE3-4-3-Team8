@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class OrderDTO {
-    private Long memberId;
+    private Long orderId;
     private String orderStatus;
     private long totalPrice;
 }

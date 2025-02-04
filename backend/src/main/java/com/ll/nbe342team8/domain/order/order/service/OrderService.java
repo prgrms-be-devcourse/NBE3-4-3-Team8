@@ -40,7 +40,8 @@ public class OrderService {
 
         // DTO로 변환하여 반환
         return orders.stream()
-                .map(order -> new OrderDTO(order.getMember().getId(),
+                .map(order -> new OrderDTO(
+                        order.getId(),
                         order.getOrderStatus().name(),
                         order.getTotalPrice()))
                 .collect(Collectors.toList());
