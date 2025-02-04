@@ -8,8 +8,9 @@ public record BookResponseDto(Long id,
                               int price,
                               int stock,
                               float rating,
-                              String image,
-                              Integer categoryId) {
+                              String coverImage,
+                              Integer categoryId,
+                              long salesPoint) {
 
     public static BookResponseDto from(Book book){
         return new BookResponseDto(
@@ -20,7 +21,8 @@ public record BookResponseDto(Long id,
                 book.getStock(),
                 book.getRating(),
                 book.getCoverImage(),
-                book.getCategoryId().getCategoryId()
+                book.getCategoryId().getCategoryId(),
+                book.getSalesPoint()
         );
     }
 }

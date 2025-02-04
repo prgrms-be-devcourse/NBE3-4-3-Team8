@@ -7,12 +7,14 @@ import com.ll.nbe342team8.domain.book.book.type.SortType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/books")
 @Tag(name = "Book", description = "Book API")
@@ -27,7 +29,6 @@ public class BookController {
                                              @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType) {
 
         Page<Book> books = bookService.getAllBooks(page, pageSize, sortType);
-
         return books.map(BookResponseDto::from);
     }
 

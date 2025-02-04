@@ -4,7 +4,7 @@ import org.springframework.data.domain.Sort;
 
 public enum SortType {
     PUBLISHED_DATE("pubDate", Sort.Direction.DESC),       // 출간일순
-    SALES_COUNT("salesCount", Sort.Direction.ASC),              // 판매량순
+    SALES_POINT("salesPoint", Sort.Direction.ASC),              // 판매량순
     RATING("rating", Sort.Direction.DESC),                      // 평점순
     REVIEW_COUNT("reviewCount", Sort.Direction.DESC);           // 리뷰 많은순
 
