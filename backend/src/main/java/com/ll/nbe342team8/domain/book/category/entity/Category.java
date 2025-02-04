@@ -1,7 +1,5 @@
 package com.ll.nbe342team8.domain.book.category.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.global.jpa.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
@@ -44,4 +42,6 @@ public class Category extends BaseEntity {
 
     @OneToMany(mappedBy = "categoryId", cascade = CascadeType.ALL)
     private List<Book> books = new ArrayList<>();
+
+    private String category; // 카테고리 종류 ex) 국내도서 > 경제/경영 > 재테크/금융 > 재테크 > 부자되는법
 }

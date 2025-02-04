@@ -1,7 +1,7 @@
 package com.ll.nbe342team8.domain.book.book.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ll.nbe342team8.domain.book.book.dto.BookPatchRequestDto;
 import com.ll.nbe342team8.domain.book.category.entity.Category;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -29,6 +28,9 @@ public class Book extends BaseTime {
 
     @NotNull
     private String author;     // 저자
+
+    @Column(name = "isbn")
+    private String isbn;       // ISBN
 
     @NotNull
     private String isbn13;     // ISBN13
@@ -68,6 +70,7 @@ public class Book extends BaseTime {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
+    @JoinColumn(name = "category_id") // @@@실행 이상하면 지워보기@@@
     private Category categoryId; // 카테고리
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
@@ -82,4 +85,23 @@ public class Book extends BaseTime {
         this.reviewCount--;
         this.rating -= rating;
     }
+
+    public void update(BookPatchRequestDto requestDto) {
+        if (requestDto.getTitle() != null) this.title = requestDto.getTitle();
+        if (requestDto.getAuthor() != null) this.author = requestDto.getAuthor();
+        if (requestDto.getIsbn() != null) this.isbn = requestDto.getIsbn();
+        if (requestDto.getIsbn13() != null) this.isbn13 = requestDto.getIsbn13();
+        if (requestDto.getPubDate() != null) this.pubDate = requestDto.getPubDate();
+        if (requestDto.getPrice() != null) this.price = requestDto.getPrice();
+        if (requestDto.getStock() != null) this.stock = requestDto.getStock();
+        if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
+        if (requestDto.getRating() != null) this.rating = requestDto.getRating();
+        if (requestDto.getToc() != null) this.toc = requestDto.getToc();
+        if (requestDto.getCover() != null) this.cover = requestDto.getCover();
+        if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
+        if (requestDto.getDescriptionImage() != null) this.descriptionImage = requestDto.getDescriptionImage();
+        if (requestDto.getCategoryId() != null) this.categoryId = requestDto.getCategoryId();
+    }
+
+
 }
