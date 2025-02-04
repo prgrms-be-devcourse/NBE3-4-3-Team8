@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -94,7 +95,7 @@ public class BaseInitData {
         );
 
         if (bookService.count() > 0) return;
-        LocalDateTime date = LocalDateTime.of(2024, 12, 1, 0, 0);
+        LocalDate date = LocalDate.of(2024, 1, 1);
 
         for (int i = 1; i <= 30; i++) {
             Category category = Category.builder()
@@ -103,13 +104,15 @@ public class BaseInitData {
             categoryRepository.save(category);
 
             Book book = Book.builder()
-                    .title("title")
-                    .author("author")
-                    .price(10000)
+                    .title("제목")
+                    .author("작가")
+                    .priceStandard(10000)
+                    .pricesSales(9000)
                     .stock(100)
                     .coverImage(coverUrls.get(i-1))
 //                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
+                    .publisher("출판사")
                     .categoryId(category)
                     .build();
 

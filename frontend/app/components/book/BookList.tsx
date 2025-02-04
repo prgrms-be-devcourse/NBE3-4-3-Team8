@@ -5,17 +5,7 @@ import { useRef, useState } from 'react';
 import ArrowButton from '../common/ArrowButton';
 import NoImage from '@/app/components/common/NoImage';
 import { useRouter } from 'next/navigation';
-
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  price: number;
-  stock: number;
-  coverImage: string;
-  pubDate: string;
-  categoryId: number;
-}
+import { Book } from '@/types/book';
 
 interface BookListProps {
   title: string;

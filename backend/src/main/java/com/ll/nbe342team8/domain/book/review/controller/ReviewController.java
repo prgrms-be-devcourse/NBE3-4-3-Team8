@@ -64,8 +64,7 @@ public class ReviewController {
     @Operation(summary = "리뷰 등록")
     public void createReview(@PathVariable("book-id") Long bookId,
                              @PathVariable("member-id") Long memberId,
-                             @RequestParam(name = "content") String content,
-                             @RequestParam(name = "rating") float rating){
+                             @RequestBody Review req){
 
         Book book = bookService.getBookById(bookId);
         Member member = memberService.getMemberById(memberId);
@@ -73,10 +72,10 @@ public class ReviewController {
         Review review = Review.builder()
                 .book(book)
                 .member(member)
-                .content(content)
-                .rating(rating)
+                .content(req.getContent())
+                .rating(req.getRating())
                 .build();
 
-        reviewService.create(review, rating);
+        reviewService.create(review, req.getRating());
     }
 }

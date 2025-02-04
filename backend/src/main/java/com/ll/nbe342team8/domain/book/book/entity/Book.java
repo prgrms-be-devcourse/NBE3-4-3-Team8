@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,10 +34,13 @@ public class Book extends BaseTime {
     private String isbn13;     // ISBN13
 
     @NotNull
-    private LocalDateTime pubDate;      //출판일
+    private LocalDate pubDate;      //출판일
 
     @NotNull
-    private int price;         // 가격
+    private int priceStandard;         // 정가
+
+    @NotNull
+    private int pricesSales;         // 판매가
 
     @NotNull
     private int stock;         // 재고
@@ -58,6 +62,8 @@ public class Book extends BaseTime {
     private long salesPoint;
 
     private long reviewCount;
+
+    private String publisher;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

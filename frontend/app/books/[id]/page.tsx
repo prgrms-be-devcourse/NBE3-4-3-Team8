@@ -1,29 +1,26 @@
+// books/[id]/page.tsx
 import React from 'react';
 import { BookInfo } from '@/app/components/book/BookInfo';
 import { BookTabs } from '@/app/components/book/BookTabs';
+import type { Book } from '@/types/book';
 
 interface BookDetailPageProps {
-    params: {
-        id: string;
-    };
+  params: { id: string };
 }
 
-export default function BookDetailPage({ params }: BookDetailPageProps) {
-    // 실제로는 이 부분에서 params.id를 사용하여 책 데이터를 가져옵니다
-    const bookData = {
-        title: "구체적인 도서 제목",
-        author: "작가명",
-        publisher: "출판사",
-        originalPrice: 50000,
-        salePrice: 45000,
-        rating: 0,
-        reviewCount: 0
-    };
+export default async function BookDetailPage({ params }: BookDetailPageProps) {
+  const response = await fetch(`http://localhost:8080/books/${params.id}`, {
+    cache: 'no-store',
+  });
 
-    return (
-        <div className="min-h-screen bg-white">
-            <BookInfo {...bookData} />
-            <BookTabs />
-        </div>
-    );
+  if (!response.ok) throw new Error('도서 정보를 불러오지 못했습니다');
+
+  const bookData: Book = await response.json();
+
+  return (
+    <div className="min-h-screen bg-white">
+      <BookInfo book={bookData} />
+      <BookTabs bookId={bookData.id} />
+    </div>
+  );
 }

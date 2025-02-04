@@ -3,6 +3,7 @@ import React from 'react';
 import Banner from './components/Banner';
 import BookList from './components/book/BookList';
 import { useEffect, useState } from 'react';
+import { Book } from '@/types/book';
 
 interface PageResponse<T> {
   content: T[];
