@@ -17,7 +17,8 @@ public record BookResponseDto(Long id,
                               float rating,
                               long reviewCount,
                               String coverImage,
-                              Integer categoryId) {
+                              Integer categoryId,
+                              String description) {
 
     public static BookResponseDto from(Book book){
         return new BookResponseDto(
@@ -33,7 +34,8 @@ public record BookResponseDto(Long id,
                 book.getRating(),
                 book.getReviewCount(),
                 book.getCoverImage(),
-                book.getCategoryId().getCategoryId()
+                book.getCategoryId().getCategoryId(),
+                book.getDescription()
         );
     }
 }

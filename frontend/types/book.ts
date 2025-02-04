@@ -12,4 +12,5 @@ export interface Book {
   rating: number;
   reviewCount: number;
   publisher: string;
+  description: string;
 }

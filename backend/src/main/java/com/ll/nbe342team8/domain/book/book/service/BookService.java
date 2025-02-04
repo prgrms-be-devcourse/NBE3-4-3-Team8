@@ -53,4 +53,12 @@ public class BookService {
         book.deleteReview(rating);
         return bookRepository.save(book);
     }
+
+    public Page<Book> searchBooks(int page, int pageSize, SortType sortType, String title){
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(sortType.getOrder());
+
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
+        return bookRepository.findBooksByTitleContaining(title, pageable);
+    }
 }

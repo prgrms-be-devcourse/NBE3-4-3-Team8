@@ -7,14 +7,14 @@ export default function NavBar() {
     const [searchText, setSearchText] = useState('');
 
     const handleSearch = () => {
-        // 검색 버튼 클릭 시 검색 결과 페이지로 이동
-        router.push('/search');
+        // 검색 버튼 클릭 시 /search?title=검색어 로 이동
+        router.push(`/search?title=${encodeURIComponent(searchText)}`);
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            // 엔터 시 검색 결과 페이지로 이동
-            router.push('/search');
+            // 엔터 시 /search?title=검색어 로 이동
+            router.push(`/search?title=${encodeURIComponent(searchText)}`);
         }
     };
 

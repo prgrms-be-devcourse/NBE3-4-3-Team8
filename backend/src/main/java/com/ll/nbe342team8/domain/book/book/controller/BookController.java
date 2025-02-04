@@ -11,9 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @RestController
 @RequestMapping("/books")
@@ -37,5 +34,21 @@ public class BookController {
     public BookResponseDto getBookById(@PathVariable("book-id") long bookId) {
         Book book = bookService.getBookById(bookId);
         return BookResponseDto.from(book);
+    }
+
+    @Operation(summary = "특정 도서 댓글 조회")
+    @GetMapping("/{book-id}/review")
+    public void getBookReview(@PathVariable("book-id") long bookId) {
+
+    }
+
+    @Operation(summary = "도서 이름 검색")
+    @GetMapping("/search")
+    public Page<BookResponseDto> searchBooks(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int pageSize,
+                                             @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType,
+                                             @RequestParam String title){
+        Page<Book> books = bookService.searchBooks(page, pageSize, sortType, title);
+        return books.map(BookResponseDto::from);
     }
 }

@@ -1,70 +1,54 @@
-import React from 'react';
-import BookList from '../components/BookList';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import SearchResultItem from "./components/SearchResultItem";
+import { fetchSearchBooks } from "@/utils/api.js";
+
+interface Book {
+    id: number;
+    title: string;
+    price: number;
+    coverImage: string;
+    description: string;
+}
 
 export default function SearchPage() {
-    // 예시용 하드코딩된 데이터
-    const dummyBooks = [
-        {
-            id: 1,
-            title: '도서 제목 예시',
-            author: '저자',
-            publisher: '출판사',
-            originalPrice: 50000,
-            salePrice: 45000,
-            rating: 0.0,
-            reviewCount: 0,
-        },
-        {
-            id: 2,
-            title: '다른 도서 제목',
-            author: '저자',
-            publisher: '출판사',
-            originalPrice: 20000,
-            salePrice: 18000,
-            rating: 4.5,
-            reviewCount: 12,
-        },
-        {
-            id: 3,
-            title: '또 다른 도서',
-            author: '저자',
-            publisher: '출판사',
-            originalPrice: 30000,
-            salePrice: 27000,
-            rating: 3.8,
-            reviewCount: 5,
-        },
-    ];
+    // URL 쿼리 파라미터에서 title 값을 읽어옴 (예: /books/search?title=김한민)
+    const searchParams = useSearchParams();
+    const titleParam = searchParams.get("title") || "";
+    const [books, setBooks] = useState<Book[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!titleParam) return;
+
+        const fetchBooks = async () => {
+            try {
+                // 백엔드 API 호출 (GET /books/search?title=검색어)
+                const data = await fetchSearchBooks(0, 10, "PUBLISHED_DATE", titleParam);
+                // 백엔드 응답이 페이지네이션 형태(content 필드가 있을 경우)
+                setBooks(data.content || data);
+            } catch (error) {
+                console.error("도서 검색 중 오류 발생:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBooks();
+    }, [titleParam]);
+
+    if (loading) return <p>검색 결과 로딩 중...</p>;
+    if (!books.length) return <p>검색 결과가 없습니다.</p>;
 
     return (
-        <div className="py-8">
-            <h2 className="text-xl font-bold mb-6">
-                &apos;검색어&apos;에 대한 {dummyBooks.length}개의 검색결과
-            </h2>
-
-            {/* 정렬/필터/페이지네이션 등을 위한 영역 (간단히 예시) */}
-            <div className="flex gap-4 mb-4">
-                <select className="border border-gray-300 rounded px-2 py-1">
-                    <option>인기순</option>
-                    <option>평점순</option>
-                    <option>최신순</option>
-                </select>
-                <select className="border border-gray-300 rounded px-2 py-1">
-                    <option>20개씩 보기</option>
-                    <option>40개씩 보기</option>
-                </select>
-            </div>
-
-            {/* 실제 도서 목록 */}
-            <BookList books={dummyBooks} />
-
-            {/* 페이지네이션 UI 예시 */}
-            <div className="flex justify-center mt-8 gap-2">
-                <button className="px-3 py-1 border border-gray-300 rounded">1</button>
-                <button className="px-3 py-1 border border-gray-300 rounded">2</button>
-                <button className="px-3 py-1 border border-gray-300 rounded">3</button>
-                {/* ... */}
-                <button className="px-3 py-1 border border-gray-300 rounded">10</button>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+            <h1 className="text-2xl font-bold mb-6">검색 결과: "{titleParam}"</h1>
+            <div className="space-y-6">
+                {books.map((book) => (
+                    <SearchResultItem key={book.id} book={book} />
+                ))}
             </div>
         </div>
     );

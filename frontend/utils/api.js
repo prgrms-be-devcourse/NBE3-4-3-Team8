@@ -58,4 +58,44 @@ export const fetchCart = async (memberId) => {
     }
 };
 
+// 장바구니 아이템(수량) 업데이트
+export const updateCartItem = async (bookId, memberId, quantity) => {
+    try {
+        // PUT /cart/{book-id}/{member-id}?quantity=xxx
+        await api.put(`/cart/${bookId}/${memberId}`, null, {
+            params: { quantity },
+        });
+    } catch (error) {
+        console.error('장바구니 수량 변경 중 오류 발생:', error);
+        throw error;
+    }
+};
+
+// 장바구니 아이템 삭제
+export const removeCartItems = async (memberId, cartItems) => {
+    // DELETE /cart/{member-id}, body: { cartItems: [ { bookId, quantity }, ... ] }
+    try {
+        await api.delete(`/cart/${memberId}`, {
+            data: { cartItems },
+        });
+    } catch (error) {
+        console.error('장바구니 아이템 삭제 중 오류 발생:', error);
+        throw error;
+    }
+};
+
+// 📌 도서 이름 검색 (fetchSearchBooks)
+export const fetchSearchBooks = async (page = 0, pageSize = 10, sortType = "PUBLISHED_DATE", title) => {
+    try {
+        const response = await api.get(`/books/search`, {
+            params: { page, pageSize, sortType, title },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("도서 검색 중 오류 발생:", error);
+        throw error;
+    }
+};
+
 export default api;
+
