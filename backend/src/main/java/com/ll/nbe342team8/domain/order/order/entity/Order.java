@@ -1,3 +1,4 @@
+
 package com.ll.nbe342team8.domain.order.order.entity;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
@@ -20,12 +21,12 @@ public class Order extends BaseTime {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
-    private OrderType orderType;
+    private OrderStatus orderStatus;
 
     @Column(name = "total_price")
     private long totalPrice;
 
-    public enum OrderType{
+    public enum OrderStatus{
         ORDERED,
         DELIVERY,
         COMPLETE
