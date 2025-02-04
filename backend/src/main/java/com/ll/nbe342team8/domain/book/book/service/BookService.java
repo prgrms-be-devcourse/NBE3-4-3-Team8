@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +83,23 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    private Book mapToEntity(ExternalBookDto dto) {
+        return Book.builder()
+                .title(dto.getTitle())
+                .author(dto.getAuthor())
+                .isbn(dto.getIsbn())
+                .isbn13(dto.getIsbn13())
+                .pubDate(LocalDate.parse(dto.getPubDate()))
+                .priceStandard(dto.getPriceStandard())
+                .pricesSales(dto.getPriceSales())
+                .toc(dto.getToc())
+                .coverImage(dto.getCover())
+                .description(dto.getDescription())
+                .descriptionImage(dto.getDescriptionImage())
+                .categoryId(dto.getCategoryId())
+                .build();
+    }
+
     // 도서 정보 수정
     @Transactional
     public BookResponseDto updateBookPart(Long bookId, BookPatchRequestDto requestDto) {
@@ -90,6 +108,6 @@ public class BookService {
 
         book.update(requestDto); // DTO 에서 null 이 아닌 값만 업데이트
 
-        return BookResponseDto.fromEntity(book);
+        return BookResponseDto.from(book);
     }
 }

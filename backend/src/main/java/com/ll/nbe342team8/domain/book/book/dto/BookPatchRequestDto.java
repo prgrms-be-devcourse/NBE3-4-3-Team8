@@ -23,7 +23,10 @@ public class BookPatchRequestDto {
     private LocalDate pubDate;
 
     @Min(value = 0, message = "가격은 0 이상이어야 합니다.")
-    private Integer price;
+    private Integer priceStandard;
+
+    @Min(value = 0, message = "가격은 0 이상이어야 합니다.")
+    private Integer priceSales;
 
     @Min(value = 0, message = "재고는 0 이상이어야 합니다.")
     private Integer stock;

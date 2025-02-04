@@ -30,15 +30,15 @@ public class Category extends BaseEntity {
     private String mall;
 
     @NotNull
-    private String Depth1;
+    private String depth1;
 
-    private String Depth2;
+    private String depth2;
 
-    private String Depth3;
+    private String depth3;
 
-    private String Depth4;
+    private String depth4;
 
-    private String Depth5;
+    private String depth5;
 
     @OneToMany(mappedBy = "categoryId", cascade = CascadeType.ALL)
     private List<Book> books = new ArrayList<>();

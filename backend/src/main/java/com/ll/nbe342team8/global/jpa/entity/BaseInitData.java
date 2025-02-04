@@ -100,6 +100,9 @@ public class BaseInitData {
         for (int i = 1; i <= 30; i++) {
             Category category = Category.builder()
                     .categoryId(0)
+                    .categoryName("카테고리1")
+                    .mall("국내도서")
+                    .depth1("경영/경제")
                     .build();
             categoryRepository.save(category);
 
@@ -114,6 +117,7 @@ public class BaseInitData {
                     .pubDate(date.plusDays(i))
                     .publisher("출판사")
                     .categoryId(category)
+                    .isbn13("isbn13")
                     .build();
 
             bookService.create(book);

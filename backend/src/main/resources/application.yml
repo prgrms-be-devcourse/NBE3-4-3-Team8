@@ -15,3 +15,6 @@ spring:
     console:
       enabled: true  # H2 콘솔 활성화
       path: /h2-console  # H2 콘솔 경로 (기본값: /h2-console)
+
+aladin:
+  ttbkey: ttbcameogu1634001

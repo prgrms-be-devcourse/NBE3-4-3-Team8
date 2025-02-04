@@ -92,12 +92,13 @@ public class Book extends BaseTime {
         if (requestDto.getIsbn() != null) this.isbn = requestDto.getIsbn();
         if (requestDto.getIsbn13() != null) this.isbn13 = requestDto.getIsbn13();
         if (requestDto.getPubDate() != null) this.pubDate = requestDto.getPubDate();
-        if (requestDto.getPrice() != null) this.price = requestDto.getPrice();
+        if (requestDto.getPriceStandard() != null) this.priceStandard = requestDto.getPriceStandard();
+        if (requestDto.getPriceSales() != null) this.pricesSales = requestDto.getPriceSales();
         if (requestDto.getStock() != null) this.stock = requestDto.getStock();
         if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
         if (requestDto.getRating() != null) this.rating = requestDto.getRating();
         if (requestDto.getToc() != null) this.toc = requestDto.getToc();
-        if (requestDto.getCover() != null) this.cover = requestDto.getCover();
+        if (requestDto.getCover() != null) this.coverImage = requestDto.getCover();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getDescriptionImage() != null) this.descriptionImage = requestDto.getDescriptionImage();
         if (requestDto.getCategoryId() != null) this.categoryId = requestDto.getCategoryId();
