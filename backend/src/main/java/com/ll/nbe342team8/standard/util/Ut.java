@@ -2,7 +2,7 @@ package com.ll.nbe342team8.standard.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-
+import org.springframework.beans.factory.annotation.Value;
 
 
 public class Ut {
@@ -20,5 +20,13 @@ public class Ut {
         public static String toString(Object obj) {
             return om.writeValueAsString(obj);
         }
+    }
+
+    public static class Kakao {
+
+        @Value("${spring.kakao.auth.client}")
+        public static String client;
+        @Value("${spring.kakao.auth.redirect}")
+        public static String redirect;
     }
 }
