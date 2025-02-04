@@ -8,45 +8,49 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class BookResponseDto {
-    private Long id;
-    private String title;
-    private String author;
-    private String isbn;
-    private String isbn13;
-    private LocalDate pubDate;
-    private int price;
-    private int stock;
-    private int status;
-    private float rating;
-    private String toc;
-    private String cover;
-    private String description;
-    private String descriptionImage;
-    private Category categoryId;
+public record BookResponseDto(Long id,
+                              String title,
+                              String author,
+                              String isbn,
+                              String isbn13,
+                              String publisher,
+                              LocalDate pubDate,
+                              int priceStandard,
+                              int priceSales,
+                              long salesPoint,
+                              int stock,
+                              int status,
+                              float rating,
+                              String toc,
+                              long reviewCount,
+                              String coverImage,
+                              Integer categoryId,
+                              String description,
+                              String descriptionImage) {
 
-    public static BookResponseDto fromEntity(Book book) {
-        return BookResponseDto.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .author(book.getAuthor())
-                .isbn(book.getIsbn())
-                .isbn13(book.getIsbn13())
-                .pubDate(book.getPubDate())
-                .price(book.getPrice())
-                .stock(book.getStock())
-                .status(book.getStatus())
-                .rating(book.getRating())
-                .toc(book.getToc())
-                .cover(book.getCover())
-                .description(book.getDescription())
-                .descriptionImage(book.getDescriptionImage())
-                .categoryId(book.getCategoryId())
-                .build();
+    public static BookResponseDto from(Book book){
+        return new BookResponseDto(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getIsbn(),
+                book.getIsbn13(),
+                book.getPublisher(),
+                book.getPubDate(),
+                book.getPriceStandard(),
+                book.getPricesSales(),
+                book.getSalesPoint(),
+                book.getStock(),
+                book.getStatus(),
+                book.getRating(),
+                book.getToc(),
+                book.getReviewCount(),
+                book.getCoverImage(),
+                book.getCategoryId().getCategoryId(),
+                book.getDescription(),
+                book.getDescriptionImage()
+        );
     }
 }

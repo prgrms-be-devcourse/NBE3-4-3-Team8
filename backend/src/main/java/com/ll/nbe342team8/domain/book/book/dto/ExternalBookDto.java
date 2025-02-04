@@ -18,7 +18,8 @@ public class ExternalBookDto {
     private String pubDate;           // 출판일
     private String isbn;              // ISBN
     private String isbn13;            // ISBN13
-    private int price;                // 가격
+    private int priceStandard;        // 정가
+    private int priceSales;           // 판매가
     private String toc;               // 목차
     private String cover;             // 커버 이미지 URL
     private String description;       // 상세 설명
