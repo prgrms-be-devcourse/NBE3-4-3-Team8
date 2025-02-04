@@ -38,10 +38,4 @@ public class BookController {
         Book book = bookService.getBookById(bookId);
         return BookResponseDto.from(book);
     }
-
-    @Operation(summary = "특정 도서 댓글 조회")
-    @GetMapping("/{book-id}/review")
-    public void getBookReview(@PathVariable("book-id") long bookId) {
-
-    }
 }

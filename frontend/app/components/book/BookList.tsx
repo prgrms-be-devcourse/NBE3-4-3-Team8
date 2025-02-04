@@ -23,10 +23,11 @@ interface BookListProps {
 }
 
 export default function BookList({ title, books }: BookListProps) {
-  const router = useRouter(); // 추가
+  const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
   const [showRightButton, setShowRightButton] = useState(true);
+  const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({});
 
   const handleScroll = () => {
     if (scrollRef.current) {
@@ -50,6 +51,22 @@ export default function BookList({ title, books }: BookListProps) {
     router.push(`/books/${bookId}`);
   };
 
+  const handleImageError = (bookId: number) => {
+    setImageErrors((prev) => ({
+      ...prev,
+      [bookId]: true,
+    }));
+  };
+
+  const isValidImageUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="w-full py-8">
       <h2 className="text-2xl font-bold mb-6 px-4">{title}</h2>
@@ -67,7 +84,7 @@ export default function BookList({ title, books }: BookListProps) {
               onClick={() => handleBookClick(book.id)}
             >
               <div className="relative w-full aspect-[3/4.5]">
-                {book.coverImage ? (
+                {book.coverImage && isValidImageUrl(book.coverImage) && !imageErrors[book.id] ? (
                   <Image
                     src={book.coverImage}
                     alt={book.title}
@@ -75,6 +92,7 @@ export default function BookList({ title, books }: BookListProps) {
                     sizes="240px"
                     className="rounded object-cover"
                     priority
+                    onError={() => handleImageError(book.id)}
                   />
                 ) : (
                   <NoImage />

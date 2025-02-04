@@ -108,6 +108,7 @@ public class BaseInitData {
                     .price(10000)
                     .stock(100)
                     .coverImage(coverUrls.get(i-1))
+//                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
                     .categoryId(category)
                     .build();
