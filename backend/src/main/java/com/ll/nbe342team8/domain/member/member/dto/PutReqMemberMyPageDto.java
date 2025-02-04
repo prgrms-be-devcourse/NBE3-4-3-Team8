@@ -1,30 +1,28 @@
 package com.ll.nbe342team8.domain.member.member.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
-import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
-import com.ll.nbe342team8.domain.member.member.entity.Member;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PutReqMemberMyPageDto {
 
-    @NotBlank
+    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9 ]+$", message = "이름에는 특수문자를 포함할 수 없습니다.")
     @JsonProperty("name")
     String name;
 
 
+    @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "휴대폰 번호 형식이 올바르지 않습니다. (010-XXXX-XXXX)")
+    @NotBlank(message = "공백은 허용하지 않습니다.")
     @JsonProperty("phoneNumber")
     String phoneNumber;
 

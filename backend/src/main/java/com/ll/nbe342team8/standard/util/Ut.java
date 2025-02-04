@@ -2,7 +2,7 @@ package com.ll.nbe342team8.standard.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.text.StringEscapeUtils;
 
 
 public class Ut {
@@ -22,11 +22,9 @@ public class Ut {
         }
     }
 
-    public static class Kakao {
-
-        @Value("${spring.kakao.auth.client}")
-        public static String client;
-        @Value("${spring.kakao.auth.redirect}")
-        public static String redirect;
+    public static class XSSSanitizer {
+        public static String sanitize(String input) {
+            return StringEscapeUtils.escapeHtml4(input);
+        }
     }
 }

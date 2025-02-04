@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.member.deliveryInformation.controller;
 
+import com.ll.nbe342team8.domain.member.deliveryInformation.dto.ReqDeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.deliveryInformation.service.DeliveryInformationService;
 import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
@@ -24,7 +25,7 @@ public class DeliveryInformationController {
     // 배송 정보 등록. 5개 까지 등록 할 수 있으며 한번에 하나씩 등록한다.
     // 등록할 배송 정보인 DeliveryInformationDto를 매개변수로 받는다.
     @PostMapping("/my/deliveryInformation")
-    public ResponseEntity<?> postDeliveryInformation(@RequestBody @Valid DeliveryInformationDto deliveryInformationDto
+    public ResponseEntity<?> postDeliveryInformation(@RequestBody @Valid ReqDeliveryInformationDto reqDeliveryInformationDto
             ) {
 
         //jwt 토큰에서 id를 통해 회원정보를 찾는다.
@@ -42,7 +43,7 @@ public class DeliveryInformationController {
         if(member.getDeliveryInformations().size() >=5) { throw new ServiceException(400,"배송지는 5개까지 설정할수있습니다."); }
 
         //사용자 개체의 배송 정보 리스트에 배송 정보 추가
-        deliveryInformationService.addDeliveryInformation(member,deliveryInformationDto);
+        deliveryInformationService.addDeliveryInformation(member,reqDeliveryInformationDto);
 
         //갱신된 사용자 개체를 dto로 변환해 반환한다. 프론트에선 반환 받는 memberDto로 마이페이지 갱신
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
@@ -75,7 +76,7 @@ public class DeliveryInformationController {
     //등록해논 배송 정보를 갱신한다. 하나씩 갱신 가능하며 배송 정보 id를 매개변수로 받는다.
     @PutMapping("/my/deliveryInformation/{id}")
     public ResponseEntity<?> putDeliveryInformation(@PathVariable(name = "id") Long id
-                                                    , @RequestBody @Valid DeliveryInformationDto deliveryInformationDto) {
+                                                    , @RequestBody @Valid ReqDeliveryInformationDto reqDeliveryInformationDto) {
 
         //jwt 토큰에서 id를 통해 회원정보를 찾는다.
         //여기선 임시로 이메일을 통해 회원정보를 찾는다.
@@ -93,7 +94,7 @@ public class DeliveryInformationController {
         if(optionalDeliveryInformation.isEmpty()) { throw new ServiceException(404,"배송지를 찾을 수 없습니다.");}
 
         //배송 정보와 기본 배송지 설정을 갱신한다.
-        deliveryInformationService.modifyDeliveryInformation(optionalDeliveryInformation.get(),deliveryInformationDto,member);
+        deliveryInformationService.modifyDeliveryInformation(optionalDeliveryInformation.get(),reqDeliveryInformationDto,member);
 
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
 

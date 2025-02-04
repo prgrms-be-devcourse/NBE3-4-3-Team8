@@ -15,3 +15,7 @@ export interface MemberMyPageDto {
     phoneNumber: string;
     deliveryInformationDtos: DeliveryInformationDto[];
   }
+
+  export interface errorDto {
+    message : string;
+  }

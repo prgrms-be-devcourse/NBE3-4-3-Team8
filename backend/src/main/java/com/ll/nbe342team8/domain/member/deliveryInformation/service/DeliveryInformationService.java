@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.member.deliveryInformation.service;
 
+import com.ll.nbe342team8.domain.member.deliveryInformation.dto.ReqDeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.deliveryInformation.repository.DeliveryInformationRepository;
@@ -17,7 +18,7 @@ public class DeliveryInformationService {
     private final DeliveryInformationRepository deliveryInformationRepository;
 
     @Transactional
-    public void addDeliveryInformation(Member member, DeliveryInformationDto dto) {
+    public void addDeliveryInformation(Member member, ReqDeliveryInformationDto dto) {
 
         //dto 데이터를 가져와 새로운 배송 정보 개체생성
         DeliveryInformation deliveryInformation=new DeliveryInformation(dto,member);
@@ -37,7 +38,7 @@ public class DeliveryInformationService {
     }
 
     @Transactional
-    public void modifyDeliveryInformation(DeliveryInformation deliveryInformation,DeliveryInformationDto dto,Member member) {
+    public void modifyDeliveryInformation(DeliveryInformation deliveryInformation,ReqDeliveryInformationDto dto,Member member) {
         //기본 배송지 설정을 결정하는 dto의 isDefaultAddress 가 true인 경우 member의 deliveryinformation 데이터 들의
         //isDefaultAddress 값을 모두 false로 만든 후 deliveryInformation을 갱신 -> 언제나 기본 배송지 1개로 유지 가능하다.
         //dto의 isDefaultAddress가 false인 경우 그냥 데이터 갱신한다.

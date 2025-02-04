@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.member.deliveryInformation.entity;
 
 import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
+import com.ll.nbe342team8.domain.member.deliveryInformation.dto.ReqDeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.Entity;
@@ -31,23 +32,23 @@ public class DeliveryInformation extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public DeliveryInformation(DeliveryInformationDto deliveryInformationDto,Member member) {
-        this.addressName=deliveryInformationDto.getAddressName();
-        this.postCode=deliveryInformationDto.getPostCode();
-        this.detailAddress=deliveryInformationDto.getDetailAddress();
-        this.isDefaultAddress=deliveryInformationDto.getIsDefaultAddress();
-        this.recipient=deliveryInformationDto.getRecipient();
-        this.phone=deliveryInformationDto.getPhone();
+    public DeliveryInformation(ReqDeliveryInformationDto dto, Member member) {
+        this.addressName=dto.getAddressName();
+        this.postCode=dto.getPostCode();
+        this.detailAddress=dto.getDetailAddress();
+        this.isDefaultAddress=dto.getIsDefaultAddress();
+        this.recipient=dto.getRecipient();
+        this.phone=dto.getPhone();
         this.member=member;
     }
 
-    public void updateDeliveryInfo(DeliveryInformationDto dto) {
-        if (dto.getAddressName() != null) this.addressName = dto.getAddressName();
-        if (dto.getPostCode() != null) this.postCode = dto.getPostCode();
-        if (dto.getDetailAddress() != null) this.detailAddress = dto.getDetailAddress();
-        if (dto.getRecipient() != null) this.recipient = dto.getRecipient();
-        if (dto.getPhone() != null) this.phone = dto.getPhone();
-        if (dto.getIsDefaultAddress() !=null) this.isDefaultAddress=dto.getIsDefaultAddress();
+    public void updateDeliveryInfo(ReqDeliveryInformationDto dto) {
+        this.addressName = dto.getAddressName();
+        this.postCode = dto.getPostCode();
+        this.detailAddress = dto.getDetailAddress();
+        this.recipient = dto.getRecipient();
+        this.phone = dto.getPhone();
+        this.isDefaultAddress=dto.getIsDefaultAddress();
 
     }
 

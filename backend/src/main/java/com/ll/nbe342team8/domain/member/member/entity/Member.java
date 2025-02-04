@@ -46,8 +46,8 @@ public class Member extends BaseTime {
 
 
     public void updateMemberInfo(PutReqMemberMyPageDto dto) {
-        if (dto.getName() != null) this.name = dto.getName();
-        if (dto.getPhoneNumber() != null) this.phoneNumber = dto.getPhoneNumber();
+        this.name = dto.getName();
+        this.phoneNumber = dto.getPhoneNumber();
 
     }
 

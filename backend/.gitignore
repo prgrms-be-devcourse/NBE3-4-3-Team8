@@ -35,3 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### private project file
+src/main/java/com/ll/nbe342team8/domain/member/member/controller/AuthController.java
+src/main/java/com/ll/nbe342team8/domain/member/member/service/AuthService.java
+src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoAccount.java
+src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoProfile.java
+src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoTokenResponse.java
+src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoUserProperties.java
+src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoUserResponse.java
