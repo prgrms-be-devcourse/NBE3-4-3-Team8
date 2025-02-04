@@ -3,6 +3,7 @@ package com.ll.nbe342team8.domain.member.deliveryInformation.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,22 +20,18 @@ public class ReqDeliveryInformationDto {
     Long id;
 
     @NotBlank(message = "공백은 허용하지 않습니다.")
-    @Pattern(regexp = "^[가-힣a-zA-Z0-9 ]+$", message = "특수문자를 포함할 수 없습니다.")
     @JsonProperty("addressName")
     String addressName;
 
     @NotBlank(message = "공백은 허용하지 않습니다.")
-    @Pattern(regexp = "^[가-힣a-zA-Z0-9 ]+$", message = "특수문자를 포함할 수 없습니다.")
     @JsonProperty("postCode")
     String postCode;
 
     @NotBlank(message = "공백은 허용하지 않습니다.")
-    @Pattern(regexp = "^[가-힣a-zA-Z0-9 ]+$", message = "특수문자를 포함할 수 없습니다.")
     @JsonProperty("detailAddress")
     String detailAddress;
 
     @NotBlank(message = "공백은 허용하지 않습니다.")
-    @Pattern(regexp = "^[가-힣a-zA-Z0-9 ]+$", message = "특수문자를 포함할 수 없습니다.")
     @JsonProperty("recipient")
     String recipient;
 
@@ -43,7 +40,7 @@ public class ReqDeliveryInformationDto {
     @JsonProperty("phone")
     String phone;
 
-    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @NotNull
     @JsonProperty("isDefaultAddress")
     Boolean isDefaultAddress;
 
