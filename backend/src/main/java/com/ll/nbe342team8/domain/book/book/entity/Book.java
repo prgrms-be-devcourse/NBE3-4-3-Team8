@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.book.book.entity;
 
+import com.ll.nbe342team8.domain.book.book.dto.BookPatchRequestDto;
 import com.ll.nbe342team8.domain.book.category.entity.Category;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
@@ -57,8 +58,25 @@ public class Book extends BaseTime {
     private String descriptionImage;      // 상세페이지 이미지 URL
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Category category; // 카테고리
     @JoinColumn(name = "category_id")
     private Category categoryId; // 카테고리
+
+    public void update(BookPatchRequestDto requestDto) {
+        if (requestDto.getTitle() != null) this.title = requestDto.getTitle();
+        if (requestDto.getAuthor() != null) this.author = requestDto.getAuthor();
+        if (requestDto.getIsbn() != null) this.isbn = requestDto.getIsbn();
+        if (requestDto.getIsbn13() != null) this.isbn13 = requestDto.getIsbn13();
+        if (requestDto.getPubDate() != null) this.pubDate = requestDto.getPubDate();
+        if (requestDto.getPrice() != null) this.price = requestDto.getPrice();
+        if (requestDto.getStock() != null) this.stock = requestDto.getStock();
+        if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
+        if (requestDto.getRating() != null) this.rating = requestDto.getRating();
+        if (requestDto.getToc() != null) this.toc = requestDto.getToc();
+        if (requestDto.getCover() != null) this.cover = requestDto.getCover();
+        if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
+        if (requestDto.getDescriptionImage() != null) this.descriptionImage = requestDto.getDescriptionImage();
+        if (requestDto.getCategoryId() != null) this.categoryId = requestDto.getCategoryId();
+    }
+
 
 }

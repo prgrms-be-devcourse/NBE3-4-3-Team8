@@ -1,8 +1,11 @@
 package com.ll.nbe342team8.domain.book.book.service;
 
+import com.ll.nbe342team8.domain.book.book.dto.BookPatchRequestDto;
+import com.ll.nbe342team8.domain.book.book.dto.BookResponseDto;
 import com.ll.nbe342team8.domain.book.book.dto.ExternalBookDto;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.repository.BookRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,17 @@ public class BookService {
                 .descriptionImage(dto.getDescriptionImage())
                 .categoryId(dto.getCategoryId())
                 .build();
+    }
+
+    // 도서 정보 수정
+    @Transactional
+    public BookResponseDto updateBookPart(Long bookId, BookPatchRequestDto requestDto) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("책을 찾을 수 없습니다."));
+
+        book.update(requestDto); // DTO 에서 null 이 아닌 값만 업데이트
+
+        return BookResponseDto.fromEntity(book);
     }
 
 }
