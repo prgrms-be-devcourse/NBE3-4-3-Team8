@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import type { Book } from '@/types/book';
 import { addToCart } from '@/utils/api';
+import StarRating from "@/app/search/components/StarRating";
 
 interface BookInfoProps {
   book: Book;
@@ -62,10 +63,13 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
             <p className="mt-2">
               평점: {averageRating} ({book.reviewCount}개 리뷰)
             </p>
+            <p>
+              <StarRating rating={book.averageRating ? book.averageRating : 0}/>
+            </p>
           </div>
           <div className="flex flex-col gap-2">
             <button
-              className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               onClick={handleAddToCart}
             >
               장바구니 담기
