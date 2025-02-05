@@ -47,7 +47,7 @@ public class CartService {
     }
 
     private Cart findCartByBook(Member member, Long bookId) {
-        for (Cart cart : member.getCart()) {
+        for (Cart cart : member.getCarts()) {
             if (cart.getBook().getId().equals(bookId)) {
                 return cart;
             }
@@ -59,7 +59,7 @@ public class CartService {
 
         cartRequestDto.cartItems()
                 .forEach(cartItemRequestDto -> {
-                    Cart cartItem = member.getCart().stream()
+                    Cart cartItem = member.getCarts().stream()
                             .filter(cart -> cart.getBook().getId().equals(cartItemRequestDto.bookId()))
                             .findFirst()
                             .orElseThrow(() -> new IllegalArgumentException("장바구니에 없음"));
