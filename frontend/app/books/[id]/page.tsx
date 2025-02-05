@@ -5,11 +5,12 @@ import { BookTabs } from '@/app/components/book/BookTabs';
 import type { Book } from '@/types/book';
 
 interface BookDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>; // 1. Promise 타입으로 변경
 }
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
-  const response = await fetch(`http://localhost:8080/books/${params.id}`, {
+  const { id } = await params; // 2. params await 처리
+  const response = await fetch(`http://localhost:8080/books/${id}`, {
     cache: 'no-store',
   });
 
