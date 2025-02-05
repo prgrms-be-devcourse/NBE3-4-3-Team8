@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -51,6 +52,9 @@ public class Book extends BaseTime {
     private int status;         // 판매 상태
 
     private float rating;      // 평점
+
+    @Formula("CASE WHEN review_count = 0 THEN 0 ELSE rating / review_count END")
+    private float averageRating;        //평균 평점
 
     private String toc;        // 목차
 

@@ -61,10 +61,17 @@ public class BookService {
     }
 
     public Page<Book> searchBooks(int page, int pageSize, SortType sortType, String title) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(sortType.getOrder());
-
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
+        Pageable pageable;
+        // 출간일을 보조 정렬 기준으로 항상 적용하려면, 판매량, 평점, 리뷰 정렬 시 복합 정렬 조건을 사용
+        if (sortType == SortType.SALES_POINT || sortType == SortType.RATING || sortType == SortType.REVIEW_COUNT) {
+            pageable = PageRequest.of(page, pageSize, Sort.by(
+                    new Sort.Order(sortType.getOrder().getDirection(), sortType.getOrder().getProperty()),
+                    new Sort.Order(Sort.Direction.DESC, "pubDate")
+            ));
+        } else {
+            // 기본적으로 출간일 순인 경우엔 그냥 해당 정렬을 사용
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortType.getOrder()));
+        }
         return bookRepository.findBooksByTitleContaining(title, pageable);
     }
 

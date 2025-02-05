@@ -10,6 +10,7 @@ export interface Book {
   pubDate: string;
   categoryId: number;
   rating: number;
+  averageRating: number;
   reviewCount: number;
   publisher: string;
   description: string;
