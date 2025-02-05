@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.jpa.entity;
+package com.ll.nbe342team8.global.initData;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
