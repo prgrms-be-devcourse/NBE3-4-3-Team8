@@ -20,30 +20,34 @@ interface CartItem {
 
 // API 통신 함수
 export const addToCart = async (bookId: number, memberId: number, quantity: number) => {
-  if (isLoggedIn()) {
-    const memberId = getMemberId();
-    if (!memberId) throw new Error('로그인이 필요합니다');
+  try {
+    if (memberId > 0) {
+      // 로그인 상태
+      const response = await fetch(`http://localhost:8080/cart/${bookId}/${memberId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ bookId, quantity }),
+      });
 
-    const response = await fetch(`http://localhost:8080/cart/${bookId}/${memberId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ bookId, quantity }),
-    });
-
-    if (!response.ok) throw new Error('장바구니 추가 실패');
-  } else {
-    const cart = getGuestCart();
-    const existingItem = cart.find((item) => item.bookId === bookId);
-
-    if (existingItem) {
-      existingItem.quantity += quantity;
+      if (!response.ok) throw new Error('장바구니 추가 실패');
     } else {
-      cart.push({ bookId, quantity });
-    }
+      // 비로그인 상태
+      const cart = getGuestCart();
+      const existingItem = cart.find((item) => item.bookId === bookId);
 
-    saveGuestCart(cart);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ bookId, quantity });
+      }
+
+      saveGuestCart(cart);
+    }
+  } catch (error) {
+    console.error('장바구니 처리 중 오류:', error);
+    throw error;
   }
 };
 

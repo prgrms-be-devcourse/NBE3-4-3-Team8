@@ -7,6 +7,7 @@ import type { Book } from '@/types/book';
 import { addToCart } from '@/utils/api';
 import { getMemberId, isLoggedIn } from '@/utils/auth';
 import { AddToCartButton } from '@/app/components/common/AddToCartButton';
+import StarRating from '@/app/search/components/StarRating';
 
 interface BookInfoProps {
   book: Book;
@@ -34,7 +35,6 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
         await addToCart(book.id, 1, 1);
       }
     } catch (error) {
-      console.error('장바구니 추가 실패', error);
       alert(error instanceof Error ? error.message : '장바구니 추가에 실패했습니다');
     }
   };
@@ -81,6 +81,7 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
             <p className="mt-2">
               평점: {averageRating} ({book.reviewCount}개 리뷰)
             </p>
+            <StarRating rating={book.averageRating ? book.averageRating : 0} />
           </div>
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
