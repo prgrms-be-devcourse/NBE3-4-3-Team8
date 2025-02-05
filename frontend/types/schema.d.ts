@@ -22,6 +22,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyPage"];
+        put: operations["putMyPage"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/deliveryInformation/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["putDeliveryInformation"];
+        post?: never;
+        delete: operations["deleteDeliveryInformation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cart/{book-id}/{member-id}": {
         parameters: {
             query?: never;
@@ -51,6 +83,38 @@ export interface paths {
         put?: never;
         /** 리뷰 등록 */
         post: operations["createReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/question": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postQuesiton"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/deliveryInformation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postDeliveryInformation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -134,6 +198,38 @@ export interface paths {
         };
         /** 특정 도서 리뷰 조회 */
         get: operations["getReviewsById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/orders/{orderId}/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDetailOrders"];
         put?: never;
         post?: never;
         delete?: never;
@@ -226,10 +322,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my/orders/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteOrder"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        PutReqMemberMyPageDto: {
+            name: string;
+            phoneNumber: string;
+        };
+        ReqDeliveryInformationDto: {
+            /** Format: int64 */
+            id?: number;
+            addressName: string;
+            postCode: string;
+            detailAddress: string;
+            recipient: string;
+            phone: string;
+            isDefaultAddress: boolean;
+        };
         Book: {
             /** Format: int64 */
             id?: number;
@@ -270,6 +396,21 @@ export interface components {
             /** Format: int32 */
             quantity?: number;
         };
+        DeliveryInformation: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            addressName?: string;
+            postCode?: string;
+            detailAddress?: string;
+            isDefaultAddress?: boolean;
+            recipient?: string;
+            phone?: string;
+            member?: components["schemas"]["Member"];
+        };
         Member: {
             /** Format: int64 */
             id?: number;
@@ -283,8 +424,9 @@ export interface components {
             memberType?: "USER" | "ADMIN";
             /** Format: int64 */
             oauthId?: number;
-            review?: components["schemas"]["Review"][];
-            cart?: components["schemas"]["Cart"][];
+            email?: string;
+            deliveryInformations?: components["schemas"]["DeliveryInformation"][];
+            carts?: components["schemas"]["Cart"][];
         };
         Review: {
             /** Format: int64 */
@@ -298,6 +440,10 @@ export interface components {
             content?: string;
             /** Format: float */
             rating?: number;
+        };
+        ReqQuestionDto: {
+            content: string;
+            title: string;
         };
         CartItemRequestDto: {
             /** Format: int64 */
@@ -379,10 +525,10 @@ export interface components {
             descriptionImage?: string;
         };
         PageReviewResponseDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
@@ -400,11 +546,11 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             unpaged?: boolean;
         };
         ReviewResponseDto: {
@@ -424,6 +570,23 @@ export interface components {
             sorted?: boolean;
             unsorted?: boolean;
         };
+        OrderDTO: {
+            /** Format: int64 */
+            memberId?: number;
+            orderStatus?: string;
+            /** Format: int64 */
+            totalPrice?: number;
+        };
+        DetailOrderDto: {
+            /** Format: int64 */
+            orderId?: number;
+            /** Format: int64 */
+            bookId?: number;
+            /** Format: int32 */
+            bookQuantity?: number;
+            /** @enum {string} */
+            deliveryStatus?: "PENDING" | "SHIPPED" | "DELIVERED";
+        };
         CartResponseDto: {
             /** Format: int64 */
             memberId?: number;
@@ -437,10 +600,10 @@ export interface components {
             coverImage?: string;
         };
         PageBookResponseDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
@@ -503,6 +666,98 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    getMyPage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    putMyPage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutReqMemberMyPageDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    putDeliveryInformation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReqDeliveryInformationDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    deleteDeliveryInformation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
             };
         };
     };
@@ -576,6 +831,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    postQuesiton: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReqQuestionDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    postDeliveryInformation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReqDeliveryInformationDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
             };
         };
     };
@@ -747,6 +1050,50 @@ export interface operations {
             };
         };
     };
+    getOrders: {
+        parameters: {
+            query: {
+                memberId: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["OrderDTO"][];
+                };
+            };
+        };
+    };
+    getDetailOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["DetailOrderDto"][];
+                };
+            };
+        };
+    };
     getBannerImages: {
         parameters: {
             query?: never;
@@ -854,6 +1201,28 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["PageBookResponseDto"];
+                };
+            };
+        };
+    };
+    deleteOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };

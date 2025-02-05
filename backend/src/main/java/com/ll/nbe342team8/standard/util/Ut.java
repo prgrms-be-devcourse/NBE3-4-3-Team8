@@ -2,8 +2,8 @@ package com.ll.nbe342team8.standard.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.apache.commons.text.StringEscapeUtils;
 
-import javax.crypto.SecretKey;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,12 +14,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 
 public class Ut {
+
     public static class str {
         public static boolean isBlank(String str) {
             return str == null || str.trim().isEmpty();
@@ -32,6 +30,12 @@ public class Ut {
         @SneakyThrows
         public static String toString(Object obj) {
             return om.writeValueAsString(obj);
+        }
+    }
+
+    public static class XSSSanitizer {
+        public static String sanitize(String input) {
+            return StringEscapeUtils.escapeHtml4(input);
         }
     }
 

@@ -18,6 +18,7 @@ interface PageResponse<T> {
 export default function HomePage() {
   const [trendingBooks, setTrendingBooks] = useState<Book[]>([]);
   const [newBooks, setNewBooks] = useState<Book[]>([]);
+  
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -42,6 +43,7 @@ export default function HomePage() {
       <Banner />
       <BookList title="이달의 신작" books={newBooks} />
       <BookList title="급상승! 많이 보고 있는 상품" books={trendingBooks} />
+      
     </>
   );
 }
