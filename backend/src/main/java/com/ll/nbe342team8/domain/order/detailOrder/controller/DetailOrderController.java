@@ -18,6 +18,7 @@ public class DetailOrderController {
     public DetailOrderController(DetailOrderService detailOrderService){
         this.detailOrderService = detailOrderService;
     }
+    //주문상세조회
     @GetMapping("/{orderId}/details")
     public ResponseEntity<List<DetailOrderDto>> getDetailOrders(@PathVariable Long orderId){
         List<DetailOrderDto> detailOrders = detailOrderService.getDetailOrdersByOrderId(orderId);

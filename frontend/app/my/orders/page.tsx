@@ -1,14 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function OrdersPage() {
+    const searchParams = useSearchParams()
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
   const router = useRouter();
 
   useEffect(() => {
-    const memberId = 1; // 예시로 memberId를 설정
+      const memberId = searchParams.get("memberId")
+      if (!memberId) return
     fetch(`http://localhost:8080/my/orders?memberId=${memberId}`)
       .then((res) => {
         if (!res.ok) {
@@ -24,7 +26,7 @@ export default function OrdersPage() {
         console.error("주문 목록 불러오기 실패", err);
         setError("주문 목록을 불러오는 데 실패했습니다.");
       });
-  }, []);
+  }, [searchParams.get("memberId")]);
 
   // orders가 배열인지 확인
   if (error) {
