@@ -56,13 +56,13 @@ public class DataInitializer {
             bookRepository.save(book1);
             bookRepository.save(book2);
         }
-
-        // 주문 데이터 초기화
+// 주문 데이터 초기화
         if (orderRepository.count() == 0) {
             Member member1 = memberRepository.findById(1L).orElseThrow();  // 이미 초기화된 회원을 가져옴
             Member member2 = memberRepository.findById(2L).orElseThrow();
             Member member3 = memberRepository.findById(3L).orElseThrow();
 
+            // 기존 주문
             Order order1 = new Order(member1, Order.OrderStatus.COMPLETE, 2500);
             Order order2 = new Order(member2, Order.OrderStatus.ORDERED, 4500);
             Order order3 = new Order(member3, Order.OrderStatus.ORDERED, 3500);
@@ -70,16 +70,35 @@ public class DataInitializer {
             orderRepository.save(order2);
             orderRepository.save(order3);
 
+            // member2에게 3개의 주문 추가
+            Order order4 = new Order(member2, Order.OrderStatus.ORDERED, 5000);
+            Order order5 = new Order(member2, Order.OrderStatus.DELIVERY, 3200);
+            Order order6 = new Order(member2, Order.OrderStatus.COMPLETE, 1500);
+
+            orderRepository.save(order4);
+            orderRepository.save(order5);
+            orderRepository.save(order6);
+
             // 주문 세부 사항 (DetailOrder)
             Book book1 = bookRepository.findById(1L).orElseThrow();  // 이미 초기화된 상품을 가져옴
             Book book2 = bookRepository.findById(2L).orElseThrow();
 
+            // 기존 주문에 DetailOrder 추가
             DetailOrder detailOrder1 = new DetailOrder(order1, book1, 2, DetailOrder.DeliveryStatus.PENDING);
             DetailOrder detailOrder2 = new DetailOrder(order2, book2, 3, DetailOrder.DeliveryStatus.PENDING);
             DetailOrder detailOrder3 = new DetailOrder(order3, book1, 1, DetailOrder.DeliveryStatus.PENDING);
+
+            // member2의 추가된 주문에 DetailOrder 추가
+            DetailOrder detailOrder4 = new DetailOrder(order4, book2, 2, DetailOrder.DeliveryStatus.PENDING);
+            DetailOrder detailOrder5 = new DetailOrder(order5, book1, 1, DetailOrder.DeliveryStatus.SHIPPED);
+            DetailOrder detailOrder6 = new DetailOrder(order6, book2, 2, DetailOrder.DeliveryStatus.DELIVERED);
+
             detailOrderRepository.save(detailOrder1);
             detailOrderRepository.save(detailOrder2);
             detailOrderRepository.save(detailOrder3);
+            detailOrderRepository.save(detailOrder4);
+            detailOrderRepository.save(detailOrder5);
+            detailOrderRepository.save(detailOrder6);
         }
     }
 }
