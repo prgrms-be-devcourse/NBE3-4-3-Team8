@@ -29,6 +29,9 @@ public class DetailOrder extends BaseTime {
     private DeliveryStatus deliveryStatus;
 
     public enum DeliveryStatus {
-        PENDING, SHIPPED, DELIVERED
+        PENDING, //대기중
+        SHIPPING, //배송중
+        DELIVERED,//배송완료
+        RETURNED//반품
     }
 }

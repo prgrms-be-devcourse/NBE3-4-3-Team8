@@ -72,7 +72,7 @@ public class DataInitializer {
 
             // member2에게 3개의 주문 추가
             Order order4 = new Order(member2, Order.OrderStatus.ORDERED, 5000);
-            Order order5 = new Order(member2, Order.OrderStatus.DELIVERY, 3200);
+            Order order5 = new Order(member2, Order.OrderStatus.CANCELLED, 3200);
             Order order6 = new Order(member2, Order.OrderStatus.COMPLETE, 1500);
 
             orderRepository.save(order4);
@@ -85,12 +85,12 @@ public class DataInitializer {
 
             // 기존 주문에 DetailOrder 추가
             DetailOrder detailOrder1 = new DetailOrder(order1, book1, 2, DetailOrder.DeliveryStatus.PENDING);
-            DetailOrder detailOrder2 = new DetailOrder(order2, book2, 3, DetailOrder.DeliveryStatus.PENDING);
-            DetailOrder detailOrder3 = new DetailOrder(order3, book1, 1, DetailOrder.DeliveryStatus.PENDING);
+            DetailOrder detailOrder2 = new DetailOrder(order2, book2, 3, DetailOrder.DeliveryStatus.RETURNED);
+            DetailOrder detailOrder3 = new DetailOrder(order3, book1, 1, DetailOrder.DeliveryStatus. SHIPPING);
 
             // member2의 추가된 주문에 DetailOrder 추가
             DetailOrder detailOrder4 = new DetailOrder(order4, book2, 2, DetailOrder.DeliveryStatus.PENDING);
-            DetailOrder detailOrder5 = new DetailOrder(order5, book1, 1, DetailOrder.DeliveryStatus.SHIPPED);
+            DetailOrder detailOrder5 = new DetailOrder(order5, book1, 1, DetailOrder.DeliveryStatus.SHIPPING);
             DetailOrder detailOrder6 = new DetailOrder(order6, book2, 2, DetailOrder.DeliveryStatus.DELIVERED);
 
             detailOrderRepository.save(detailOrder1);

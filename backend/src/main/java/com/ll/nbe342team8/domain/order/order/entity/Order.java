@@ -27,9 +27,9 @@ public class Order extends BaseTime {
     private long totalPrice;
 
     public enum OrderStatus{
-        ORDERED,
-        DELIVERY,
-        COMPLETE
+        ORDERED,//주문됨
+        CANCELLED,//주문 취소됨
+        COMPLETE //주문 완료됨(배송까지)
     }
 
 }
