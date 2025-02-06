@@ -32,4 +32,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/cart/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi deliveryInformationAPI() {
+        return GroupedOpenApi.builder()
+                .group("deliveryInformation")
+                .pathsToMatch("/my/deliveryInformation/**")
+                .build();
+    }
 }

@@ -1,5 +1,5 @@
 aladin:
-  ttbkey:
+  ttbkey: ${TTBKEY}
 
 spring:
   profiles:
