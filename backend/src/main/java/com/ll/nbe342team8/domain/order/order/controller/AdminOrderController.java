@@ -24,9 +24,9 @@ public class AdminOrderController {
 
 	@GetMapping
 	@Operation(summary = "전체 회원 주문 조회")
-	public Page<AdminOrderDTO> getAllOrdersForAdmin(@RequestParam(defaultValue = "0") int page,
-													@RequestParam(defaultValue = "10") int pageSize,
-													@RequestParam(defaultValue = "ORDER_DATE") SortType sortType) {
+	public Page<AdminOrderDTO> getAllOrders(@RequestParam(defaultValue = "0") int page,
+											@RequestParam(defaultValue = "10") int pageSize,
+											@RequestParam(defaultValue = "ORDER_DATE") SortType sortType) {
 		return adminOrderService.getAllOrders(page, pageSize, sortType);
 	}
 }
