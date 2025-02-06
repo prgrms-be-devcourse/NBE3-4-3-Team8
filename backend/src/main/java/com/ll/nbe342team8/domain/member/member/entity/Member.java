@@ -38,7 +38,11 @@ public class Member extends BaseTime {
     private String oauthId;
 
     @Column(name = "email")
-    private String email; // 소셜 로그인 ID
+    private String email; // 사용자 이메일
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
 
     // Enum 사용자 역할
     public enum MemberType {

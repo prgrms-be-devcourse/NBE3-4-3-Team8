@@ -7,6 +7,10 @@ import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -61,5 +65,23 @@ public class MemberService {
 
     public Optional<Member> findByOauthId(String oauthId) {
         return memberRepository.findByOauthId(oauthId);
+    }
+
+    public Optional<Member> findByUsername(String username) { return memberRepository.findByUsername(username);}
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Member member = findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        if (member.getMemberType() != Member.MemberType.ADMIN) {
+            throw new UsernameNotFoundException("관리자 권한이 없습니다.");
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                member.getUsername(),
+                member.getPassword(),
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        );
     }
 }
