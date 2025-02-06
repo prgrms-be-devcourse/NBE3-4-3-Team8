@@ -1,5 +1,7 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
+import com.ll.nbe342team8.domain.book.review.entity.Review;
+import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
@@ -52,6 +54,9 @@ public class Member extends BaseTime {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryInformation> deliveryInformations;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Cart> carts;
 
 
     public void updateMemberInfo(PutReqMemberMyPageDto dto) {

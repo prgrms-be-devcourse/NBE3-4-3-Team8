@@ -47,7 +47,7 @@ public class CartController {
 
         Member member = memberService.getMemberById(memberId);
 
-        Cart cartItem = member.getCart().stream()
+        Cart cartItem = member.getCarts().stream()
                 .filter(cart -> cart.getBook().getId().equals(bookId))
                 .findFirst()
                 .orElse(null);
