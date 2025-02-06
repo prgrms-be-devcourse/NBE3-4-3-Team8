@@ -11,7 +11,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +37,14 @@ public class Member extends BaseTime {
     private MemberType memberType; // 사용자 역할(사용자, 관리자)
 
     @Column(name="oauth_id")
-    private Long oauthId;
+    private String oauthId;
 
     @Column(name = "email")
-    private String email; // 소셜 로그인 ID
+    private String email; // 사용자 이메일
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
 
     // Enum 사용자 역할
     public enum MemberType {
@@ -68,5 +75,16 @@ public class Member extends BaseTime {
 
     public void deleteDeliveryInformaiton(Long id) {
         deliveryInformations.removeIf(deliveryInfo -> deliveryInfo.getId().equals(id));
+    }
+
+    public String getUsername() {
+        return oauthId;
+    }
+    public String getNickname() {
+        return name;
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
     }
 }
