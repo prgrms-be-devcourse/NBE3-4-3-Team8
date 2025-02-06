@@ -1,3 +1,4 @@
+//app/hooks/useAuth.ts
 import { useState, useEffect } from 'react';
 
 interface User {
@@ -21,16 +22,27 @@ export function useAuth() {
 
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       try {
         const res = await fetch('http://localhost:8080/api/auth/me', {
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+
         if (res.ok) {
           const data = await res.json();
           setUser(data);
+        } else {
+          localStorage.removeItem('accessToken');
         }
       } catch (error) {
         console.error('로그인 정보 가져오기 실패:', error);
+        localStorage.removeItem('accessToken');
       } finally {
         setLoading(false);
       }
@@ -39,5 +51,10 @@ export function useAuth() {
     fetchUser();
   }, []);
 
-  return { user, loading };
+  const logout = () => {
+    localStorage.removeItem('accessToken');
+    setUser(null);
+  };
+
+  return { user, loading, logout };
 }

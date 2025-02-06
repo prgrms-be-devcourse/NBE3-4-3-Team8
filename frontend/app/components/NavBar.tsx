@@ -1,3 +1,4 @@
+//app/components/NavBar.tsx
 'use client';
 import React, { useState, KeyboardEvent } from 'react';
 import { useRouter } from 'next/navigation';
@@ -5,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import KakaoLoginButton from './KakaoLoginButton';
 
 export default function NavBar() {
-  const { user } = useAuth(); // useUser 훅 사용
+  const { user, logout } = useAuth(); // useUser 훅 사용
   const router = useRouter();
   const [searchText, setSearchText] = useState('');
 
@@ -19,14 +20,6 @@ export default function NavBar() {
       // 엔터 시 /search?title=검색어 로 이동
       router.push(`/search?title=${encodeURIComponent(searchText)}`);
     }
-  };
-
-  const handleLogout: () => Promise<void> = async () => {
-    await fetch('http://localhost:8080/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });
-    window.location.href = '/'; // 새로고침으로 세션 초기화
   };
 
   return (
@@ -56,16 +49,16 @@ export default function NavBar() {
             </button>
           </div>
           <nav className="flex gap-6 text-sm text-black">
-            {user ? ( // 🔹 로그인한 경우
+            {user ? ( // 로그인한 경우
               <>
                 <span className="cursor-pointer">{user.name}님</span> {/* 사용자 이름 표시 */}
-                <button onClick={handleLogout} className="text-red-500">
+                <button onClick={logout} className="text-red-500">
                   로그아웃
                 </button>{' '}
                 {/* 로그아웃 버튼 */}
               </>
             ) : (
-              <KakaoLoginButton /> // 🔹 로그인하지 않은 경우, 카카오 로그인 버튼 표시
+              <KakaoLoginButton /> // 로그인하지 않은 경우, 카카오 로그인 버튼 표시
             )}
             <span className="cursor-pointer" onClick={() => router.push('/cart')}>
               장바구니
