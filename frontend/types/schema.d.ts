@@ -497,9 +497,9 @@ export interface components {
             password?: string;
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
-            oauthId?: string;
             username?: string;
             authorities?: components["schemas"]["GrantedAuthority"][];
+            oauthId?: string;
         };
         Review: {
             /** Format: int64 */
@@ -646,8 +646,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
         };
         OrderDTO: {
             /** Format: int64 */

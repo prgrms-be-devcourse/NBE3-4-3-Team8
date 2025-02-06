@@ -37,7 +37,7 @@ public class Member extends BaseTime {
 
     private String email; // 사용자 이메일
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
 

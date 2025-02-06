@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -31,14 +32,23 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         SecurityUser securityUser = (SecurityUser) oAuth2User;
 
         String jwtToken = jwtService.generateToken(securityUser.getMember());
+        ResponseCookie cookie = ResponseCookie.from("accessToken", jwtToken)
+                .path("/")
+                .domain("localhost")
+                .sameSite("Strict")
+                .secure(true)
+                .httpOnly(true)
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
 
         String targetUrl = UriComponentsBuilder
                 .fromUriString(redirectUri)
-                .queryParam("token", jwtToken)
+//                .queryParam("token", jwtToken)
                 .build()
                 .toUriString();
 
         // 프론트엔드로 리다이렉트
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+//        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, redirectUri);
     }
 }
