@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.domain.qna.question.dto;
+package com.ll.nbe342team8.domain.book.book.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class QuestionDto {
+public class BookDto {
 }

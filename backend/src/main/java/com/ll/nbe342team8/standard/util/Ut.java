@@ -2,7 +2,7 @@ package com.ll.nbe342team8.standard.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.apache.commons.text.StringEscapeUtils;
+
 
 
 public class Ut {
@@ -19,12 +19,6 @@ public class Ut {
         @SneakyThrows
         public static String toString(Object obj) {
             return om.writeValueAsString(obj);
-        }
-    }
-
-    public static class XSSSanitizer {
-        public static String sanitize(String input) {
-            return StringEscapeUtils.escapeHtml4(input);
         }
     }
 }

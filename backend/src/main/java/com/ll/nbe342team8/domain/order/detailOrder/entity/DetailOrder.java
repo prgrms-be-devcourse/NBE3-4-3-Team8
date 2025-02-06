@@ -24,11 +24,6 @@ public class DetailOrder extends BaseTime {
     @Column(name = "book_quantity")
     private int bookQuantity;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "delivery_status")
-    private DeliveryStatus deliveryStatus;
-
-    public enum DeliveryStatus {
-        PENDING, SHIPPED, DELIVERED
-    }
+    @Column(name = "delivery_status", nullable = false)
+    private int deliveryStatus;
 }
