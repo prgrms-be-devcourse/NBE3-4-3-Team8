@@ -1,13 +1,18 @@
 package com.ll.nbe342team8.domain.order.detailOrder.dto;
 
-import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
+
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder.DeliveryStatus;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+@Getter
+@AllArgsConstructor
 public class DetailOrderDto {
+    private Long orderId;
+    private Long bookId;
+    private int bookQuantity;
+    private DeliveryStatus deliveryStatus;
+
+
     
 }
