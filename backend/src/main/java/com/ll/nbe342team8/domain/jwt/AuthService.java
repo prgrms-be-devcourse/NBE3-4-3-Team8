@@ -2,6 +2,7 @@ package com.ll.nbe342team8.domain.jwt;
 
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
@@ -35,5 +36,16 @@ public class AuthService {
         }
 
         return ResponseEntity.ok(memberOptional.get());
+    }
+
+    public ResponseEntity<?> logout(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        String actualToken = token.substring(7); // "Bearer " 제거
+        jwtService.invalidateToken(actualToken); // ✅ 토큰 무효화
+
+        return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 }
