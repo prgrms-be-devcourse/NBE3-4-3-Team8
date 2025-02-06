@@ -51,6 +51,7 @@ public class BaseInitData {
         for (int i = 1; i <= 10; i++) {
             Member member = Member.builder()
                     .name("test" + i)
+                    .password("")
                     .phoneNumber("01012345678")
                     .memberType(Member.MemberType.USER)
                     .build();
@@ -109,7 +110,7 @@ public class BaseInitData {
                     .title("제목")
                     .author("작가")
                     .priceStandard(10000)
-                    .pricesSales(9000+ i)
+                    .pricesSales(9000)
                     .stock(100)
                     .coverImage(coverUrls.get(i-1))
 //                    .coverImage("img src")

@@ -62,7 +62,7 @@ public class MemberController {
         //jwt 토큰에서 id를 통해 회원정보를 찾는다.
         //여기선 임시로 이메일을 통해 회원정보를 찾는다.
         String email="rdh0427@naver.com";
-        //modifyOrJoin()`이 `String oauthId`를 요구하므로
+        //modifyOrJoin()`이 `String oAuthId`를 요구하므로
         // `member.getOauthId()`와 `member.getEmail()`을 인자로 전달하도록 수정
 
         Optional<Member> optionalMember = memberService.findByEmail(email);
@@ -82,7 +82,7 @@ public class MemberController {
         Member member=optionalMember.get();
 
         // jwt 토큰으로 찾은 사용자 개체 갱신
-        memberService.modifyOrJoin(member.getOauthId(), putReqMemberMyPageDto, member.getEmail());
+        memberService.modifyOrJoin(member.getOAuthId(), putReqMemberMyPageDto, member.getEmail());
 
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
 

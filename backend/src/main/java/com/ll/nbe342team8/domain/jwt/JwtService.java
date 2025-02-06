@@ -26,7 +26,7 @@ public class JwtService {
 
         // JWT 토큰을 생성합니다. 이때 카카오 ID를 주요 식별자로 사용합니다
         return Jwts.builder()
-                .setSubject(member.getOauthId())  // 카카오 ID를 토큰의 주체로 설정
+                .setSubject(member.getOAuthId())  // 카카오 ID를 토큰의 주체로 설정
                 .claim("id", member.getId())      // 내부 DB ID는 부가 정보로 포함
                 .claim("email", member.getEmail())
                 .claim("name", member.getName())

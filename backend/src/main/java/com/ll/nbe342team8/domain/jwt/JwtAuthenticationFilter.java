@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String kakaoId = jwtService.getKakaoIdFromToken(token);
 
 
-                Optional<Member> optionalMember = memberRepository.findByOauthId(kakaoId);
+                Optional<Member> optionalMember = memberRepository.findByoAuthId(kakaoId);
                 if (optionalMember.isPresent()) {
                     Member member = optionalMember.get();
                     SecurityUser securityUser = new SecurityUser(member);

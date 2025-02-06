@@ -17,7 +17,7 @@ public class SecurityUser extends User implements OAuth2User {
 
     public SecurityUser(Member member) {
         super(
-                member.getUsername(),  // oauthId를 username으로 사용
+                member.getUsername(),  // oAuthId를 username으로 사용
                 "",                   // 비밀번호는 빈 문자열
                 member.getAuthorities() // Member에서 정의한 권한 사용
         );

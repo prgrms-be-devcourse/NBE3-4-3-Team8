@@ -46,14 +46,13 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/me").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/**").permitAll()
                 )
-                .formLogin(form -> form
-                        .loginPage("/admin/login")
-                        .defaultSuccessUrl("/admin/dashboard", true)
-                        .permitAll()
-                )
+//                .formLogin(form -> form
+//                        .loginPage("/admin/login")
+//                        .defaultSuccessUrl("/admin/dashboard", true)
+//                        .permitAll()
+//                )
                 .csrf((csrf) -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))) // H2 콘솔 예외처리
                 .csrf(AbstractHttpConfigurer::disable)

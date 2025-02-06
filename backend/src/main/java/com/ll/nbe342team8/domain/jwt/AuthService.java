@@ -29,7 +29,7 @@ public class AuthService {
         }
 
         String kakaoId = jwtService.getKakaoIdFromToken(actualToken);
-        Optional<Member> memberOptional = memberRepository.findByOauthId(kakaoId);
+        Optional<Member> memberOptional = memberRepository.findByoAuthId(kakaoId);
 
         if (memberOptional.isEmpty()) {
             return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");

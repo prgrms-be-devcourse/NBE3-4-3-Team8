@@ -26,23 +26,18 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class Member extends BaseTime {
 
-    @Column(name = "name")
     private String name; // 사용자 이름
 
-    @Column(name = "phone_number")
     private String phoneNumber; // 전화번호
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "member_type")
     private MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-    @Column(name="oauth_id")
-    private String oauthId;
+    private String oAuthId;
 
-    @Column(name = "email")
     private String email; // 사용자 이메일
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
 
 
@@ -78,10 +73,7 @@ public class Member extends BaseTime {
     }
 
     public String getUsername() {
-        return oauthId;
-    }
-    public String getNickname() {
-        return name;
+        return oAuthId;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
