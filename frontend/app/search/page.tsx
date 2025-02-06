@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import BookGrid from "./components/BookGrid";
@@ -9,10 +8,11 @@ import { Pagination } from "@/app/components/common/Pagination";
 import { SortBar } from "./components/SortBar";
 
 export default function SearchPage() {
-    // URL 쿼리 파라미터에서 title와 sort 값을 읽어옴
+    // URL 쿼리 파라미터에서 keyword, searchType, sort 값을 읽어옴
     const searchParams = useSearchParams();
     const router = useRouter();
-    const titleParam = searchParams.get("title") || "";
+    const keywordParam = searchParams.get("keyword") || "";
+    const searchTypeParam = searchParams.get("searchType") || "TITLE";
     const initialSort = searchParams.get("sort") || "PUBLISHED_DATE";
 
     const [books, setBooks] = useState<Book[]>([]);
@@ -24,11 +24,12 @@ export default function SearchPage() {
     const pageSize = 12;
 
     useEffect(() => {
-        if (!titleParam) return;
+        if (!keywordParam) return;
 
         const fetchBooks = async () => {
             try {
-                const data = await fetchSearchBooks(currentPage, pageSize, sortType, titleParam);
+                // fetchSearchBooks가 searchType 파라미터도 받도록 수정했다고 가정
+                const data = await fetchSearchBooks(currentPage, pageSize, sortType, searchTypeParam, keywordParam);
                 setBooks(data.content || data);
                 setTotalPages(data.totalPages || 1);
             } catch (error) {
@@ -39,7 +40,7 @@ export default function SearchPage() {
         };
 
         fetchBooks();
-    }, [titleParam, currentPage, sortType]);
+    }, [keywordParam, searchTypeParam, currentPage, sortType]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -60,7 +61,7 @@ export default function SearchPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold mb-6">검색 결과: "{titleParam}"</h1>
+            <h1 className="text-2xl font-bold mb-6">검색 결과: "{keywordParam}"</h1>
             <SortBar currentSort={sortType} onSortChange={handleSortChange} />
             <BookGrid books={books} />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />

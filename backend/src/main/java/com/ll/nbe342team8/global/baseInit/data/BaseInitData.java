@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
 public class BaseInitData {
 
@@ -109,12 +109,13 @@ public class BaseInitData {
                     .title("제목")
                     .author("작가")
                     .priceStandard(10000)
-                    .pricesSales(9000)
+                    .pricesSales(9000+ i)
                     .stock(100)
                     .coverImage(coverUrls.get(i-1))
 //                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
                     .publisher("출판사")
+                    .salesPoint(50+i)
                     .categoryId(category)
                     .isbn13("isbn13")
                     .build();

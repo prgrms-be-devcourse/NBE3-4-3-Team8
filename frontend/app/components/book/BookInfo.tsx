@@ -63,9 +63,7 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
             <p className="mt-2">
               평점: {averageRating} ({book.reviewCount}개 리뷰)
             </p>
-            <p>
               <StarRating rating={book.averageRating ? book.averageRating : 0}/>
-            </p>
           </div>
           <div className="flex flex-col gap-2">
             <button

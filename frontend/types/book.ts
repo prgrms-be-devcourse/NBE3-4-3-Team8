@@ -15,3 +15,10 @@ export interface Book {
   publisher: string;
   description: string;
 }
+
+export enum SearchType {
+  TITLE = "TITLE",
+  AUTHOR = "AUTHOR",
+  ISBN13 = "ISBN13",
+  PUBLISHER = "PUBLISHER"
+}

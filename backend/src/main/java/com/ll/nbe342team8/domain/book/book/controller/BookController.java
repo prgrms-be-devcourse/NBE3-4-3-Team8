@@ -4,6 +4,7 @@ import com.ll.nbe342team8.domain.book.book.dto.BookPatchRequestDto;
 import com.ll.nbe342team8.domain.book.book.dto.BookResponseDto;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
+import com.ll.nbe342team8.domain.book.book.type.SearchType;
 import com.ll.nbe342team8.domain.book.book.type.SortType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,13 +45,16 @@ public class BookController {
 
     }
 
-    @Operation(summary = "도서 이름 검색")
+    @Operation(summary = "도서 검색 (제목, 저자, ISBN13, 출판사 검색)")
     @GetMapping("/search")
-    public Page<BookResponseDto> searchBooks(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "10") int pageSize,
-                                             @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType,
-                                             @RequestParam String title){
-        Page<Book> books = bookService.searchBooks(page, pageSize, sortType, title);
+    public Page<BookResponseDto> searchBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType,
+            @RequestParam(defaultValue = "TITLE") SearchType searchType,
+            @RequestParam String keyword) {
+
+        Page<Book> books = bookService.searchBooks(page, pageSize, sortType, searchType, keyword);
         return books.map(BookResponseDto::from);
     }
 
