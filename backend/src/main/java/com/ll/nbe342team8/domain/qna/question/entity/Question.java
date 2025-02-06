@@ -20,10 +20,10 @@ public class Question extends BaseTime {
 
 
     @Column(nullable = true) // 질문 제목
-    private String title;
+    private String questionTitle;
 
     @Column(nullable = true) // 질문 내용
-    private String content;
+    private String questionContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
