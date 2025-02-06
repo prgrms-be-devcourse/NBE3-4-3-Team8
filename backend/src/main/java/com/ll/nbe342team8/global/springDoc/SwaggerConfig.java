@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.config;
+package com.ll.nbe342team8.global.springDoc;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

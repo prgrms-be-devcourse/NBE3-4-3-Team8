@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.baseInit.data;
+package com.ll.nbe342team8.global.initData;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;

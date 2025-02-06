@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.baseInit.data;
+package com.ll.nbe342team8.global.initData;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.repository.BookRepository;
@@ -12,7 +12,6 @@ import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
