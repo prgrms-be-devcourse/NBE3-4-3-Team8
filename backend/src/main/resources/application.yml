@@ -1,17 +1,10 @@
+aladin:
+  ttbkey:
+
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb  # H2 메모리 데이터베이스
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    hibernate:
-      ddl-auto: update  # 스키마 자동 업데이트 (create, create-drop, update, none 가능)
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-    show-sql: true  # SQL 쿼리 로그를 출력
-  h2:
-    console:
-      enabled: true  # H2 콘솔 활성화
-      path: /h2-console  # H2 콘솔 경로 (기본값: /h2-console)
+  profiles:
+    active: mysql
+
+
+
+

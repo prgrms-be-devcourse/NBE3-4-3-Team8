@@ -204,4 +204,5 @@ gradle-app.setting
 *.hprof
 
 .idea/
+db_dev.mv.db
 # End of https://www.toptal.com/developers/gitignore/api/nextjs,intellij,java,gradle
