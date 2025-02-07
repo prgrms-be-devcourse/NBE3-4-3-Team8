@@ -1,6 +1,8 @@
 package com.ll.nbe342team8.domain.book.book.service;
 
 import com.ll.nbe342team8.domain.book.book.dto.ExternalBookDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -8,14 +10,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class ExternalBookApiService {
 
-    private final WebClient webClient;
-    private final String ttbkey;
+    @Autowired  private WebClient webClient;
+    @Value("${aladin.ttbkey}")private String ttbkey;
 
-    public ExternalBookApiService(WebClient.Builder webClientBuilder,
-                                  @Value("${aladin.ttbkey}") String ttbkey) {
-        this.webClient = webClientBuilder.baseUrl("http://www.aladin.co.kr/ttb/api/").build();
-        this.ttbkey = ttbkey;
-    }
+//    public ExternalBookApiService(WebClient.Builder webClientBuilder,
+//                                  @Value("${aladin.ttbkey}") String ttbkey) {
+//        this.webClient = webClientBuilder.baseUrl("http://www.aladin.co.kr/ttb/api/").build();
+//        this.ttbkey = ttbkey;
+//    }
 
     public ExternalBookDto searchBook(String isbn13) {
         if (isbn13 == null || isbn13.isEmpty()) {
@@ -23,7 +25,7 @@ public class ExternalBookApiService {
         }
 
         String url = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?"
-                + "ttbkey=" + ttbkey
+                + "ttbkey=ttbkumjjick2245001"
                 + "&itemIdType=ISBN13"
                 + "&ItemId=" + isbn13
                 + "&output=js"

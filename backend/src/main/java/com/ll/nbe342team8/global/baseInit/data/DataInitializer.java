@@ -1,7 +1,9 @@
 package com.ll.nbe342team8.global.baseInit.data;
 
+import com.ll.nbe342team8.domain.book.book.dto.ExternalBookDto;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.repository.BookRepository;
+import com.ll.nbe342team8.domain.book.book.service.ExternalBookApiService;
 import com.ll.nbe342team8.domain.book.category.entity.Category;
 import com.ll.nbe342team8.domain.book.category.repository.CategoryRepository;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
@@ -26,6 +28,7 @@ public class DataInitializer {
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
     private final DetailOrderRepository detailOrderRepository;
+    private final ExternalBookApiService externalBookApiService;
 
 
     @PostConstruct
@@ -94,7 +97,7 @@ public class DataInitializer {
         if (bookRepository.count() == 0) {
             Category category1 = categoryRepository.findById(1L).orElseThrow();  // 카테고리 데이터 가져오기
             Category category2 = categoryRepository.findById(2L).orElseThrow();
-
+            ExternalBookDto beingRich =  externalBookApiService.searchBook("9791162227022");
             Book book1 = Book.builder()
                     .title("부자 되는 법") // 책 제목
                     .author("홍길동") // 저자

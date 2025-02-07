@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/me").permitAll()
+                        .requestMatchers("/books","/event/banners","/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
