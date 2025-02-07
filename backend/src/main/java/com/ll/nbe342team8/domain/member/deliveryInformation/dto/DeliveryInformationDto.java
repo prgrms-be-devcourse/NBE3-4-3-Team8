@@ -11,25 +11,18 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DeliveryInformationDto {
 
-    @JsonProperty("id")
     Long id;
 
-    @JsonProperty("addressName")
     String addressName;
 
-    @JsonProperty("postCode")
     String postCode;
 
-    @JsonProperty("detailAddress")
     String detailAddress;
 
-    @JsonProperty("recipient")
     String recipient;
 
-    @JsonProperty("phone")
     String phone;
 
-    @JsonProperty("isDefaultAddress")
     Boolean isDefaultAddress;
 
     public DeliveryInformationDto(DeliveryInformation deliveryInformation) {

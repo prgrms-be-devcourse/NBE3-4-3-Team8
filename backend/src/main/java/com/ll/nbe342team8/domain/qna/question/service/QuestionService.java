@@ -78,6 +78,6 @@ public class QuestionService {
         String sanitizedContent = Ut.XSSSanitizer.sanitize(content);
         String sanitizedTitle = Ut.XSSSanitizer.sanitize(title);
         LocalDateTime cutoffTime = LocalDateTime.now().minus(duration);
-        return questionRepository.existsByMemberAndTitleAndContentAndCreatedAtAfter( member, sanitizedTitle, sanitizedContent, cutoffTime);
+        return questionRepository.existsByMemberAndTitleAndContentAndCreateDateAfter( member, sanitizedTitle, sanitizedContent, cutoffTime);
     }
 }

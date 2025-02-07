@@ -9,6 +9,8 @@ import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.service.QuestionService;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
 import com.ll.nbe342team8.standard.PageDto.PageDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
 
+@Tag(name = "QuestionController", description = " qna 질문 컨트롤러")
 @RequiredArgsConstructor
 @RestController
 public class QuestionController {
@@ -25,6 +27,43 @@ public class QuestionController {
     private final MemberService memberService;
     private final QuestionService questionService;
 
+    @Operation(summary = "사용자가 작성한 qna 질문 목록 조회")
+    @GetMapping("/my/question")
+    public ResponseEntity<?> getQuesitons(@RequestParam(name = "page", defaultValue = "0") int page
+    ) {
+
+        //jwt 토큰에서 id를 통해 회원정보를 찾는다.
+        //여기선 임시로 이메일을 통해 회원정보를 찾는다.
+        String email="rdh0427@naver.com";
+
+        Member member = memberService.findByEmail(email)
+                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
+
+        PageDto<QuestionDto> pageDto = new PageDto<>();
+
+        pageDto = questionService.getPage(member, page);
+
+        return ResponseEntity.ok(pageDto);
+    }
+
+    @Operation(summary = "사용자의 특정 qna 질문 조회")
+    @GetMapping("/my/question/{id}")
+    public ResponseEntity<?> getQuestion(@RequestParam(name = "id") Long id) {
+
+        String email="rdh0427@naver.com";
+
+        Member member = memberService.findByEmail(email)
+                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
+
+        Question question = questionService.findById(id)
+                .orElseThrow(() -> new ServiceException(404, "질문을 찾을 수 없습니다."));
+
+        QuestionDto questionDto=new QuestionDto(question);
+
+        return ResponseEntity.ok(questionDto);
+    }
+
+    @Operation(summary = "사용자가 qna 질문 등록")
     @PostMapping("/my/question")
     public ResponseEntity<?> postQuesiton(@RequestBody @Valid ReqQuestionDto reqQuestionDto
                                           ) {
@@ -42,9 +81,10 @@ public class QuestionController {
         return ResponseEntity.ok(Map.of("message", "질문 등록 성공."));
     }
 
-    @GetMapping("/my/question")
-    public ResponseEntity<?> getQuesitons(@RequestParam(name = "page", defaultValue = "0") int page
-                                          ) {
+    @Operation(summary = "사용자의 특정 qna 질문 수정")
+    @PutMapping("/my/question/{id}")
+    public ResponseEntity<?> modifyQuesiton(@RequestParam(name = "id") Long id
+            ,@RequestBody @Valid ReqQuestionDto reqQuestionDto) {
 
         //jwt 토큰에서 id를 통해 회원정보를 찾는다.
         //여기선 임시로 이메일을 통해 회원정보를 찾는다.
@@ -53,31 +93,17 @@ public class QuestionController {
         Member member = memberService.findByEmail(email)
                 .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
 
-        PageDto<QuestionDto> pageDto = new PageDto<>();
-
-        pageDto = questionService.getPage(member, page);
-
-        return ResponseEntity.ok(pageDto);
-    }
-
-    @GetMapping("/my/question/{id}")
-    public ResponseEntity<?> getQuestion(@RequestParam(name = "id") Long id) {
-
-        String email="rdh0427@naver.com";
-
-        Member member = memberService.findByEmail(email)
-                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
-
         Question question = questionService.findById(id)
                 .orElseThrow(() -> new ServiceException(404, "질문을 찾을 수 없습니다."));
 
-        QuestionDto questionDto=new QuestionDto(question);
+        validateQuestionOwner(member, question);
 
-        return ResponseEntity.ok(questionDto);
+        questionService.modifyQuestion(question,reqQuestionDto);
+
+        return ResponseEntity.ok(Map.of("message", "질문 수정 성공."));
     }
 
-
-
+    @Operation(summary = "사용자의 특정 qna 질문 삭제")
     @DeleteMapping("/my/question/{id}")
     public ResponseEntity<?> removeQuesiton(@RequestParam(name = "id") Long id
     ) {
@@ -97,27 +123,6 @@ public class QuestionController {
         questionService.deleteQuestion(question);
 
         return ResponseEntity.ok(Map.of("message", "질문 삭제 성공."));
-    }
-
-    @PutMapping("/my/question/{id}")
-    public ResponseEntity<?> modifyQuesiton(@RequestParam(name = "id") Long id
-                                            ,@RequestBody @Valid ReqQuestionDto reqQuestionDto) {
-
-        //jwt 토큰에서 id를 통해 회원정보를 찾는다.
-        //여기선 임시로 이메일을 통해 회원정보를 찾는다.
-        String email="rdh0427@naver.com";
-
-        Member member = memberService.findByEmail(email)
-                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
-
-        Question question = questionService.findById(id)
-                .orElseThrow(() -> new ServiceException(404, "질문을 찾을 수 없습니다."));
-
-        validateQuestionOwner(member, question);
-
-        questionService.modifyQuestion(question,reqQuestionDto);
-
-        return ResponseEntity.ok(Map.of("message", "질문 수정 성공."));
     }
 
 

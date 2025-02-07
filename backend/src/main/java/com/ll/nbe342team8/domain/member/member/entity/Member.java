@@ -62,15 +62,13 @@ public class Member extends BaseTime {
 
     }
 
-    public void addDeliveryInformaiton(DeliveryInformation deliveryInformation) {
+    public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
         this.deliveryInformations.add(deliveryInformation);
     }
 
-    public void convertFalseDeliveryInformaitonsIsDefaultAddress() {
+    public void convertFalseDeliveryInformationsIsDefaultAddress() {
         deliveryInformations.forEach(info -> info.setIsDefaultAddress(false));
     }
 
-    public void deleteDeliveryInformaiton(Long id) {
-        deliveryInformations.removeIf(deliveryInfo -> deliveryInfo.getId().equals(id));
-    }
+
 }

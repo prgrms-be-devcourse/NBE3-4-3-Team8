@@ -40,4 +40,21 @@ public class SwaggerConfig {
                 .pathsToMatch("/my/deliveryInformation/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi QuestionAnswerAPI() {
+        return GroupedOpenApi.builder()
+                .group("Q&A")
+                .pathsToMatch("/my/question/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi memberAPI() {
+        return GroupedOpenApi.builder()
+                .group("member")
+                .pathsToMatch("/my/**")
+                .pathsToExclude("/my/deliveryInformation/**", "/my/question/**")  // 특정 경로 제외
+                .build();
+    }
 }

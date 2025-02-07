@@ -10,6 +10,8 @@ import com.ll.nbe342team8.domain.qna.answer.service.AnswerService;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.service.QuestionService;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "QuestionController", description = " qna 답변 컨트롤러")
 @RequiredArgsConstructor
 @RestController
 public class AnswerController {
@@ -30,6 +33,7 @@ public class AnswerController {
     //qna 답변 경우 관리자만 작성 가능하다
 
     //사용자가 답변 리스트 조회
+    @Operation(summary = "사용자가 작성한 qna 질문에 대한 답변 조회")
     @GetMapping("/my/question/{question_id}/answer")
     public ResponseEntity<?> getAnswers(@RequestParam(name = "question_id") Long questionId
     ) {
@@ -56,6 +60,7 @@ public class AnswerController {
     }
 
     //관리자가 상세 답변 데이터 조회
+    @Operation(summary = "사용자가 작성한 qna 질문의 상세 답변 조회")
     @GetMapping("/my/question/{question_id}/answer/{answer_id}")
     public ResponseEntity<?> getAnswer(@RequestParam(name = "question_id") Long questionId,
                                        @RequestParam(name = "answer_id") Long answerId
@@ -87,6 +92,7 @@ public class AnswerController {
 
 
     //관리자가 질문에 답변 등록
+    @Operation(summary = "사용자가 작성한 qna 질문에 답변 등록(관리자 전용)")
     @PostMapping("/my/question/{question_id}/answer")
     public ResponseEntity<?> postAnswer(@RequestParam(name = "question_id") Long questionId,
                                         @RequestBody @Valid ReqAnswerDto reqAnswerDto ) {
@@ -114,6 +120,7 @@ public class AnswerController {
     }
 
     //관리자가 질문에 답변 수정
+    @Operation(summary = "사용자가 작성한 qna 질문에 답변 수정(관리자 전용)")
     @PutMapping("/my/question/{question_id}/answer/{answer_id}")
     public ResponseEntity<?> modifyAnswer(@RequestParam(name = "question_id") Long questionId,
                                           @RequestParam(name = "answer_id") Long answerId,
@@ -144,6 +151,7 @@ public class AnswerController {
     }
 
     //관리자가 답변 삭제
+    @Operation(summary = "사용자가 작성한 qna 질문에 답변 삭제(관리자 전용)")
     @DeleteMapping("/my/question/{question_id}/answer/{answer_id}")
     public ResponseEntity<?> modifyAnswer(@RequestParam(name = "question_id") Long questionId,
                                           @RequestParam(name = "answer_id") Long answerId ) {

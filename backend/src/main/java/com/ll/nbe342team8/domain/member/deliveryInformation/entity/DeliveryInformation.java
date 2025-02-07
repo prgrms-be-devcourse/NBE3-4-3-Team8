@@ -37,7 +37,7 @@ public class DeliveryInformation extends BaseTime {
         this.addressName = Ut.XSSSanitizer.sanitize(dto.getAddressName());
         this.postCode = Ut.XSSSanitizer.sanitize(dto.getPostCode());
         this.detailAddress = Ut.XSSSanitizer.sanitize(dto.getDetailAddress());
-        this.recipient = Ut.XSSSanitizer.sanitize(recipient);
+        this.recipient = Ut.XSSSanitizer.sanitize(dto.getRecipient());
         this.phone = Ut.XSSSanitizer.sanitize(dto.getPhone());
         this.isDefaultAddress=dto.getIsDefaultAddress();
         this.member=member;

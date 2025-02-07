@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInfor
 import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.deliveryInformation.repository.DeliveryInformationRepository;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +26,16 @@ public class DeliveryInformationService {
 
         //사용자 개체의 배송 정보 리스트에 생성한 배송 정보개체를 추가 등록한다.
         //더티 체킹을 이용해 사용자 개체를 갱신한다.
-        member.addDeliveryInformaiton(deliveryInformation);
+        member.addDeliveryInformation(deliveryInformation);
 
     }
 
     @Transactional
-    public void deleteDeliveryInformation(Member member,Long id) {
+    public void deleteDeliveryInformation(DeliveryInformation deliveryInformation) {
 
         //사용자개체의 배송 정보 리스트에서 id에 해당하는 deliveryInformation을 찾아 삭제
         //더티 체킹을 이용해 개체 갱신
-        member.deleteDeliveryInformaiton(id);
+        deliveryInformationRepository.delete(deliveryInformation);
     }
 
     @Transactional
@@ -44,12 +45,18 @@ public class DeliveryInformationService {
         //dto의 isDefaultAddress가 false인 경우 그냥 데이터 갱신한다.
         //더티 체킹을 이용한 개체 갱신
         if(dto.getIsDefaultAddress()) {
-            member.convertFalseDeliveryInformaitonsIsDefaultAddress();
+            member.convertFalseDeliveryInformationsIsDefaultAddress();
         }
         deliveryInformation.updateDeliveryInfo(dto);
     }
 
     public Optional<DeliveryInformation> findById(Long id) {
         return deliveryInformationRepository.findById(id);
+    }
+
+    //수정, 삭제하려는 게시글을 사용자가 작성한지 학인
+    public boolean isDeliveryInformationOwner(Member member, DeliveryInformation deliveryInformation) {
+
+        return deliveryInformation.getMember().getId().equals(member.getId());
     }
 }

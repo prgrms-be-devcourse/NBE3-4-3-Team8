@@ -12,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    boolean existsByQuestionAndMemberAndContentAndCreatedAtAfter(Question question, Member member, String content, LocalDateTime cutoffTime);
-    List<Answer> findByQuestionOrderByCreatedAtDesc(Question question);
+    boolean existsByQuestionAndMemberAndContentAndCreateDateAfter(Question question, Member member, String content, LocalDateTime cutoffTime);
+    List<Answer> findByQuestionOrderByCreateDateDesc(Question question);
 }

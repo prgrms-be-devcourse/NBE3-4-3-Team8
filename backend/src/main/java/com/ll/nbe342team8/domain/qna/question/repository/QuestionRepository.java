@@ -13,5 +13,5 @@ import java.time.LocalDateTime;
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Page<Question> findByMember(Pageable pageable, Member member);
-    boolean existsByMemberAndTitleAndContentAndCreatedAtAfter( Member member, String title,String content, LocalDateTime cutoffTime);
+    boolean existsByMemberAndTitleAndContentAndCreateDateAfter( Member member, String title,String content, LocalDateTime cutoffTime);
 }

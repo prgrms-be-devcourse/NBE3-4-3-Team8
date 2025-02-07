@@ -5,6 +5,8 @@ import com.ll.nbe342team8.domain.member.member.dto.ResMemberMyPageDto;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import jakarta.validation.Valid;
 
 import java.util.Optional;
 
+@Tag(name = "DeliveryInformationController", description = "사용자 정보 컨트롤러")
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -22,6 +25,7 @@ public class MemberController {
     private final MemberService memberService;
 
     //마이페이지 데이터를 불러온다. 마이페이지는 resMemberMyPageDto 데이터를 이용해 마이페이지를 구성한다.
+    @Operation(summary = "사용자 정보 조회")
     @GetMapping("/my")
     public ResponseEntity<?> getMyPage() {
 
@@ -42,6 +46,7 @@ public class MemberController {
     }
 
     //사용자 정보를 갱신하는 기능(배송 정보 제외)이며 갱신 정보는 putReqMemberMyPageDto로 받는다.
+    @Operation(summary = "사용자 정보 갱신")
     @PutMapping("/my")
     public ResponseEntity<?> putMyPage(@RequestBody @Valid PutReqMemberMyPageDto putReqMemberMyPageDto
                                       ) {
