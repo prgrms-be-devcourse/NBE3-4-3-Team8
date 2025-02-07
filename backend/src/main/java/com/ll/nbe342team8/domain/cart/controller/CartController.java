@@ -7,14 +7,18 @@ import com.ll.nbe342team8.domain.cart.dto.CartRequestDto;
 import com.ll.nbe342team8.domain.cart.dto.CartResponseDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.service.CartService;
+import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,13 +32,13 @@ public class CartController {
     private final MemberService memberService;
 
     @Operation(summary = "장바구니 추가")
-    @PostMapping("/{book-id}/{member-id}")
-    public void addCart(@PathVariable("book-id") long bookId,
-                        @PathVariable("member-id") long memberId,
-                        @RequestBody CartItemRequestDto cartItemRequestDto) {
+    @PostMapping("/")
+    public void addCart(@RequestBody CartItemRequestDto cartItemRequestDto,
+                        @RequestAttribute("member") Member member) {
 
         CartRequestDto cartRequestDto = new CartRequestDto(List.of(cartItemRequestDto));
-        updateCartItems(memberId, cartRequestDto);
+
+        updateCartItems(member.getId(), cartRequestDto);
     }
 
     @Operation(summary = "장바구니 수정")

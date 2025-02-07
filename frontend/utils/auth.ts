@@ -12,7 +12,9 @@ export const isLoggedIn = () => {
   return !!cookies['user_session'];
 };
 
-export const getMemberId = () => {
+export const getJwtToken = () => {
+  if (typeof window === 'undefined') return null;
+
   const cookies = document.cookie.split(';').reduce(
     (acc, cookie) => {
       const [name, value] = cookie.trim().split('=');
@@ -21,5 +23,6 @@ export const getMemberId = () => {
     },
     {} as Record<string, string>,
   );
-  return cookies['member_id'] || null;
+
+  return cookies['jwtToken'] || null;
 };

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import type { Book } from '@/types/book';
 import { addToCart } from '@/utils/api';
-import { getMemberId, isLoggedIn } from '@/utils/auth';
+import { getJwtToken, isLoggedIn } from '@/utils/auth';
 import { AddToCartButton } from '@/app/components/common/AddToCartButton';
 import StarRating from '@/app/search/components/StarRating';
 
@@ -14,10 +14,9 @@ interface BookInfoProps {
 }
 
 export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
-  const [quantity, setQuantity] = useState(1); // 수량 상태 추가
+  const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
-  // 수량 변경 핸들러
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (value > 0) {
@@ -28,11 +27,11 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
   const handleAddToCart = async () => {
     try {
       if (isLoggedIn()) {
-        const memberId = getMemberId();
-        if (!memberId) throw new Error('로그인 정보가 없습니다');
-        await addToCart(book.id, memberId, 1);
+        const jwtToken = getJwtToken();
+        if (!jwtToken) throw new Error('로그인 정보가 없습니다');
+        await addToCart(book.id, jwtToken, quantity);
       } else {
-        await addToCart(book.id, 1, 1);
+        await addToCart(book.id, null, quantity);
       }
     } catch (error) {
       alert(error instanceof Error ? error.message : '장바구니 추가에 실패했습니다');
@@ -46,15 +45,8 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
 
   return (
     <div className="max-w-[800px] mx-auto px-4 py-8">
-      {' '}
-      {/* 전체 컨테이너 너비 증가 */}
       <div className="flex gap-8">
-        {' '}
-        {/* flex-row가 기본값이므로 생략 가능 */}
-        {/* 도서 이미지 */}
         <div className="w-[380px] flex-shrink-0">
-          {' '}
-          {/* flex-shrink-0으로 크기 고정 */}
           <Image
             src={book.coverImage || '/default-book.png'}
             alt={book.title}
@@ -64,10 +56,7 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
             priority
           />
         </div>
-        {/* 도서 정보 */}
         <div className="w-[380px]">
-          {' '}
-          {/* 이미지와 동일한 너비 */}
           <h1 className="text-2xl font-bold">{book.title}</h1>
           <p className="text-lg mt-2">{book.author}</p>
           <p className="text-gray-600 mt-1">
@@ -105,7 +94,7 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
           <div className="flex flex-col gap-2">
             <AddToCartButton
               bookId={book.id}
-              memberId={isLoggedIn() ? Number(getMemberId()) : 0}
+              jwtToken={isLoggedIn() ? getJwtToken() : null}
               quantity={quantity}
               className="w-full py-3"
             />

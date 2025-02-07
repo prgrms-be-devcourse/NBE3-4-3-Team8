@@ -1,7 +1,21 @@
 // utils/cart.ts
-import { getMemberId, isLoggedIn } from '@/utils/auth';
 
 const CART_KEY = 'guest_cart';
+const API_URL = 'http://localhost:8080/cart/';
+const JWT_COOKIE_NAME = 'jwtToken';
+
+interface CartItem {
+  bookId: number;
+  quantity: number;
+}
+
+// JWT 토큰 쿠키 존재 여부로 로그인 상태 확인
+const isLoggedIn = () => {
+  return document.cookie
+    .split(';')
+    .map((item) => item.trim())
+    .some((item) => item.startsWith(`${JWT_COOKIE_NAME}=`));
+};
 
 export const getGuestCart = (): CartItem[] => {
   if (typeof window === 'undefined') return [];
@@ -13,27 +27,23 @@ export const saveGuestCart = (cart: CartItem[]) => {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
 };
 
-interface CartItem {
-  bookId: number;
-  quantity: number;
-}
-
-// API 통신 함수
-export const addToCart = async (bookId: number, memberId: number, quantity: number) => {
+export const addToCart = async (bookId: number, quantity: number) => {
   try {
-    if (memberId > 0) {
-      // 로그인 상태
-      const response = await fetch(`http://localhost:8080/cart/${bookId}/${memberId}`, {
+    console.log('JWT 쿠키 존재:', isLoggedIn());
+    if (isLoggedIn()) {
+      // 로그인 사용자: API 서버 연동
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ bookId, quantity }),
+        credentials: 'include', // 쿠키 포함 설정
       });
 
       if (!response.ok) throw new Error('장바구니 추가 실패');
     } else {
-      // 비로그인 상태
+      // 비로그인 사용자: 로컬 스토리지 사용
       const cart = getGuestCart();
       const existingItem = cart.find((item) => item.bookId === bookId);
 
@@ -42,7 +52,6 @@ export const addToCart = async (bookId: number, memberId: number, quantity: numb
       } else {
         cart.push({ bookId, quantity });
       }
-
       saveGuestCart(cart);
     }
   } catch (error) {
@@ -51,26 +60,25 @@ export const addToCart = async (bookId: number, memberId: number, quantity: numb
   }
 };
 
-// 로그인 시 호출할 동기화 함수
 export const syncGuestCart = async () => {
   if (!isLoggedIn()) return;
 
   const guestCart = getGuestCart();
   if (guestCart.length === 0) return;
 
-  const memberId = getMemberId();
-  if (!memberId) throw new Error('회원 ID를 찾을 수 없습니다.');
-
   try {
     await Promise.all(
       guestCart.map((item) =>
-        fetch(`http://localhost:8080/cart/${item.bookId}/${memberId}`, {
+        fetch(API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             bookId: item.bookId,
             quantity: item.quantity,
           }),
+          credentials: 'include', // 쿠키 포함 설정
         }),
       ),
     );
@@ -83,10 +91,10 @@ export const syncGuestCart = async () => {
 
 export const fetchCart = async (): Promise<CartItem[]> => {
   if (isLoggedIn()) {
-    const memberId = getMemberId();
-    if (!memberId) throw new Error('회원 ID를 찾을 수 없습니다.');
+    const response = await fetch(API_URL, {
+      credentials: 'include', // 쿠키 포함 설정
+    });
 
-    const response = await fetch(`http://localhost:8080/cart/${memberId}`);
     if (!response.ok) throw new Error('장바구니 조회 실패');
     return response.json();
   } else {

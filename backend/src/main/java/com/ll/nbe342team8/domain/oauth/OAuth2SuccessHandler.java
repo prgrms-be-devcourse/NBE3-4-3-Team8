@@ -32,12 +32,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         SecurityUser securityUser = (SecurityUser) oAuth2User;
 
         String jwtToken = jwtService.generateToken(securityUser.getMember());
-        ResponseCookie cookie = ResponseCookie.from("accessToken", jwtToken)
+        ResponseCookie cookie = ResponseCookie.from("jwtToken", jwtToken)
                 .path("/")
                 .domain("localhost")
                 .sameSite("Strict")
                 .secure(true)
-                .httpOnly(true)
+//                .httpOnly(true) // true로 해놓으면 프론트에서 document.cookie로 쿠키 확인 불가능...
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
 

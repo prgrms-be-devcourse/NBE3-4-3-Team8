@@ -5,14 +5,14 @@ import { addToCart } from '@/utils/cart';
 
 interface AddToCartButtonProps {
   bookId: number;
-  memberId?: number;
+  jwtToken: string | null;
   quantity: number;
   className?: string;
 }
 
 export const AddToCartButton = ({
   bookId,
-  memberId,
+  jwtToken,
   quantity,
   className,
 }: AddToCartButtonProps) => {
@@ -21,7 +21,7 @@ export const AddToCartButton = ({
   const handleClick = async () => {
     setIsAdding(true);
     try {
-      await addToCart(bookId, memberId || 0, quantity); // quantity 전달
+      await addToCart(bookId, quantity);
       alert('장바구니에 추가되었습니다');
     } catch (error) {
       console.error('장바구니 추가 실패:', error);
