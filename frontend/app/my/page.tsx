@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import { MemberMyPageDto,DeliveryInformationDto, errorDto  } from "./types";
 import { GetMyPage, PutMyPage, PutMyAddress, PostAddress, DeleteAddress } from "./api";
 
+import Image from 'next/image';
+import Link from 'next/link';
+import Sidebar from '@/app/components/my/Sidebar';
 
 export default function Home() {
+  
 
+    const router = useRouter();
     const [responseBody, setResponseBody] = useState<MemberMyPageDto | null>(null);
 
     const [isEditing, setIsEditing] = useState(false);
@@ -195,7 +200,10 @@ export default function Home() {
     //console.log(responseBody);
 
     return (
-        <div className="container mx-auto p-4">
+      <div className="flex">
+        
+        <main className="flex-1 p-6">
+        <div className="w-full h-full flex flex-col flex-1 p-4">
           <h1 className="text-2xl font-bold mb-4">마이페이지</h1>
     
           {responseBody ? (
@@ -304,6 +312,19 @@ export default function Home() {
                 ) : (
                   <p className="text-gray-500">등록된 배송지가 없습니다.</p>
                 )}
+
+                <button
+                onClick={() => router.push("/my/question/createForm")}
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+                >
+                질문 등록하기
+                </button>
+                <button
+                onClick={() => router.push("/my/question")}
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+                >
+                질문 목록
+                </button>
     
                 {/* 배송지 추가 버튼 */}
                 {!isAddingAddress ? (
@@ -335,6 +356,8 @@ export default function Home() {
           ) : (
             <p className="text-gray-500">데이터를 불러오는 중...</p>
           )}
+        </div>
+        </main>
         </div>
       );
   }
