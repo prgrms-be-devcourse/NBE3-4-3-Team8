@@ -66,7 +66,7 @@ public class DataInitializer {
                     .name("user1")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER) // 사용자 역할
-                    .oauthId(123456789L) // 예제 OAuth ID
+                    .oauthId(String.valueOf(123456789L)) // 예제 OAuth ID
                     .email("chulsoo@example.com") // 소셜 로그인 ID
                     .deliveryInformations(new ArrayList<>()) // 초기에는 빈 리스트
                     .build();
@@ -74,7 +74,7 @@ public class DataInitializer {
                     .name("user2")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER) // 사용자 역할
-                    .oauthId(123456789L) // 예제 OAuth ID
+                    .oauthId(String.valueOf(123456789L)) // 예제 OAuth ID
                     .email("chulsoo11@example.com") // 소셜 로그인 ID
                     .deliveryInformations(new ArrayList<>()) // 초기에는 빈 리스트
                     .build();
@@ -82,7 +82,7 @@ public class DataInitializer {
                     .name("user3")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER) // 사용자 역할
-                    .oauthId(123456789L) // 예제 OAuth ID
+                    .oauthId(String.valueOf(123456789L)) // 예제 OAuth ID
                     .email("chulsoo3@example.com") // 소셜 로그인 ID
                     .deliveryInformations(new ArrayList<>()) // 초기에는 빈 리스트
                     .build();
@@ -90,7 +90,6 @@ public class DataInitializer {
             memberRepository.save(member2);
             memberRepository.save(member3);
         }
-
         // 상품 데이터 초기화
         if (bookRepository.count() == 0) {
             Category category1 = categoryRepository.findById(1L).orElseThrow();  // 카테고리 데이터 가져오기

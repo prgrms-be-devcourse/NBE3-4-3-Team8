@@ -3,6 +3,8 @@ package com.ll.nbe342team8.domain.jwt;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
+@Component
 public class JwtService {
     @Value("${custom.jwt.secret}")
     private String secretKey;

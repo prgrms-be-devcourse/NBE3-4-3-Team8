@@ -23,7 +23,7 @@ public class ExternalBookApiService {
         }
 
         String url = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?"
-                + "ttbkey=ttbcameogu1634001" // 하드코딩 (추후수정)
+                + "ttbkey=" + ttbkey
                 + "&itemIdType=ISBN13"
                 + "&ItemId=" + isbn13
                 + "&output=js"

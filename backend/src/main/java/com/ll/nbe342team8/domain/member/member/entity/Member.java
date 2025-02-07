@@ -45,6 +45,9 @@ public class Member extends BaseTime {
     @Column(name = "password", nullable = false)
     private String password;
 
+    private String username;
+
+
 
     // Enum 사용자 역할
     public enum MemberType {

@@ -67,7 +67,7 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findByOauthId(oauthId);
     }
 
-    public Optional<Member> findByUsername(String username) { return memberRepository.findByUsername(username);}
+    public Optional<Member> findByUsername(String oauthId) { return memberRepository.findByUsername(oauthId);}
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
