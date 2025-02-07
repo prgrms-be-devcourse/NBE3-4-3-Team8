@@ -4,7 +4,3 @@ aladin:
 spring:
   profiles:
     active: mysql
-
-
-
-

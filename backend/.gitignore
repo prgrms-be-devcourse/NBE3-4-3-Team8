@@ -44,3 +44,9 @@ src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoProfile.java
 src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoTokenResponse.java
 src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoUserProperties.java
 src/main/java/com/ll/nbe342team8/domain/member/member/dto/KakaoUserResponse.java
+
+# Ignore application configuration files
+application.yml
+application-dev.yml
+application-prod.yml
+application-secret.yml
