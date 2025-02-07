@@ -6,13 +6,15 @@ import com.ll.nbe342team8.domain.book.book.dto.ExternalBookDto;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.repository.BookRepository;
 import com.ll.nbe342team8.domain.book.book.type.SearchType;
-import com.ll.nbe342team8.domain.book.book.type.SortType;
+import com.ll.nbe342team8.domain.book.book.type.BookSortType;
+import com.ll.nbe342team8.global.exceptions.ServiceException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,20 +29,24 @@ public class BookService {
     private final ExternalBookApiService externalBookApiService;
     private final BookRepository bookRepository;
 
-    public Page<Book> getAllBooks(int page, int pageSize, SortType sortType) {
+    public Page<Book> getAllBooks(int page, int pageSize, BookSortType bookSortType) {
         List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(sortType.getOrder());
+        sorts.add(bookSortType.getOrder());
+
+        if(!(bookSortType == BookSortType.PUBLISHED_DATE)){ // 출간일을 보조 정렬 기준으로 추가
+            BookSortType baseSort = BookSortType.PUBLISHED_DATE;
+            sorts.add(baseSort.getOrder());
+        }
 
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
         return bookRepository.findAll(pageable);
     }
 
     public Book getBookById(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID 값이 null입니다.");
-        }
+        // Todo: GlobalExceptionHandler 를 통해 처리하도록 수정
+
         return bookRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + id + ")의 책을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "id에 해당하는 책이 없습니다."));
     }
 
     public long count() {
@@ -51,27 +57,27 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Book createReview(Book book, float rating) {
+    public Book createReview(Book book, Double rating) {
         book.createReview(rating);
         return bookRepository.save(book);
     }
 
-    public Book deleteReview(Book book, float rating) {
+    public Book deleteReview(Book book, Double rating) {
         book.deleteReview(rating);
         return bookRepository.save(book);
     }
 
     @Transactional(readOnly = true)
-    public Page<Book> searchBooks(int page, int pageSize, SortType sortType, SearchType searchType, String keyword) {
+    public Page<Book> searchBooks(int page, int pageSize, BookSortType bookSortType, SearchType searchType, String keyword) {
         Pageable pageable;
         // 판매량, 평점, 리뷰 정렬 시 보조 정렬 기준으로 출간일(pubDate) 적용
-        if (sortType == SortType.SALES_POINT || sortType == SortType.RATING || sortType == SortType.REVIEW_COUNT) {
+        if (bookSortType == BookSortType.SALES_POINT || bookSortType == BookSortType.RATING || bookSortType == BookSortType.REVIEW_COUNT) {
             pageable = PageRequest.of(page, pageSize, Sort.by(
-                    new Sort.Order(sortType.getOrder().getDirection(), sortType.getOrder().getProperty()),
+                    new Sort.Order(bookSortType.getOrder().getDirection(), bookSortType.getOrder().getProperty()),
                     new Sort.Order(Sort.Direction.DESC, "pubDate")
             ));
         } else {
-            pageable = PageRequest.of(page, pageSize, Sort.by(sortType.getOrder()));
+            pageable = PageRequest.of(page, pageSize, Sort.by(bookSortType.getOrder()));
         }
 
         switch (searchType) {

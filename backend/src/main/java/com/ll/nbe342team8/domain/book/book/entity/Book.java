@@ -23,6 +23,10 @@ import java.util.List;
 @AllArgsConstructor
 public class Book extends BaseTime {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
+
     @Column(length = 100)
     @NotNull
     private String title;      // 제목
@@ -30,7 +34,6 @@ public class Book extends BaseTime {
     @NotNull
     private String author;     // 저자
 
-    @Column(name = "isbn")
     private String isbn;       // ISBN
 
     @NotNull
@@ -40,21 +43,21 @@ public class Book extends BaseTime {
     private LocalDate pubDate;      //출판일
 
     @NotNull
-    private int priceStandard;         // 정가
+    private Integer priceStandard;         // 정가
 
     @NotNull
-    private int pricesSales;         // 판매가
+    private Integer pricesSales;         // 판매가
 
     @NotNull
-    private int stock;         // 재고
+    private Integer stock;         // 재고
 
     @NotNull
-    private int status;         // 판매 상태
+    private Integer status;         // 판매 상태
 
-    private float rating;      // 평점
+    private Double rating;      // 평점
 
     @Formula("CASE WHEN review_count = 0 THEN 0 ELSE rating / review_count END")
-    private float averageRating;        //평균 평점
+    private Double averageRating;        //평균 평점
 
     private String toc;        // 목차
 
@@ -62,12 +65,11 @@ public class Book extends BaseTime {
 
     private String description;           // 상세페이지 글
 
-    @Column(name = "description2")
     private String descriptionImage;
 
-    private long salesPoint;
+    private Long salesPoint;
 
-    private long reviewCount;
+    private Long reviewCount;
 
     private String publisher;
 
@@ -80,12 +82,12 @@ public class Book extends BaseTime {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private List<Review> review;
 
-    public void createReview(float rating) {
+    public void createReview(Double rating) {
         this.reviewCount++;
         this.rating += rating;
     }
 
-    public void deleteReview(float rating) {
+    public void deleteReview(Double rating) {
         this.reviewCount--;
         this.rating -= rating;
     }

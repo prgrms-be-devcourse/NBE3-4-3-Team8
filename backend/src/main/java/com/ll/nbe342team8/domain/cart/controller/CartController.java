@@ -28,52 +28,32 @@ import java.util.stream.Collectors;
 public class CartController {
 
     private final CartService cartService;
-    private final BookService bookService;
     private final MemberService memberService;
 
     @Operation(summary = "장바구니 추가")
-    @PostMapping("/")
-    public void addCart(@RequestBody CartItemRequestDto cartItemRequestDto,
+    @PostMapping
+    public void addCart(@RequestBody CartRequestDto cartRequestDto, // CartRequestDto로 변경
                         @RequestAttribute("member") Member member) {
 
-        CartRequestDto cartRequestDto = new CartRequestDto(List.of(cartItemRequestDto));
-
-        updateCartItems(member.getId(), cartRequestDto);
-    }
-
-    @Operation(summary = "장바구니 수정")
-    @PutMapping("/{book-id}/{member-id}")
-    public void updateCartItem(@PathVariable("book-id") long bookId,
-                               @PathVariable("member-id") long memberId,
-                               @RequestParam("quantity") int quantity) {
-
-        Member member = memberService.getMemberById(memberId);
-
-        Cart cartItem = member.getCarts().stream()
-                .filter(cart -> cart.getBook().getId().equals(bookId))
-                .findFirst()
-                .orElse(null);
-
-        cartService.updateCartItem(cartItem, quantity);
+        if (cartRequestDto != null) {
+            cartService.updateCartItems(member, cartRequestDto);
+        }
     }
 
     @Operation(summary = "장바구니 수정 json")
-    @PostMapping("/{member-id}")
-    public void updateCartItems(@PathVariable("member-id") long memberId,
+    @PutMapping
+    public void updateCartItems(@RequestAttribute("member") Member member,
                                 @RequestBody CartRequestDto cartRequestDto){
 
-        Member member = memberService.getMemberById(memberId);
         if (cartRequestDto != null) {
             cartService.updateCartItems(member, cartRequestDto);
         }
     }
 
     @Operation(summary = "장바구니 삭제")
-    @DeleteMapping("/{member-id}")
-    public void deleteBook(@PathVariable("member-id") long memberId,
+    @DeleteMapping
+    public void deleteBook(@RequestAttribute("member") Member member,
                            @RequestBody CartRequestDto cartRequestDto) {
-
-        Member member = memberService.getMemberById(memberId);
 
         if (cartRequestDto != null) {
             cartService.deleteProduct(member, cartRequestDto);
@@ -81,9 +61,8 @@ public class CartController {
     }
 
     @Operation(summary = "장바구니 조회")
-    @GetMapping("/{member-id}")
-    public List<CartResponseDto> getCart(@PathVariable("member-id") long memberId) {
-        Member member = memberService.getMemberById(memberId);
+    @GetMapping
+    public List<CartResponseDto> getCart(@RequestAttribute("member") Member member) {
         List<Cart> carts = cartService.findCartByMember(member);
 
         return carts.stream()

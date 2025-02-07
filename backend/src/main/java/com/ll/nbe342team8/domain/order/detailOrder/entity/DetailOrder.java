@@ -8,11 +8,14 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetailOrder extends BaseTime {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;

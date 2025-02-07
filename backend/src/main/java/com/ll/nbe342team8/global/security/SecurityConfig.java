@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cart/**").authenticated()
+//                        .requestMatchers("/cart/**").authenticated()
                         .requestMatchers("/error").permitAll() // 에러 페이지 허용
                         .anyRequest().permitAll()
                 )

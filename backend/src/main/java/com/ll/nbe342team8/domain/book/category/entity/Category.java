@@ -1,10 +1,7 @@
 package com.ll.nbe342team8.domain.book.category.entity;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
-import com.ll.nbe342team8.global.jpa.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +16,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category extends BaseEntity {
+public class Category{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
+
     @NotNull
     private Integer categoryId;
 
@@ -40,7 +42,7 @@ public class Category extends BaseEntity {
 
     private String depth5;
 
-    @OneToMany(mappedBy = "categoryId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "categoryId")
     private List<Book> books = new ArrayList<>();
 
     private String category; // 카테고리 종류 ex) 국내도서 > 경제/경영 > 재테크/금융 > 재테크 > 부자되는법

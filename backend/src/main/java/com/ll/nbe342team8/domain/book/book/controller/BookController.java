@@ -5,11 +5,12 @@ import com.ll.nbe342team8.domain.book.book.dto.BookResponseDto;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
 import com.ll.nbe342team8.domain.book.book.type.SearchType;
-import com.ll.nbe342team8.domain.book.book.type.SortType;
+import com.ll.nbe342team8.domain.book.book.type.BookSortType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,36 +26,30 @@ public class BookController {
     @GetMapping
     @Operation(summary = "전체 도서 조회")
     public Page<BookResponseDto> getAllBooks(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "10") int pageSize,
-                                             @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType) {
+                                             @RequestParam(defaultValue = "10") @Range(min = 0, max = 100) int pageSize,
+                                             @RequestParam(defaultValue = "PUBLISHED_DATE") BookSortType bookSortType) {
 
-        Page<Book> books = bookService.getAllBooks(page, pageSize, sortType);
+        Page<Book> books = bookService.getAllBooks(page, pageSize, bookSortType);
         return books.map(BookResponseDto::from);
     }
 
     @Operation(summary = "특정 도서 조회")
-    @GetMapping("/{book-id}")
-    public BookResponseDto getBookById(@PathVariable("book-id") long bookId) {
+    @GetMapping("/{bookId}")
+    public BookResponseDto getBookById(@PathVariable Long bookId) {
         Book book = bookService.getBookById(bookId);
         return BookResponseDto.from(book);
-    }
-
-    @Operation(summary = "특정 도서 댓글 조회")
-    @GetMapping("/{book-id}/review")
-    public void getBookReview(@PathVariable("book-id") long bookId) {
-
     }
 
     @Operation(summary = "도서 검색 (제목, 저자, ISBN13, 출판사 검색)")
     @GetMapping("/search")
     public Page<BookResponseDto> searchBooks(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "PUBLISHED_DATE") SortType sortType,
+            @RequestParam(defaultValue = "10") @Range(min = 0, max = 100) int pageSize,
+            @RequestParam(defaultValue = "PUBLISHED_DATE") BookSortType bookSortType,
             @RequestParam(defaultValue = "TITLE") SearchType searchType,
             @RequestParam String keyword) {
 
-        Page<Book> books = bookService.searchBooks(page, pageSize, sortType, searchType, keyword);
+        Page<Book> books = bookService.searchBooks(page, pageSize, bookSortType, searchType, keyword);
         return books.map(BookResponseDto::from);
     }
 
@@ -68,7 +63,7 @@ public class BookController {
     }
 
     @PatchMapping("/admin/books/{bookId}")
-    public ResponseEntity<BookResponseDto> updateBookPart(@PathVariable("bookId") Long bookId,
+    public ResponseEntity<BookResponseDto> updateBookPart(@PathVariable Long bookId,
                                                           @RequestBody BookPatchRequestDto requestDto) {
         BookResponseDto updatedBook = bookService.updateBookPart(bookId, requestDto);
 

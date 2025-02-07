@@ -13,17 +13,17 @@ public record BookResponseDto(
         LocalDate pubDate,
         int priceStandard,
         int priceSales,
-        long salesPoint,
+        Long salesPoint,
         int stock,
         int status,
-        float rating,
+        Double rating,
         String toc,
-        long reviewCount,
+        Long reviewCount,
         String coverImage,
         Integer categoryId,
         String description,
         String descriptionImage,
-        float averageRating  // 추가한 평균 평점 필드
+        Double averageRating  // 추가한 평균 평점 필드
 ) {
     public static BookResponseDto from(Book book) {
         return new BookResponseDto(

@@ -116,7 +116,7 @@ public class BaseInitData {
 //                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
                     .publisher("출판사")
-                    .salesPoint(50+i)
+                    .salesPoint(50L + i)
                     .categoryId(category)
                     .isbn13("isbn13")
                     .build();
@@ -138,7 +138,7 @@ public class BaseInitData {
             Member member = memberService.getMemberById((long) i);
 
             for (int j = 1; j <= 10; j++) {
-                float rating = (float) (random.nextInt(11) * 0.5);
+                Double rating = random.nextInt(11) * 0.5;
                 Review review = Review.builder()
                         .book(book)
                         .member(member)

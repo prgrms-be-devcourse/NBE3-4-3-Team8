@@ -2,10 +2,7 @@ package com.ll.nbe342team8.domain.qna.question.entity;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +15,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Question extends BaseTime {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
     @Column(nullable = true) // 질문 제목
     private String title;

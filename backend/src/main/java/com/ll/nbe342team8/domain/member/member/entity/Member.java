@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member extends BaseTime {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
     private String name; // 사용자 이름
 
@@ -50,7 +53,7 @@ public class Member extends BaseTime {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryInformation> deliveryInformations;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     private List<Cart> carts;
 
 

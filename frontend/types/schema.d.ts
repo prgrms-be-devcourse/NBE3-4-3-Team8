@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/reviews/{review-id}": {
+    "/reviews/{reviewId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -38,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/cart/{book-id}/{member-id}": {
+    "/cart/{bookId}/{memberId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -120,7 +120,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/cart/{member-id}": {
+    "/cart/{memberId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -139,7 +139,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/cart/": {
+    "/cart/items": {
         parameters: {
             query?: never;
             header?: never;
@@ -237,7 +237,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/reviews/{book-id}": {
+    "/reviews/{bookId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -319,7 +319,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/books/{book-id}": {
+    "/books/{bookId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -328,23 +328,6 @@ export interface paths {
         };
         /** 특정 도서 조회 */
         get: operations["getBookById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/books/{book-id}/review": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 특정 도서 댓글 조회 */
-        get: operations["getBookReview"];
         put?: never;
         post?: never;
         delete?: never;
@@ -439,12 +422,12 @@ export interface components {
             phoneNumber: string;
         };
         Book: {
-            /** Format: int64 */
-            id?: number;
             /** Format: date-time */
             createDate?: string;
             /** Format: date-time */
             modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
             title: string;
             author: string;
             isbn?: string;
@@ -459,9 +442,9 @@ export interface components {
             stock: number;
             /** Format: int32 */
             status: number;
-            /** Format: float */
+            /** Format: double */
             rating?: number;
-            /** Format: float */
+            /** Format: double */
             averageRating?: number;
             toc?: string;
             coverImage?: string;
@@ -475,18 +458,22 @@ export interface components {
             review?: components["schemas"]["Review"][];
         };
         Cart: {
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
             /** Format: int64 */
             id?: number;
             /** Format: int32 */
             quantity?: number;
         };
         DeliveryInformation: {
-            /** Format: int64 */
-            id?: number;
             /** Format: date-time */
             createDate?: string;
             /** Format: date-time */
             modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
             addressName?: string;
             postCode?: string;
             detailAddress?: string;
@@ -499,12 +486,12 @@ export interface components {
             authority?: string;
         };
         Member: {
-            /** Format: int64 */
-            id?: number;
             /** Format: date-time */
             createDate?: string;
             /** Format: date-time */
             modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
             name?: string;
             phoneNumber?: string;
             /** @enum {string} */
@@ -514,20 +501,20 @@ export interface components {
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
             username?: string;
-            oauthId?: string;
             authorities?: components["schemas"]["GrantedAuthority"][];
+            oauthId?: string;
         };
         Review: {
-            /** Format: int64 */
-            id?: number;
             /** Format: date-time */
             createDate?: string;
             /** Format: date-time */
             modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
             book?: components["schemas"]["Book"];
             member?: components["schemas"]["Member"];
             content?: string;
-            /** Format: float */
+            /** Format: double */
             rating?: number;
         };
         ReqQuestionDto: {
@@ -562,7 +549,7 @@ export interface components {
             stock?: number;
             /** Format: int32 */
             status?: number;
-            /** Format: float */
+            /** Format: double */
             rating?: number;
             toc?: string;
             cover?: string;
@@ -606,7 +593,7 @@ export interface components {
             stock?: number;
             /** Format: int32 */
             status?: number;
-            /** Format: float */
+            /** Format: double */
             rating?: number;
             toc?: string;
             /** Format: int64 */
@@ -616,36 +603,36 @@ export interface components {
             categoryId?: number;
             description?: string;
             descriptionImage?: string;
-            /** Format: float */
+            /** Format: double */
             averageRating?: number;
         };
         PageReviewResponseDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
             first?: boolean;
             last?: boolean;
             pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             empty?: boolean;
         };
         PageableObject: {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            pageSize?: number;
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
-            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
             unpaged?: boolean;
         };
         ReviewResponseDto: {
@@ -655,7 +642,7 @@ export interface components {
             reviewId?: number;
             author?: string;
             content?: string;
-            /** Format: float */
+            /** Format: double */
             rating?: number;
             /** Format: date-time */
             createDate?: string;
@@ -695,21 +682,21 @@ export interface components {
             coverImage?: string;
         };
         PageBookResponseDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
             first?: boolean;
             last?: boolean;
             pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             empty?: boolean;
         };
         AdminDetailOrderDTO: {
@@ -735,39 +722,39 @@ export interface components {
             detailOrders?: components["schemas"]["AdminDetailOrderDTO"][];
         };
         PageAdminOrderDTO: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
             first?: boolean;
             last?: boolean;
             pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
             first?: boolean;
             last?: boolean;
             pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             empty?: boolean;
         };
     };
@@ -787,7 +774,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                "review-id": number;
+                reviewId: number;
             };
             cookie?: never;
         };
@@ -807,7 +794,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                "review-id": number;
+                reviewId: number;
             };
             cookie?: never;
         };
@@ -877,8 +864,8 @@ export interface operations {
             };
             header?: never;
             path: {
-                "book-id": number;
-                "member-id": number;
+                bookId: number;
+                memberId: number;
             };
             cookie?: never;
         };
@@ -1015,7 +1002,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                "member-id": number;
+                memberId: number;
             };
             cookie?: never;
         };
@@ -1037,7 +1024,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                "member-id": number;
+                memberId: number;
             };
             cookie?: never;
         };
@@ -1061,7 +1048,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                "member-id": number;
+                memberId: number;
             };
             cookie?: never;
         };
@@ -1201,7 +1188,7 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                sortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC";
+                reviewSortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC" | "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
             };
             header?: never;
             path?: never;
@@ -1225,11 +1212,11 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                sortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC";
+                reviewSortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC" | "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
             };
             header?: never;
             path: {
-                "book-id": number;
+                bookId: number;
             };
             cookie?: never;
         };
@@ -1315,7 +1302,7 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                sortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
+                bookSortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
             };
             header?: never;
             path?: never;
@@ -1339,7 +1326,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                "book-id": number;
+                bookId: number;
             };
             cookie?: never;
         };
@@ -1356,32 +1343,12 @@ export interface operations {
             };
         };
     };
-    getBookReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                "book-id": number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     searchBooks: {
         parameters: {
             query: {
                 page?: number;
                 pageSize?: number;
-                sortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
+                bookSortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
                 searchType?: "TITLE" | "AUTHOR" | "ISBN13" | "PUBLISHER";
                 keyword: string;
             };
