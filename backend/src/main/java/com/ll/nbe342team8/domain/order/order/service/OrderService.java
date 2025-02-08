@@ -7,7 +7,7 @@ import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +27,7 @@ public class OrderService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional(readOnly = true) //사용하여 주문 조회 최적화
     public List<OrderDTO> getOrdersByMemberId(Long memberId) {
         // 회원이 존재하는지 먼저 체크
         Member member = memberRepository.findById(memberId)
@@ -44,7 +45,7 @@ public class OrderService {
                         order.getId(),
                         order.getOrderStatus().name(),
                         order.getTotalPrice()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
