@@ -71,6 +71,7 @@ public class DataInitializer {
                     .memberType(Member.MemberType.USER) // 사용자 역할
                     .oauthId(String.valueOf(123456789L)) // 예제 OAuth ID
                     .email("chulsoo@example.com") // 소셜 로그인 ID
+                    .password("securePassword1")
                     .deliveryInformations(new ArrayList<>()) // 초기에는 빈 리스트
                     .build();
             Member member2 = Member.builder()
@@ -79,6 +80,7 @@ public class DataInitializer {
                     .memberType(Member.MemberType.USER) // 사용자 역할
                     .oauthId(String.valueOf(123456789L)) // 예제 OAuth ID
                     .email("chulsoo11@example.com") // 소셜 로그인 ID
+                    .password("securePassword2")
                     .deliveryInformations(new ArrayList<>()) // 초기에는 빈 리스트
                     .build();
             Member member3 = Member.builder()
@@ -87,6 +89,7 @@ public class DataInitializer {
                     .memberType(Member.MemberType.USER) // 사용자 역할
                     .oauthId(String.valueOf(123456789L)) // 예제 OAuth ID
                     .email("chulsoo3@example.com") // 소셜 로그인 ID
+                    .password("securePassword3")
                     .deliveryInformations(new ArrayList<>()) // 초기에는 빈 리스트
                     .build();
             memberRepository.save(member1);

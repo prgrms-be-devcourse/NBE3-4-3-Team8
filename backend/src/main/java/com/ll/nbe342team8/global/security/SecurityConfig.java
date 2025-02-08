@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .redirectionEndpoint(redirection -> redirection
                                 .baseUri("/login/oauth2/code/*"))
                         .successHandler(oAuth2SuccessHandler())
+                        .defaultSuccessUrl("/home", true) // 로그인 성공 후 리디렉션 URL 설정
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout") //
