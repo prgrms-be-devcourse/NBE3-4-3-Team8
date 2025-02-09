@@ -6,7 +6,11 @@ export default function KakaoLoginButton() {
   const router = useRouter();
 
   const handleLogin = () => {
-    router.push('http://localhost:8080/oauth2/authorization/kakao');
+    const currentUrl = window.location.pathname + window.location.search; // 현재 페이지의 URL 저장
+    sessionStorage.setItem('redirectUrl', currentUrl); // ✅ 세션 스토리지에 저장
+
+    const loginUrl = `http://localhost:8080/oauth2/authorization/kakao?redirectUrl=${encodeURIComponent(currentUrl)}`;
+    router.push(loginUrl);
   };
 
   return (
