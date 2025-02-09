@@ -13,7 +13,7 @@ public class SecurityUser extends User implements OAuth2User {
     private final long id;
     private final String nickname;
     private final String email;
-    private Member member;
+    private final Member member;
 
     public SecurityUser(Member member) {
         super(
@@ -25,10 +25,6 @@ public class SecurityUser extends User implements OAuth2User {
         this.nickname = member.getName();
         this.email = member.getEmail(); // email 필드명 주의
         this.member = member;
-    }
-
-    public Member getMember() {
-        return this.member;
     }
 
     @Override
