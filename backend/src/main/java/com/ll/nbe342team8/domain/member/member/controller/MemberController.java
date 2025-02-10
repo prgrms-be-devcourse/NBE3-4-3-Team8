@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.member.member.controller;
 
 import com.ll.nbe342team8.domain.jwt.AuthService;
+import com.ll.nbe342team8.domain.member.member.dto.MemberDto;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
 import com.ll.nbe342team8.domain.member.member.dto.ResMemberMyPageDto;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
@@ -11,13 +12,16 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.Optional;
 
-@RequestMapping("/api/auth")
+@RequestMapping("/api/auth/me")
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -25,23 +29,25 @@ public class MemberController {
     private final AuthService authService;
     private final MemberService memberService;
 
+    @GetMapping("")
+    public ResponseEntity<?> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof SecurityUser securityUser) {
+            return ResponseEntity.ok(new MemberDto(securityUser.getMember()));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
 
     //마이페이지 데이터를 불러온다. 마이페이지는 resMemberMyPageDto 데이터를 이용해 마이페이지를 구성한다.
+    //
     @GetMapping("/my")
     public ResponseEntity<?> getMyPage() {
-        //@RequestHeader("Authorization") String token 변수로 추가해서 토큰을 받아온다.
         //jwt 토큰에서 id를 통해 회원정보를 찾는다.
         //여기선 임시로 이메일을 통해 회원정보를 찾는다.
         String email="rdh0427@naver.com";
-        /*
-         ResponseEntity<?> authResponse = authService.authenticate(token);
-        if (!authResponse.getStatusCode().is2xxSuccessful()) {
-            return authResponse;  // 인증 실패 시 바로 응답 반환
-        }
 
-        Member member = (Member) authResponse.getBody();
-        return ResponseEntity.ok(new ResMemberMyPageDto(member));
-        */
         Optional<Member> optionalMember = memberService.findByEmail(email);
 
         //사용자가 존재하지 않는 경우 에러 반환
@@ -51,6 +57,16 @@ public class MemberController {
         ResMemberMyPageDto memberMyPageDto=new ResMemberMyPageDto(optionalMember.get());
 
         return ResponseEntity.status(200).body(memberMyPageDto);
+
+        /*
+        @GetMapping("/my")
+        public ResponseEntity<?> getMyPage(@CookieValue(value = "accessToken", required = false) String token) {
+            Member member = authService.getMemberFromToken(token);
+            // 명시적으로 지연 로딩 데이터 초기화
+
+            ResMemberMyPageDto memberMyPageDto = new ResMemberMyPageDto(member);
+            return ResponseEntity.ok(memberMyPageDto);
+        }*/
 
     }
 
@@ -66,17 +82,7 @@ public class MemberController {
         // `member.getOauthId()`와 `member.getEmail()`을 인자로 전달하도록 수정
 
         Optional<Member> optionalMember = memberService.findByEmail(email);
-         /*
-          ResponseEntity<?> authResponse = authService.authenticate(token);
-        if (!authResponse.getStatusCode().is2xxSuccessful()) {
-            return authResponse;  // 인증 실패 시 바로 응답 반환
-        }
 
-        Member member = (Member) authResponse.getBody();
-        memberService.modifyOrJoin(member.getOauthId(), putReqMemberMyPageDto, member.getEmail());
-
-        return ResponseEntity.ok(new ResMemberMyPageDto(member));
-        */
         if(optionalMember.isEmpty()) { throw new ServiceException(404,"사용자를 찾을 수 없습니다.");}
 
         Member member=optionalMember.get();
@@ -87,11 +93,27 @@ public class MemberController {
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
 
         return ResponseEntity.status(200).body(resMemberMyPageDto);
+
+        /*
+           @PutMapping("/profile")
+    public ResponseEntity<?> putMyPage(@CookieValue(value = "accessToken", required = false) String token,
+                                       @RequestBody @Valid PutReqMemberMyPageDto putReqMemberMyPageDto) {
+        Member member = authService.getMemberFromToken(token);
+
+        member = memberService.modifyOrJoin(member.getOauthId(), putReqMemberMyPageDto, member.getEmail());
+        // 업데이트된 멤버 정보의 지연 로딩 데이터 초기화
+        Hibernate.initialize(member.getDeliveryInformations());
+
+        ResMemberMyPageDto resMemberMyPageDto = new ResMemberMyPageDto(member);
+        return ResponseEntity.ok(resMemberMyPageDto);
+    }
+         */
     }
 
+
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        return authService.logout(token);
+    public ResponseEntity<?> logout() {
+        return authService.logout();
     }
 
 }
