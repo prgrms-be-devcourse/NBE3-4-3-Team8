@@ -2,7 +2,7 @@ package com.ll.nbe342team8.domain.jwt;
 
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
+import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -33,12 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractTokenFromCookies(request);
             log.info("쿠키에서 추출된 토큰 존재 여부: {}", token != null);
 
-
             if (token != null && jwtService.validateToken(token)) {
-                String kakaoId = jwtService.getKakaoIdFromToken(token);
+                String kakaoId = jwtService.getKakaoIdFromToken(token); // findByOauthId랑 기능 비교하기
                 log.info("토큰에서 추출된 카카오 ID: {}", kakaoId);
 
-                Member member = memberRepository.findByOauthId(kakaoId)
+                Member member = memberService.findByOauthId(kakaoId)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
                 log.info("회원 조회 성공: {}", member.getEmail());
 
@@ -69,5 +68,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         return null;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/books") || path.equals("/login");
     }
 }

@@ -3,27 +3,36 @@ package com.ll.nbe342team8.global.security;
 import com.ll.nbe342team8.domain.jwt.JwtAuthenticationFilter;
 import com.ll.nbe342team8.domain.jwt.JwtService;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
-import com.ll.nbe342team8.domain.oauth.CustomOAuth2UserService;
+import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.OAuth2SuccessHandler;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.ll.nbe342team8.domain.oauth.CustomOAuth2UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +42,7 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true) // @PreAuthorize 사용
 public class SecurityConfig {
     private final JwtService jwtService;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final OAuth2AuthorizedClientService authorizedClientService;
     private final CustomOAuth2UserService customOAuth2UserService;
 
@@ -45,12 +54,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh").permitAll()
+                        .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/my/orders").permitAll()
-                        .requestMatchers("/books/**","/event/**","/images/**").permitAll()
+                        .requestMatchers("/books/**","/event/**","/images/**").permitAll() // 카트, 메인페이지 추가
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService,memberRepository),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService,memberService),
                         UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/admin/login")

@@ -4,7 +4,10 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
+<<<<<<< HEAD
 import com.ll.nbe342team8.standard.util.Ut;
+=======
+>>>>>>> fd94d04b325396805d818486d9c0e8c7a48cf3c7
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +23,9 @@ import java.util.List;
 @Builder
 public class Question extends BaseTime {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
     @Column(nullable = true) // 질문 제목
     private String title;

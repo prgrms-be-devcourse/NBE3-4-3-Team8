@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.config;
+package com.ll.nbe342team8.global.springDoc;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;

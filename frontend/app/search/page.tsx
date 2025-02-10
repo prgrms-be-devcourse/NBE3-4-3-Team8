@@ -1,34 +1,37 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import SearchResultItem from "./components/SearchResultItem";
-import { fetchSearchBooks } from "@/utils/api.js";
-
-interface Book {
-    id: number;
-    title: string;
-    price: number;
-    coverImage: string;
-    description: string;
-}
+import { useSearchParams, useRouter } from "next/navigation";
+import BookGrid from "./components/BookGrid";
+import { fetchSearchBooks } from "@/utils/api";
+import { Book } from "@/types/book";
+import { Pagination } from "@/app/components/common/Pagination";
+import { SortBar } from "./components/SortBar";
 
 export default function SearchPage() {
-    // URL 쿼리 파라미터에서 title 값을 읽어옴 (예: /books/search?title=김한민)
+    // URL 쿼리 파라미터에서 keyword, searchType, sort 값을 읽어옴
     const searchParams = useSearchParams();
-    const titleParam = searchParams.get("title") || "";
+    const router = useRouter();
+    const keywordParam = searchParams.get("keyword") || "";
+    const searchTypeParam = searchParams.get("searchType") || "TITLE";
+    const initialSort = searchParams.get("sort") || "PUBLISHED_DATE";
+
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [sortType, setSortType] = useState<string>(initialSort);
+
+    const pageSize = 12;
 
     useEffect(() => {
-        if (!titleParam) return;
+        if (!keywordParam) return;
 
         const fetchBooks = async () => {
             try {
-                // 백엔드 API 호출 (GET /books/search?title=검색어)
-                const data = await fetchSearchBooks(0, 10, "PUBLISHED_DATE", titleParam);
-                // 백엔드 응답이 페이지네이션 형태(content 필드가 있을 경우)
+                // fetchSearchBooks가 searchType 파라미터도 받도록 수정했다고 가정
+                const data = await fetchSearchBooks(currentPage, pageSize, sortType, searchTypeParam, keywordParam);
                 setBooks(data.content || data);
+                setTotalPages(data.totalPages || 1);
             } catch (error) {
                 console.error("도서 검색 중 오류 발생:", error);
             } finally {
@@ -37,13 +40,28 @@ export default function SearchPage() {
         };
 
         fetchBooks();
-    }, [titleParam]);
+    }, [keywordParam, searchTypeParam, currentPage, sortType]);
 
-    if (loading) return <p>검색 결과 로딩 중...</p>;
-    if (!books.length) return <p>검색 결과가 없습니다.</p>;
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        setLoading(true);
+    };
+
+    const handleSortChange = (newSort: string) => {
+        setSortType(newSort);
+        setCurrentPage(0);
+        // URL 쿼리 파라미터 업데이트 (정렬 상태 유지)
+        const params = new URLSearchParams(window.location.search);
+        params.set("sort", newSort);
+        router.push(`/search?${params.toString()}`);
+    };
+
+    if (loading) return <p className="text-center py-8">검색 결과 로딩 중...</p>;
+    if (!books.length) return <p className="text-center py-8">검색 결과가 없습니다.</p>;
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
+<<<<<<< HEAD
             <h1 className="text-2xl font-bold mb-6">검색 결과: "{titleParam}"</h1>
             {/*
             <div className="space-y-6">
@@ -52,6 +70,12 @@ export default function SearchPage() {
                 ))}
             </div>
             */}
+=======
+            <h1 className="text-2xl font-bold mb-6">검색 결과: "{keywordParam}"</h1>
+            <SortBar currentSort={sortType} onSortChange={handleSortChange} />
+            <BookGrid books={books} />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+>>>>>>> fd94d04b325396805d818486d9c0e8c7a48cf3c7
         </div>
     );
 }
