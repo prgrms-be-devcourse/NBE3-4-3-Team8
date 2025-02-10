@@ -17,10 +17,8 @@ import java.time.LocalDateTime;
 public class BaseTime {
 
     @CreatedDate
-    @Setter(AccessLevel.PRIVATE)
     private LocalDateTime createDate;
 
     @LastModifiedDate
-    @Setter(AccessLevel.PRIVATE)
     private LocalDateTime modifyDate;
 }

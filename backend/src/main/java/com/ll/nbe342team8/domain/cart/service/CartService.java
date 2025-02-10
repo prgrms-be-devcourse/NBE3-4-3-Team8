@@ -4,10 +4,12 @@ import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
 import com.ll.nbe342team8.domain.cart.dto.CartItemRequestDto;
 import com.ll.nbe342team8.domain.cart.dto.CartRequestDto;
+import com.ll.nbe342team8.domain.cart.dto.CartResponseDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.repository.CartRepository;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,22 +33,26 @@ public class CartService {
     }
 
     public void updateCartItems(Member member, CartRequestDto cartRequestDto) {
-        for (CartItemRequestDto cartItemRequestDto : cartRequestDto.cartItems()) {
-            Book book = bookService.getBookById(cartItemRequestDto.bookId());
-            Cart cart = findCartByBook(member, cartItemRequestDto.bookId());
+        cartRequestDto.cartItems().forEach(item -> {
+            Book book = bookService.getBookById(item.bookId());
+            Cart cart = findCartByBook(member, item.bookId());
 
-            if (cart != null) {
-                cart.updateCart(cart.getQuantity() + cartItemRequestDto.quantity());
-            } else {
+            if (cart == null) {
                 cart = Cart.builder()
                         .member(member)
                         .book(book)
-                        .quantity(cartItemRequestDto.quantity())
+                        .quantity(item.quantity())
                         .build();
+            } else {
+                int newQuantity = item.isAddToCart() ? cart.getQuantity() + item.quantity() : item.quantity();
+                cart.updateCart(newQuantity);
             }
+
             cartRepository.save(cart);
-        }
+        });
     }
+
+
 
     private Cart findCartByBook(Member member, Long bookId) {
         for (Cart cart : member.getCarts()) {
@@ -71,5 +77,14 @@ public class CartService {
 
     public List<Cart> findCartByMember(Member member) {
         return cartRepository.findAllByMember(member);
+    }
+
+    public List<Cart> getCartItems(@Valid CartRequestDto cartRequestDto) {
+        return cartRequestDto.cartItems().stream()
+                .map(cartItemRequestDto -> {
+                    Book book = bookService.getBookById(cartItemRequestDto.bookId());
+                    return Cart.create(book, cartItemRequestDto.quantity());
+                })
+                .toList();
     }
 }
