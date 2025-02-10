@@ -2,8 +2,8 @@
 //import com.ll.nbe342team8.domain.book.book.repository.BookRepository;
 //import com.ll.nbe342team8.domain.book.category.entity.Category;
 //import com.ll.nbe342team8.domain.book.category.repository.CategoryRepository;
-//import com.ll.nbe342team8.domain.member.member.entity.Member;
-//import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
+//import com.ll.nbe342team8.domain.memberId.memberId.entity.Member;
+//import com.ll.nbe342team8.domain.memberId.memberId.repository.MemberRepository;
 //import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 //import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
 //import com.ll.nbe342team8.domain.order.order.entity.Order;
@@ -90,7 +90,7 @@
 //
 //            Book book1 = Book.builder()
 //                    .title("부자 되는 법") // 책 제목
-//                    .author("홍길동") // 저자
+//                    .memberId("홍길동") // 저자
 //                    .isbn("978-89-1234-567-8") // ISBN
 //                    .isbn13("9788912345678") // ISBN13
 //                    .pubDate(LocalDate.of(2023, 10, 15)) // 출판일
@@ -111,7 +111,7 @@
 //                    .build();
 //            Book book2 = Book.builder()
 //                    .title("거지 되는 법") // 책 제목
-//                    .author("홍길동") // 저자
+//                    .memberId("홍길동") // 저자
 //                    .isbn("978-89-1234-567-8") // ISBN
 //                    .isbn13("9788912345678") // ISBN13
 //                    .pubDate(LocalDate.of(2023, 10, 15)) // 출판일

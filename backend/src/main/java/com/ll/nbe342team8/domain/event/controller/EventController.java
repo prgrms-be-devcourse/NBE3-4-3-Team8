@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.event.controller;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -16,15 +17,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/event")
 public class EventController {
 
-    @GetMapping("/banners")
-    public List<String> getBannerImages() throws IOException {
+    //서버 실행 시 이미지를 저장해둘 리스트
+    private List<String> bannerImages;
+
+    @PostConstruct
+    public void initBannerImages() throws IOException {
         String location = "classpath:static/images/eventBanner/";
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         Resource[] resources = resolver.getResources(location + "**");
 
-        return Arrays.stream(resources)
+        // spring 실행 시 처음 한번만 리스트에 이미지 저장
+        // 프론트에서 요청 시 리스트 반환
+        bannerImages = Arrays.stream(resources)
                 .map(resource -> "/images/eventBanner/" + resource.getFilename())
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/banners")
+    public List<String> getBannerImages() {
+        return bannerImages;
     }
 
 }

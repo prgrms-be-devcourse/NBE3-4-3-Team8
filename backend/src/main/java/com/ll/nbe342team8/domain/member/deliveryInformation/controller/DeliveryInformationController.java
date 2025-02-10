@@ -68,7 +68,7 @@ public class DeliveryInformationController {
         //배송 정보 id로 배송 정보를 찾아 삭제
         deliveryInformationService.deleteDeliveryInformation(member,id);
 
-        // dto로 갱신된 member 데이터를 반환
+        // dto로 갱신된 memberId 데이터를 반환
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
         return ResponseEntity.status(200).body(resMemberMyPageDto);
     }

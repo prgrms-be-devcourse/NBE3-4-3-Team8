@@ -74,7 +74,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/reviews/{book-id}/{member-id}": {
+    "/reviews/{book-id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -117,6 +117,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["postDeliveryInformation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cart/anonymous": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["getAnonymousCart"];
         delete?: never;
         options?: never;
         head?: never;
@@ -425,16 +441,40 @@ export interface components {
         };
         CartItemRequestDto: {
             /** Format: int64 */
-            bookId?: number;
+            bookId: number;
             /** Format: int32 */
             quantity?: number;
+            isAddToCart?: boolean;
         };
         CartRequestDto: {
-            cartItems?: components["schemas"]["CartItemRequestDto"][];
+            cartItems: components["schemas"]["CartItemRequestDto"][];
         };
         PutReqMemberMyPageDto: {
             name: string;
             phoneNumber: string;
+        };
+        ReviewRequestDto: {
+            content?: string;
+            /** Format: double */
+            rating?: number;
+        };
+        ReqQuestionDto: {
+            content: string;
+            title: string;
+        };
+        CartResponseDto: {
+            /** Format: int64 */
+            bookId?: number;
+            /** Format: int32 */
+            quantity?: number;
+            title?: string;
+            /** Format: int32 */
+            price?: number;
+            coverImage?: string;
+        };
+        AdminLoginDto: {
+            username?: string;
+            password?: string;
         };
         Book: {
             /** Format: date-time */
@@ -472,6 +512,30 @@ export interface components {
             publisher?: string;
             review?: components["schemas"]["Review"][];
         };
+        BookPatchRequestDto: {
+            title?: string;
+            author?: string;
+            isbn?: string;
+            isbn13?: string;
+            /** Format: date */
+            pubDate?: string;
+            /** Format: int32 */
+            priceStandard?: number;
+            /** Format: int32 */
+            priceSales?: number;
+            /** Format: int32 */
+            stock?: number;
+            /** Format: int32 */
+            status?: number;
+            /** Format: double */
+            rating?: number;
+            toc?: string;
+            cover?: string;
+            description?: string;
+            descriptionImage?: string;
+            categoryId?: components["schemas"]["Category"];
+            validStatus?: boolean;
+        };
         Cart: {
             /** Format: date-time */
             createDate?: string;
@@ -481,6 +545,21 @@ export interface components {
             id?: number;
             /** Format: int32 */
             quantity?: number;
+        };
+        Category: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            categoryId: number;
+            categoryName: string;
+            mall: string;
+            depth1: string;
+            depth2?: string;
+            depth3?: string;
+            depth4?: string;
+            depth5?: string;
+            books?: components["schemas"]["Book"][];
+            category?: string;
         };
         DeliveryInformation: {
             /** Format: date-time */
@@ -531,53 +610,6 @@ export interface components {
             content?: string;
             /** Format: double */
             rating?: number;
-        };
-        ReqQuestionDto: {
-            content: string;
-            title: string;
-        };
-        AdminLoginDto: {
-            username?: string;
-            password?: string;
-        };
-        BookPatchRequestDto: {
-            title?: string;
-            author?: string;
-            isbn?: string;
-            isbn13?: string;
-            /** Format: date */
-            pubDate?: string;
-            /** Format: int32 */
-            priceStandard?: number;
-            /** Format: int32 */
-            priceSales?: number;
-            /** Format: int32 */
-            stock?: number;
-            /** Format: int32 */
-            status?: number;
-            /** Format: double */
-            rating?: number;
-            toc?: string;
-            cover?: string;
-            description?: string;
-            descriptionImage?: string;
-            categoryId?: components["schemas"]["Category"];
-            validStatus?: boolean;
-        };
-        Category: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int32 */
-            categoryId: number;
-            categoryName: string;
-            mall: string;
-            depth1: string;
-            depth2?: string;
-            depth3?: string;
-            depth4?: string;
-            depth5?: string;
-            books?: components["schemas"]["Book"][];
-            category?: string;
         };
         BookResponseDto: {
             /** Format: int64 */
@@ -636,16 +668,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -665,12 +697,15 @@ export interface components {
             bookId?: number;
             /** Format: int64 */
             reviewId?: number;
-            author?: string;
+            /** Format: int64 */
+            memberId?: number;
             content?: string;
             /** Format: double */
             rating?: number;
             /** Format: date-time */
             createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
         };
         SortObject: {
             empty?: boolean;
@@ -694,33 +729,21 @@ export interface components {
             /** @enum {string} */
             deliveryStatus?: "PENDING" | "SHIPPED" | "DELIVERED";
         };
-        CartResponseDto: {
-            /** Format: int64 */
-            memberId?: number;
-            /** Format: int64 */
-            bookId?: number;
-            /** Format: int32 */
-            quantity?: number;
-            title?: string;
-            /** Format: int32 */
-            price?: number;
-            coverImage?: string;
-        };
         PageBookResponseDto: {
             /** Format: int64 */
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -739,16 +762,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -757,16 +780,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -798,7 +821,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
             };
         };
     };
@@ -818,7 +843,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
             };
         };
     };
@@ -1006,13 +1033,12 @@ export interface operations {
             header?: never;
             path: {
                 "book-id": number;
-                "member-id": number;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Review"];
+                "application/json": components["schemas"]["ReviewRequestDto"];
             };
         };
         responses: {
@@ -1069,6 +1095,30 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getAnonymousCart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartRequestDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["CartResponseDto"][];
                 };
             };
         };
