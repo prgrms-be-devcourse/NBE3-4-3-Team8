@@ -91,7 +91,7 @@ public class MemberController {
         Member member=optionalMember.get();
 
         // jwt 토큰으로 찾은 사용자 개체 갱신
-        memberService.modifyOrJoin(member.getOAuthId(), putReqMemberMyPageDto, member.getEmail());
+        memberService.modifyOrJoin(member.getOauthId(), putReqMemberMyPageDto, member.getEmail());
 
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
 

@@ -17,7 +17,7 @@ public class MemberDto {
    private Member.MemberType memberType;
 
    public MemberDto(Member entity) {
-       this.oAuthId = entity.getOAuthId();
+       this.oAuthId = entity.getOauthId();
        this.name = entity.getName();
        this.email = entity.getEmail();
        this.memberType = entity.getMemberType();

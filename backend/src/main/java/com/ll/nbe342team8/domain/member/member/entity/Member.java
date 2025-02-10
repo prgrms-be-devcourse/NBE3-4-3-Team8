@@ -31,11 +31,14 @@ public class Member extends BaseTime {
     @Enumerated(EnumType.STRING)
     private MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-    private String oAuthId;
+    private String oauthId;
 
     private String email; // 사용자 이메일
 
     private String password;
+
+    private String username;
+
 
 
     // Enum 사용자 역할
@@ -71,10 +74,15 @@ public class Member extends BaseTime {
     
 
     public String getUsername() {
-        return oAuthId;
+        return oauthId;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
     }
+
+    public String getOauthId() {
+        return oauthId;
+    }
 }
+

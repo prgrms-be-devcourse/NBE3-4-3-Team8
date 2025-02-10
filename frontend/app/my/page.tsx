@@ -10,11 +10,10 @@ import Link from 'next/link';
 import Sidebar from '@/app/components/my/Sidebar';
 
 export default function Home() {
-  
+    const a = useState(2)
 
     const router = useRouter();
     const [responseBody, setResponseBody] = useState<MemberMyPageDto | null>(null);
-
     const [isEditing, setIsEditing] = useState(false);
     const [isAddingAddress, setIsAddingAddress] = useState(false);
     const [formData, setFormData] = useState<MemberMyPageDto>({
@@ -37,9 +36,9 @@ export default function Home() {
       useEffect(() => {
         GetMyPage()
             .then(async (response) => {
-                
+
                 if (!response.ok) {
-                    
+
                     throw new Error(`서버 오류: ${response.status}`);
                 }
                 const resData = await response.json() as MemberMyPageDto; // 🔹 JSON 변환 후 타입 지정
@@ -104,7 +103,7 @@ export default function Home() {
     }));
 };
 
-  
+
 
   // 수정 완료 버튼 클릭 시 PUT 요청 전송
   const handleSaveEditedAddress = async () => {
@@ -129,7 +128,7 @@ export default function Home() {
     const handleSaveMyPage = async () => {
         try {
             const response = await PutMyPage(formData);
-            
+
             if (response.ok) {
                 let updatedData: MemberMyPageDto;
                 updatedData = (await response.json()) as MemberMyPageDto;
@@ -143,18 +142,18 @@ export default function Home() {
             console.error("수정 실패:", error);
         }
 
-        
+
     };
 
     const handleDeleteAddress = async (id: number) => {
         try {
             const response = await DeleteAddress(id);
-            
+
             if (response.ok) {
                 let updatedData: MemberMyPageDto;
                 updatedData = (await response.json()) as MemberMyPageDto;
                 setResponseBody(updatedData); // 응답이 오면 상태 업데이트
-                
+
             } else {
                 let errorData=(await response.json()) as errorDto;
                 alert(errorData.message);
@@ -162,7 +161,7 @@ export default function Home() {
         } catch (error) {
             console.error("수정 실패:", error);
         }
-       
+
     }
 
     // 새 배송지 정보 저장
@@ -170,7 +169,7 @@ export default function Home() {
 
         try {
         const response = await PostAddress(newAddress);
-        
+
         if (response.ok) {
             let updatedData: MemberMyPageDto;
             updatedData = (await response.json()) as MemberMyPageDto;
@@ -189,12 +188,12 @@ export default function Home() {
             let errorData=(await response.json()) as errorDto;
             alert(errorData.message);
         }
-        
+
     }catch (error) {
       console.error("수정 실패:", error);
     }
   }
-    
+
 
     //console.log("responseBody");
     //console.log(responseBody);
@@ -205,7 +204,7 @@ export default function Home() {
         <main className="flex-1 p-6">
         <div className="w-full h-full flex flex-col flex-1 p-4">
           <h1 className="text-2xl font-bold mb-4">마이페이지</h1>
-    
+
           {responseBody ? (
             <div className="bg-white p-6 shadow-md rounded-md">
               {/* 사용자 정보 */}
@@ -251,7 +250,7 @@ export default function Home() {
                   </>
                 )}
               </div>
-    
+
               {/* 배송지 정보 */}
               <div>
                 <h2 className="text-xl font-semibold mb-2">배송지 정보</h2>
@@ -313,27 +312,14 @@ export default function Home() {
                   <p className="text-gray-500">등록된 배송지가 없습니다.</p>
                 )}
 
-                <button
-                onClick={() => router.push("/my/question/createForm")}
-                className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
-                >
-                질문 등록하기
-                </button>
-                <button
-                onClick={() => router.push("/my/question")}
-                className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
-                >
-                질문 목록
-                </button>
-    
                 {/* 배송지 추가 버튼 */}
                 {!isAddingAddress ? (
-                  
+
                   <button onClick={handleAddAddress} className="bg-green-500 text-white px-4 py-2 rounded-md mt-2">
                     배송지 추가하기
                   </button>
-                  
-                  
+
+
                 ) : (
                   <div className="mt-4 p-4 border rounded-md">
                     <input type="text" name="addressName" placeholder="주소명" onChange={handleNewAddressChange} className="border p-2 rounded-md w-full mb-2" />
