@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 'use client';
 
 import Cookies from 'js-cookie';
@@ -17,7 +16,6 @@ export const saveTokenToCookie = (token: string) => {
 export const getTokenFromCookie = (): string | undefined => {
   return Cookies.get('jwtToken');
 };
-=======
 // utils/auth.ts
 export const isLoggedIn = () => {
   if (typeof window === 'undefined') return false;
@@ -46,4 +44,3 @@ export const getJwtToken = () => {
 
   return cookies['jwtToken'] || null;
 };
->>>>>>> fd94d04b325396805d818486d9c0e8c7a48cf3c7

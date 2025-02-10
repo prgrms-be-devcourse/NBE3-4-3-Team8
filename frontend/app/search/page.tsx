@@ -61,21 +61,10 @@ export default function SearchPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-<<<<<<< HEAD
-            <h1 className="text-2xl font-bold mb-6">검색 결과: "{titleParam}"</h1>
-            {/*
-            <div className="space-y-6">
-                {books.map((book) => (
-                    <SearchResultItem key={book.id} book={book} />
-                ))}
-            </div>
-            */}
-=======
             <h1 className="text-2xl font-bold mb-6">검색 결과: "{keywordParam}"</h1>
             <SortBar currentSort={sortType} onSortChange={handleSortChange} />
             <BookGrid books={books} />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
->>>>>>> fd94d04b325396805d818486d9c0e8c7a48cf3c7
         </div>
     );
 }
