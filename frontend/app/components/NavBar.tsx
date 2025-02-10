@@ -1,6 +1,6 @@
 //app/components/NavBar.tsx
 'use client';
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, KeyboardEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
 import KakaoLoginButton from './KakaoLoginButton';
@@ -9,6 +9,16 @@ export default function NavBar() {
   const { user, logout } = useAuth(); // ✅ 쿠키 기반 인증이 적용된 useAuth 사용
   const router = useRouter();
   const [searchText, setSearchText] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      const redirectPath = localStorage.getItem('redirectAfterLogin');
+      if (redirectPath) {
+        localStorage.removeItem('redirectAfterLogin');
+        router.push(redirectPath);
+      }
+    }
+  }, [user]);
 
   const handleSearch = () => {
     if (!searchText.trim()) return; // ✅ 검색어가 비어있으면 검색 방지
@@ -22,8 +32,20 @@ export default function NavBar() {
   };
 
   const handleLogout = async () => {
-    await logout(); // ✅ 로그아웃 요청
-    router.push('/'); // ✅ 로그아웃 후 홈으로 이동
+    try {
+      const success = await logout();
+      if (success) {
+        // 쿠키 직접 삭제
+        document.cookie =
+          'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;';
+        document.cookie =
+          'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;';
+
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
   return (
