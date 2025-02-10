@@ -8,5 +8,7 @@ public record CartItemRequestDto(
         @NotNull(message = "도서 ID는 필수입니다")
         Long bookId,
 
-        @Min(1) int quantity
+        @Min(1) int quantity,
+
+        boolean isAddToCart
 ) {}

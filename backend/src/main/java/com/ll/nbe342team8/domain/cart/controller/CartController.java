@@ -16,10 +16,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +34,7 @@ public class CartController {
 
     private final CartService cartService;
     private final MemberService memberService;
+    private final BookService bookService;
 
     @Operation(summary = "장바구니 추가")
     @PostMapping
@@ -48,7 +51,7 @@ public class CartController {
     @Operation(summary = "장바구니 수정 json")
     @PutMapping
     public void updateCartItems(@AuthenticationPrincipal SecurityUser securityUser,
-                                @RequestBody @Valid CartRequestDto cartRequestDto){
+                                @RequestBody @Valid CartRequestDto cartRequestDto) {
 
         Member member = securityUser.getMember();
 
@@ -79,5 +82,16 @@ public class CartController {
         return carts.stream()
                 .map(CartResponseDto::from)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("/anonymous")
+    public ResponseEntity<List<CartResponseDto>> getAnonymousCart(@RequestBody @Valid CartRequestDto cartRequestDto) {
+
+        List<Cart> cartItems = cartService.getCartItems(cartRequestDto);
+        List<CartResponseDto> cartResponseDto = cartItems.stream()
+                .map(CartResponseDto::from)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(cartResponseDto);
     }
 }

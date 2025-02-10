@@ -123,6 +123,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cart/anonymous": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["getAnonymousCart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/books/admin/books": {
         parameters: {
             query?: never;
@@ -428,6 +444,7 @@ export interface components {
             bookId: number;
             /** Format: int32 */
             quantity?: number;
+            isAddToCart?: boolean;
         };
         CartRequestDto: {
             cartItems: components["schemas"]["CartItemRequestDto"][];
@@ -444,6 +461,16 @@ export interface components {
         ReqQuestionDto: {
             content: string;
             title: string;
+        };
+        CartResponseDto: {
+            /** Format: int64 */
+            bookId?: number;
+            /** Format: int32 */
+            quantity?: number;
+            title?: string;
+            /** Format: int32 */
+            price?: number;
+            coverImage?: string;
         };
         AdminLoginDto: {
             username?: string;
@@ -567,8 +594,8 @@ export interface components {
             password?: string;
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
-            oauthId?: string;
             username?: string;
+            oauthId?: string;
             authorities?: components["schemas"]["GrantedAuthority"][];
         };
         Review: {
@@ -641,16 +668,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -702,33 +729,21 @@ export interface components {
             /** @enum {string} */
             deliveryStatus?: "PENDING" | "SHIPPED" | "DELIVERED";
         };
-        CartResponseDto: {
-            /** Format: int64 */
-            memberId?: number;
-            /** Format: int64 */
-            bookId?: number;
-            /** Format: int32 */
-            quantity?: number;
-            title?: string;
-            /** Format: int32 */
-            price?: number;
-            coverImage?: string;
-        };
         PageBookResponseDto: {
             /** Format: int64 */
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -747,16 +762,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -765,16 +780,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -1080,6 +1095,30 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getAnonymousCart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartRequestDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["CartResponseDto"][];
                 };
             };
         };
