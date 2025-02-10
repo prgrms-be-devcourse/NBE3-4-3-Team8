@@ -42,7 +42,7 @@ public class Member extends BaseTime {
     @Column(name = "email")
     private String email; // 사용자 이메일
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
 
     private String username;

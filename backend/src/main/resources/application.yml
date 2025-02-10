@@ -1,0 +1,78 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: next-js-oauth2-2025-01-20
+  profiles:
+    active: dev
+    include: secret
+  web:
+    resources:
+      add-mappings: false
+  output:
+    ansi:
+      enabled: always
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            clientId: c47345d326ca974bf9ce4525ae5ddeef
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+            client-name: Kakao
+            authorization-grant-type: authorization_code
+            redirect-uri: "${custom.site.backUrl}/{action}/oauth2/code/{registrationId}"
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+  datasource:
+    url: jdbc:mysql://localhost:3306/test_db
+    username: root
+    password: jjevt3Hsy0331@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+        highlight-sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true  # SQL 쿼리 로그를 출력
+
+springdoc:
+  default-produces-media-type: application/json;charset=UTF-8
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.springframework.transaction.interceptor: TRACE
+
+custom:
+  dev:
+    cookieDomain: localhost
+    frontUrl: "http://${custom.dev.cookieDomain}:3000"
+    backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
+  prod:
+    cookieDomain: book.oa.gg
+    frontUrl: "https://www.${custom.prod.cookieDomain}"
+    backUrl: "https://api.${custom.prod.cookieDomain}"
+  site:
+    cookieDomain: "${custom.dev.cookieDomain}"
+    frontUrl: "${custom.dev.frontUrl}"
+    backUrl: "${custom.dev.backUrl}"
+    name: Book
+  jwt:
+    secret: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
+aladin:
+  ttbkey: "ttbkumjjick2245001"

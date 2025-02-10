@@ -48,10 +48,11 @@ public class OrderService {
                 .toList();
     }
 
+
     @Transactional
-    public void deleteOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+    public void deleteOrder(Long orderId, Long memberId) {
+        Order order = orderRepository.findByIdAndMemberId(orderId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
 
         if (order.getOrderStatus() != OrderStatus.COMPLETE) {
             throw new IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.");
