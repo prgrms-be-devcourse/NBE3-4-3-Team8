@@ -25,7 +25,7 @@ public class CartControllerTest {
     @DisplayName("장바구니 조회 테스트")
     public void testGetCart() {
         // URL: GET /cart/1
-        // URL: GET /cart/member-id
+        // URL: GET /cart/memberId-id
         ResponseEntity<String> response = restTemplate.getForEntity("/cart/1", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -34,7 +34,7 @@ public class CartControllerTest {
     @DisplayName("장바구니 추가 테스트")
     public void testAddCart() {
         // URL: POST /cart/1/1?quantity=2
-        // URL: POST /cart/book-id/member-id?quantity=?
+        // URL: POST /cart/book-id/memberId-id?quantity=?
         ResponseEntity<Void> response = restTemplate.postForEntity("/cart/1/1?quantity=2", null, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -43,7 +43,7 @@ public class CartControllerTest {
     @DisplayName("장바구니 수정 테스트")
     public void testUpdateCartItem() {
         // URL: PUT /cart/1/1?quantity=3
-        // URL: PUT /cart/book-id/member-id?quantity=?
+        // URL: PUT /cart/book-id/memberId-id?quantity=?
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<Void> entity = new HttpEntity<>(headers);
         ResponseEntity<Void> response = restTemplate.exchange("/cart/1/1?quantity=3", HttpMethod.PUT, entity, Void.class);
@@ -54,7 +54,7 @@ public class CartControllerTest {
     @DisplayName("장바구니 삭제 테스트")
     public void testDeleteCartItem() throws Exception {
         // URL: DELETE /cart/1 JSON body
-        // URL: DELETE /cart/member-id JSON body
+        // URL: DELETE /cart/memberId-id JSON body
         CartItemRequestDto itemRequest = new CartItemRequestDto(1L, 1);
         CartRequestDto requestDto = new CartRequestDto(Arrays.asList(itemRequest));
         HttpHeaders headers = new HttpHeaders();

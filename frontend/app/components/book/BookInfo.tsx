@@ -94,8 +94,8 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
           <div className="flex flex-col gap-2">
             <AddToCartButton
               bookId={book.id}
-              jwtToken={isLoggedIn() ? getJwtToken() : null}
               quantity={quantity}
+              isAddToCart={true}
               className="w-full py-3"
             />
             <button

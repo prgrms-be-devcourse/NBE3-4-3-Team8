@@ -32,4 +32,14 @@ public class Cart extends BaseTime {
     public void updateCart(int quantity) {
         this.quantity = quantity;
     }
+
+    public Cart(Member member, Book book, int quantity){
+        this.member = member;
+        this.book = book;
+        this.quantity = quantity;
+    }
+
+    public static Cart create(Book book, int quantity){
+        return new Cart(null, book, quantity);
+    }
 }
