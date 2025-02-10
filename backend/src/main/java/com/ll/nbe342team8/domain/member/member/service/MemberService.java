@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,8 +26,8 @@ public class MemberService implements UserDetailsService {
     }
 
     @Transactional
-    public Member modifyOrJoin(String oauthId, PutReqMemberMyPageDto dto, String email) {
-        return memberRepository.findByOauthId(oauthId) // 기존 회원인지 확인 (oauthId 기준으로 검색)
+    public Member modifyOrJoin(String oAuthId, PutReqMemberMyPageDto dto, String email) {
+        return memberRepository.findByoAuthId(oAuthId) // 기존 회원인지 확인 (oAuthId 기준으로 검색)
                 .map(member -> {
                     // 기존 회원 정보 업데이트
                     member.updateMemberInfo(dto);
@@ -36,7 +37,7 @@ public class MemberService implements UserDetailsService {
                 .orElseGet(() -> {
                     // 새 회원 생성 시 기본값으로 USER 타입 설정
                     Member member = Member.builder()
-                            .oauthId(oauthId)
+                            .oAuthId(oAuthId)
                             .email(email)
                             .name(dto.getName())
                             .phoneNumber(dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
@@ -60,22 +61,21 @@ public class MemberService implements UserDetailsService {
         return memberRepository.count();
     }
 
-    public Optional<Member> findByOauthId(String oauthId) {
-        return memberRepository.findByOauthId(oauthId);
+    public Optional<Member> findByOauthId(String oAuthId) {
+        return memberRepository.findByoAuthId(oAuthId);
     }
 
-
     @Override
-    public UserDetails loadUserByUsername(String oauthId) throws UsernameNotFoundException {
-        Member member = findByOauthId(oauthId)
+    public UserDetails loadUserByUsername(String oAuthId) throws UsernameNotFoundException {
+        Member member = findByOauthId(oAuthId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         if (member.getMemberType() != Member.MemberType.ADMIN) {
             throw new UsernameNotFoundException("관리자 권한이 없습니다.");
         }
 
-        return new org.springframework.security.core.userdetails.User(
-                member.getOauthId(),  //
+        return new User(
+                member.getOAuthId(),
                 "",
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );

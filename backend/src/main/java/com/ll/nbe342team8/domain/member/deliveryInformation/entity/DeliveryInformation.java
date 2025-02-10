@@ -5,9 +5,7 @@ import com.ll.nbe342team8.domain.member.deliveryInformation.dto.ReqDeliveryInfor
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import com.ll.nbe342team8.standard.util.Ut;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -17,6 +15,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeliveryInformation extends BaseTime {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
     private String addressName;
     

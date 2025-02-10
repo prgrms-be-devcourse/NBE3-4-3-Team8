@@ -22,9 +22,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "orders")
 public class Order extends BaseTime {
-
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
 	private Long id;
 
 	@ManyToOne

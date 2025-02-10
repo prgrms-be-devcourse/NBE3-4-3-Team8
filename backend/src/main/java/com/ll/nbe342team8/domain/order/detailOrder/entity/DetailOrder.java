@@ -8,7 +8,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,8 +24,6 @@ public class DetailOrder extends BaseTime {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    private Long memberId;
-
     private int bookQuantity;
 
     @Enumerated(EnumType.STRING)
@@ -38,5 +35,9 @@ public class DetailOrder extends BaseTime {
         SHIPPING, // 배송중
         DELIVERED, // 배송완료
         RETURNED // 반품
+    }
+
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
     }
 }

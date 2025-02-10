@@ -10,7 +10,7 @@ public record ReviewResponseDto(
         Long reviewId,
         String author,
         String content,
-        float rating,
+        Double rating,
         LocalDateTime createDate
 ) {
 
