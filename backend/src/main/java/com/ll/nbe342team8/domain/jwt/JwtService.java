@@ -35,7 +35,7 @@ public class JwtService {
         Date validity = new Date(now.getTime() + TOKEN_VALIDITY);
 
         String token = Jwts.builder()
-                .setSubject(member.getOauthId())
+                .setSubject(member.getOAuthId())
                 .claim("id", member.getId())
                 .claim("email", member.getEmail())
                 .claim("name", member.getName())
@@ -50,7 +50,7 @@ public class JwtService {
 
     public String generateRefreshToken(Member member) {
         String token = Jwts.builder()
-                .setSubject(member.getOauthId())
+                .setSubject(member.getOAuthId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
                 .signWith(key)

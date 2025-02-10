@@ -4,8 +4,6 @@ import Banner from './components/Banner';
 import BookList from './components/book/BookList';
 import { useEffect, useState } from 'react';
 import { Book } from '@/types/book';
-import { saveTokenToCookie } from '@/utils/auth';
-import { useSearchParams } from 'next/navigation';
 
 interface PageResponse<T> {
   content: T[];
@@ -20,16 +18,9 @@ interface PageResponse<T> {
 export default function HomePage() {
   const [trendingBooks, setTrendingBooks] = useState<Book[]>([]);
   const [newBooks, setNewBooks] = useState<Book[]>([]);
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchBooks = async () => {
-
-      const token = searchParams.get('token');
-      if (token) {
-        saveTokenToCookie(token);
-      }
-      
       try {
         const newBooksResponse = await fetch(
           'http://localhost:8080/books?bookSortType=PUBLISHED_DATE',

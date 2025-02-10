@@ -13,21 +13,30 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record ResMemberMyPageDto(
-        String name,
-        String phoneNumber,
-        List<DeliveryInformationDto> deliveryInformationDtos
-) {
+@Getter
+@Setter
+@NoArgsConstructor
+public class ResMemberMyPageDto {
+
+    @JsonProperty("name")
+    String name;
+
+    @JsonProperty("phoneNumber")
+    String phoneNumber;
+
+    List<DeliveryInformationDto> deliveryInformationDtos;
+
     public ResMemberMyPageDto(Member member) {
-        this(
-                member.getName(),
-                member.getPhoneNumber(),
-                member.getDeliveryInformations().stream()
-                        .sorted(Comparator
-                                .comparing((DeliveryInformation di) -> di.getIsDefaultAddress() != null && di.getIsDefaultAddress() ? 0 : 1) // 기본 배송지를 우선 정렬
-                                .thenComparing(DeliveryInformation::getAddressName, Comparator.nullsLast(Comparator.naturalOrder()))) // addressName 오름차순 정렬
-                        .map(DeliveryInformationDto::new) // DTO 변환
-                        .collect(Collectors.toList())
-        );
+        this.name=member.getName();
+        this.phoneNumber= member.getPhoneNumber();
+        List<DeliveryInformation> deliveryInformations=member.getDeliveryInformations();
+
+        this.deliveryInformationDtos = deliveryInformations.stream()
+                .sorted(Comparator.comparing((DeliveryInformation di) -> di.getIsDefaultAddress() != null && di.getIsDefaultAddress() ? 0 : 1) // true(0) 우선 정렬
+                        .thenComparing(DeliveryInformation::getAddressName, Comparator.nullsLast(Comparator.naturalOrder()))) // 나머지는 addressName 오름차순
+                .map(DeliveryInformationDto::new) // DTO 변환
+                .collect(Collectors.toList());
+
+
     }
 }

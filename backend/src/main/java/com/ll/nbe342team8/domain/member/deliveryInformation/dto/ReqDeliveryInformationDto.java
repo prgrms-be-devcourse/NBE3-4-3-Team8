@@ -10,26 +10,39 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReqDeliveryInformationDto {
 
-public record ReqDeliveryInformationDto(
-        Long id,
+    @JsonProperty("id")
+    Long id;
 
-        @NotBlank(message = "공백은 허용하지 않습니다.")
-        String addressName,
+    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @JsonProperty("addressName")
+    String addressName;
 
-        @NotBlank(message = "공백은 허용하지 않습니다.")
-        String postCode,
+    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @JsonProperty("postCode")
+    String postCode;
 
-        @NotBlank(message = "공백은 허용하지 않습니다.")
-        String detailAddress,
+    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @JsonProperty("detailAddress")
+    String detailAddress;
 
-        @NotBlank(message = "공백은 허용하지 않습니다.")
-        String recipient,
+    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @JsonProperty("recipient")
+    String recipient;
 
-        @NotBlank(message = "공백은 허용하지 않습니다.")
-        @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "휴대폰 번호 형식이 올바르지 않습니다. (010-XXXX-XXXX)")
-        String phone,
+    @NotBlank(message = "공백은 허용하지 않습니다.")
+    @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "휴대폰 번호 형식이 올바르지 않습니다. (010-XXXX-XXXX)")
+    @JsonProperty("phone")
+    String phone;
 
-        @NotNull
-        Boolean isDefaultAddress
-) {}
+    @NotNull
+    @JsonProperty("isDefaultAddress")
+    Boolean isDefaultAddress;
+
+
+}

@@ -1,6 +1,15 @@
 package com.ll.nbe342team8.domain.order.detailOrder.dto;
 
-import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder.DeliveryStatus;
 
-public record DetailOrderDto(Long orderId, Long bookId, int bookQuantity, DeliveryStatus deliveryStatus) {
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DeliveryStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class DetailOrderDto {
+    private Long orderId;
+    private Long bookId;
+    private int bookQuantity;
+    private DeliveryStatus deliveryStatus;
 }
