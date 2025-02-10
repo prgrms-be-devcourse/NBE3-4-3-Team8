@@ -1,15 +1,16 @@
 package com.ll.nbe342team8.domain.qna.question.entity;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,5 +30,19 @@ public class Question extends BaseTime {
     private Member member;
 
 
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Answer> answers = new ArrayList<>();
 
+    public void addAnswer(Answer answer) {
+        this.answers.add(answer);
+        if (answer.getQuestion() != this) {
+            answer.setQuestion(this);
+        }
+    }
+
+    public void removeAnswer(Answer answer) {
+        this.answers.remove(answer);
+        answer.setQuestion(null);
+    }
 }
