@@ -1,11 +1,31 @@
 
 import { MemberMyPageDto, DeliveryInformationDto } from "./types";
 
+function getJwtTokenFromCookie(): string | null {
+    const cookieHeader = document.cookie;
+    const jwtToken = cookieHeader
+        .split("; ")
+        .find(row => row.startsWith("jwtToken="))
+        ?.split("=")[1];
+
+    return jwtToken || null;
+}
+
 // 공통 요청 함수
 async function apiRequest(url: string, method: string, body?: object): Promise<Response> {
+    const jwtToken = getJwtTokenFromCookie();
+
+    const headers: HeadersInit = {
+        "Content-Type": "application/json",
+    };
+
+    if (jwtToken) {
+        headers["Authorization"] = `Bearer ${jwtToken}`; // 🔹 JWT 추가
+    }
+
     return fetch(new URL(url, window.location.origin).toString(), {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: body ? JSON.stringify(body) : undefined,
     });
 }

@@ -1,9 +1,6 @@
 package com.ll.nbe342team8.domain.member.member.service;
 
-import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
-import com.ll.nbe342team8.domain.book.book.entity.Book;
-import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +41,7 @@ public class MemberService implements UserDetailsService {
                             .name(dto.getName())
                             .phoneNumber(dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
                             .memberType(Member.MemberType.USER)
+                            .password("")
                             .build();
                     return memberRepository.save(member);
                 });
@@ -67,11 +64,10 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findByOauthId(oauthId);
     }
 
-    public Optional<Member> findByUsername(String username) { return memberRepository.findByUsername(username);}
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = findByUsername(username)
+    public UserDetails loadUserByUsername(String oauthId) throws UsernameNotFoundException {
+        Member member = findByOauthId(oauthId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         if (member.getMemberType() != Member.MemberType.ADMIN) {
@@ -79,8 +75,8 @@ public class MemberService implements UserDetailsService {
         }
 
         return new org.springframework.security.core.userdetails.User(
-                member.getUsername(),
-                member.getPassword(),
+                member.getOauthId(),  //
+                "",
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
     }

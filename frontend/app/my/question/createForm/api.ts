@@ -9,6 +9,6 @@ async function apiRequest(url: string, method: string, body?: object): Promise<R
 }
 
 export async function PostQuestion(reqQuestionDto: ReqQuestionDto): Promise<Response> {
-    console.log("my-page/api.ts - PostAddress");
+    console.log("my/question /api.ts - PostQuestion");
     return apiRequest("/api/my/question", "POST", reqQuestionDto);
 }
