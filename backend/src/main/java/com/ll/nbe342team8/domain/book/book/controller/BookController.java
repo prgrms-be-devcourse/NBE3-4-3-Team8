@@ -45,7 +45,7 @@ public class BookController {
     public Page<BookResponseDto> searchBooks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") @Range(min = 0, max = 100) int pageSize,
-            @RequestParam(defaultValue = "PUBLISHED_DATE") BookSortType bookSortType,
+            @RequestParam(name = "sortType", defaultValue = "PUBLISHED_DATE") BookSortType bookSortType,
             @RequestParam(defaultValue = "TITLE") SearchType searchType,
             @RequestParam String keyword) {
 

@@ -9,6 +9,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
+    withCredentials: true,
 });
 
 // 📌 전체 도서 목록 가져오기
@@ -99,6 +100,52 @@ export const fetchSearchBooks = async (
         return response.data;
     } catch (error) {
         console.error("도서 검색 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 리뷰 등록
+export const createReview = async (bookId, reviewData) => {
+    try {
+        const response = await api.post(`/reviews/${bookId}`, reviewData);
+        return response.data;
+    } catch (error) {
+        console.error("리뷰 등록 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 리뷰 수정 – 컨트롤러에서는 @RequestParam으로 content와 rating을 받으므로 쿼리 파라미터로 전송
+export const updateReview = async (reviewId, reviewData) => {
+    try {
+        const response = await api.put(`/reviews/${reviewId}`, null, {
+            params: reviewData,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("리뷰 수정 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 리뷰 삭제
+export const deleteReview = async (reviewId) => {
+    try {
+        const response = await api.delete(`/reviews/${reviewId}`);
+        return response.data;
+    } catch (error) {
+        console.error("리뷰 삭제 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 본인 조회
+export const fetchCurrentUser = async () => {
+    try {
+        const response = await api.get('/api/auth/me');
+        return response.data; // MemberDto 형태의 데이터를 받음
+    } catch (error) {
+        console.error('현재 사용자 정보를 가져오는데 오류 발생:', error);
         throw error;
     }
 };
