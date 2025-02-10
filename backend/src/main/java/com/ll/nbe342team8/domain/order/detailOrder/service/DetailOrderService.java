@@ -16,8 +16,8 @@ public class DetailOrderService {
         this.detailOrderRepository = detailOrderRepository;
     }
 
-    public List<DetailOrderDto> getDetailOrdersByOrderIdAndMemberId(Long orderId, Long memberId) {
-        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderIdAndMemberId(orderId, memberId);
+    public List<DetailOrderDto> getDetailOrdersByOrderId(Long orderId) {
+        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderId(orderId);
         return detailOrders.stream()
                 .map(detailOrder -> new DetailOrderDto(
                         detailOrder.getOrder().getId(),
@@ -25,5 +25,8 @@ public class DetailOrderService {
                         detailOrder.getBookQuantity(),
                         detailOrder.getDeliveryStatus()))
                 .collect(Collectors.toList());
+
     }
-}
+    }
+
+

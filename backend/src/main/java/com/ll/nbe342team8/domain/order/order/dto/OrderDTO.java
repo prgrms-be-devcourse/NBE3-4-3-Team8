@@ -1,4 +1,13 @@
+
 package com.ll.nbe342team8.domain.order.order.dto;
 
-public record OrderDTO(Long orderId, String orderStatus, long totalPrice) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class OrderDTO {
+    private Long memberId;
+    private String orderStatus;
+    private long totalPrice;
 }

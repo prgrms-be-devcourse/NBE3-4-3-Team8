@@ -2,7 +2,6 @@ package com.ll.nbe342team8.global.initData;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
-import com.ll.nbe342team8.domain.book.book.type.BookSortType;
 import com.ll.nbe342team8.domain.book.category.entity.Category;
 import com.ll.nbe342team8.domain.book.category.repository.CategoryRepository;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
@@ -120,11 +119,11 @@ public class BaseInitData {
                     .salesPoint(50L + i)
                     .categoryId(category)
                     .isbn13("isbn13")
-                    .status(0)
                     .build();
 
             bookService.create(book);
         }
+
     }
 
     @Transactional
@@ -133,8 +132,9 @@ public class BaseInitData {
         Random random = new Random();
 
         if (reviewService.count() > 0) return;
+
         for (int i = 1; i <= 10; i++) {
-            Book book = bookService.getBookById((long) i); //유저나책 1~10번이 지워지면에러가나서실행이안된다.
+            Book book = bookService.getBookById((long) i);
             Member member = memberService.getMemberById((long) i);
 
             for (int j = 1; j <= 10; j++) {
@@ -145,6 +145,7 @@ public class BaseInitData {
                         .content("review content " + j)
                         .rating(rating)
                         .build();
+                reviewService.create(review, rating);
             }
         }
     }

@@ -13,11 +13,6 @@ const nextConfig: NextConfig = {
         port: '8080',
         pathname: '/images/eventBanner/**',
       },
-      {
-        protocol: 'https',
-        hostname:"example.com",
-        pathname:"/*" //임시추가
-      }
     ],
   },
 };

@@ -6,24 +6,44 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public record DeliveryInformationDto(
-        Long id,
-        String addressName,
-        String postCode,
-        String detailAddress,
-        String recipient,
-        String phone,
-        Boolean isDefaultAddress
-) {
+@Getter
+@Setter
+@NoArgsConstructor
+public class DeliveryInformationDto {
+
+    @JsonProperty("id")
+    Long id;
+
+    @JsonProperty("addressName")
+    String addressName;
+
+    @JsonProperty("postCode")
+    String postCode;
+
+    @JsonProperty("detailAddress")
+    String detailAddress;
+
+    @JsonProperty("recipient")
+    String recipient;
+
+    @JsonProperty("phone")
+    String phone;
+
+    @JsonProperty("isDefaultAddress")
+    Boolean isDefaultAddress;
+
     public DeliveryInformationDto(DeliveryInformation deliveryInformation) {
-        this(
-                deliveryInformation.getId(),
-                deliveryInformation.getAddressName(),
-                deliveryInformation.getPostCode(),
-                deliveryInformation.getDetailAddress(),
-                deliveryInformation.getRecipient(),
-                deliveryInformation.getPhone(),
-                deliveryInformation.getIsDefaultAddress()
-        );
+
+        this.id=deliveryInformation.getId();
+        this.addressName=deliveryInformation.getAddressName();
+        this.postCode=deliveryInformation.getPostCode();
+        this.detailAddress=deliveryInformation.getDetailAddress();
+        this.recipient=deliveryInformation.getRecipient();
+        this.phone=deliveryInformation.getPhone();
+        this.isDefaultAddress= deliveryInformation.getIsDefaultAddress();
+
     }
+
+
+
 }

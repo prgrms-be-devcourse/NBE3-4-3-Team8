@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.exceptions;
+package com.ll.nbe342team8.domain.order.order.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.HttpStatus;
 
 @RestControllerAdvice
-public class RestExceptionHandler {
+public class GlobalRestExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {

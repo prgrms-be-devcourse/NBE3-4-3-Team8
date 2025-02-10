@@ -1,7 +1,6 @@
-aladin:
-  ttbkey: ${TTBKEY}
 server:
   port: 8080
+
 spring:
 
   profiles:
@@ -19,8 +18,8 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        #        format_sql: true
-        #        use_sql_comments: true
+#        format_sql: true
+#        use_sql_comments: true
         default_batch_fetch_size: 100
         highlight-sql: true
         naming:
@@ -54,9 +53,12 @@ spring:
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
+aladin:
+  ttbkey: ${TTBKEY}
+
 custom:
   jwt:
-    secretKey: ${SECRETKEY}
+    secretKey: ON_SECRET
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"

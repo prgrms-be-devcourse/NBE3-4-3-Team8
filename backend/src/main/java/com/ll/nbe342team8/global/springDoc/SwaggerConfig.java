@@ -26,32 +26,6 @@ public class SwaggerConfig {
 				.build();
 	}
 
-    
-
-    @Bean
-    public GroupedOpenApi deliveryInformationAPI() {
-        return GroupedOpenApi.builder()
-                .group("deliveryInformation")
-                .pathsToMatch("/my/deliveryInformation/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi QuestionAnswerAPI() {
-        return GroupedOpenApi.builder()
-                .group("Q&A")
-                .pathsToMatch("/my/question/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi memberAPI() {
-        return GroupedOpenApi.builder()
-                .group("member")
-                .pathsToMatch("/my/**")
-                .pathsToExclude("/my/deliveryInformation/**", "/my/question/**")  // 특정 경로 제외
-                .build();
-    }
 	@Bean
 	public GroupedOpenApi cartsAPI() {
 		return GroupedOpenApi.builder()
