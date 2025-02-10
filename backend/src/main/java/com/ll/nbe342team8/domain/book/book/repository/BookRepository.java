@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.book.book.repository;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findAll(Pageable pageable);
 
     Page<Book> findBooksByTitleContaining(String title, Pageable pageable);
+
+    Page<Book> findBooksByAuthorContaining(String author, Pageable pageable);
+
+    Page<Book> findBooksByIsbn13(String isbn13, Pageable pageable);
+
+    Page<Book> findBooksByPublisherContaining(String publisher, Pageable pageable);
 
     // 상품 조회
     Optional<Book> findByIsbn13(String isbn13);

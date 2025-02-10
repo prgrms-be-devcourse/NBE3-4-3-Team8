@@ -33,7 +33,7 @@ export const ReviewList = ({ bookId }: ReviewListProps) => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8080/reviews/${bookId}?page=${currentPage}&pageSize=${pageSize}&sortType=${sortType}`,
+        `http://localhost:8080/reviews/${bookId}?page=${currentPage}&pageSize=${pageSize}&reviewSortType=${sortType}`,
       );
 
       if (!response.ok) {

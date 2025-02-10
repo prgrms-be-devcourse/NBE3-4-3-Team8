@@ -1,17 +1,17 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";  // useRouter 사용
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // useRouter 사용
 
 export default function OrderDetailPage() {
   const router = useRouter();
-  const { orderId } = router.query;  // useRouter로 query를 받는 방식
+  const { orderId } = router.query; // useRouter로 query를 받는 방식
 
   const [order, setOrder] = useState(null);
-  const [error, setError] = useState("");  // error state 추가
+  const [error, setError] = useState(''); // error state 추가
 
   useEffect(() => {
     if (!orderId) {
-      setError("주문 ID가 없습니다.");
+      setError('주문 ID가 없습니다.');
       return;
     }
 
@@ -23,33 +23,34 @@ export default function OrderDetailPage() {
         return res.json();
       })
       .then((data) => {
-        console.log(data);  // 응답 데이터 확인용
+        console.log(data); // 응답 데이터 확인용
         setOrder(data);
       })
       .catch((err) => {
-        console.error("주문 상세 정보 불러오기 실패", err);
-        setError("주문 상세 정보를 불러오는 데 실패했습니다.");
+        console.error('주문 상세 정보 불러오기 실패', err);
+        setError('주문 상세 정보를 불러오는 데 실패했습니다.');
       });
   }, [orderId]);
 
   const handleDelete = async () => {
-    const confirmDelete = confirm("정말 주문을 삭제하시겠습니까?");
+    const confirmDelete = confirm('정말 주문을 삭제하시겠습니까?');
     if (!confirmDelete) return;
 
     const response = await fetch(`http://localhost:8080/my/orders/${orderId}`, {
-      method: "DELETE",
+      method: 'DELETE',
+      credentials: 'include',
     });
 
     if (response.ok) {
-      alert("주문이 삭제되었습니다.");
-      router.push("/my/orders");
+      alert('주문이 삭제되었습니다.');
+      router.push('/my/orders');
     } else {
-      alert("주문 삭제 실패!");
+      alert('주문 삭제 실패!');
     }
   };
 
   if (error) {
-    return <p>{error}</p>;  // 오류 메시지 표시
+    return <p>{error}</p>; // 오류 메시지 표시
   }
 
   if (!order) return <p>로딩 중...</p>;
@@ -71,10 +72,7 @@ export default function OrderDetailPage() {
         ))}
       </ul>
 
-      <button
-        className="bg-red-500 text-white p-2 rounded mt-4"
-        onClick={handleDelete}
-      >
+      <button className="bg-red-500 text-white p-2 rounded mt-4" onClick={handleDelete}>
         주문 삭제
       </button>
     </main>

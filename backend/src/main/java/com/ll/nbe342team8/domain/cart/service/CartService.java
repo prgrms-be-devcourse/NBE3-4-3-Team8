@@ -7,7 +7,9 @@ import com.ll.nbe342team8.domain.cart.dto.CartRequestDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.repository.CartRepository;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.global.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,7 +64,7 @@ public class CartService {
                     Cart cartItem = member.getCarts().stream()
                             .filter(cart -> cart.getBook().getId().equals(cartItemRequestDto.bookId()))
                             .findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("장바구니에 없음"));
+                            .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "해당하는 장바구니 정보가 없습니다."));
                     cartRepository.delete(cartItem);
                 });
     }

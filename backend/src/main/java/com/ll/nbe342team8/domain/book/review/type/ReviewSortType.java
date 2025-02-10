@@ -1,8 +1,13 @@
 package com.ll.nbe342team8.domain.book.review.type;
 
+import com.ll.nbe342team8.global.types.Sortable;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 
-public enum SortType {
+@Getter
+@RequiredArgsConstructor
+public enum ReviewSortType implements Sortable {
     CREATE_AT_DESC("createDate", Sort.Direction.DESC), // 최근 등록순
     CREATE_AT_ASC("createDate", Sort.Direction.ASC),   // 과거 등록순
     RATING_DESC("rating", Sort.Direction.DESC),      // 평점 높은 순
@@ -10,13 +15,4 @@ public enum SortType {
 
     private final String field;
     private final Sort.Direction direction;
-
-    SortType(String field, Sort.Direction direction) {
-        this.field = field;
-        this.direction = direction;
-    }
-
-    public Sort.Order getOrder() {
-        return new Sort.Order(direction, field);
-    }
 }

@@ -18,16 +18,19 @@ interface PageResponse<T> {
 export default function HomePage() {
   const [trendingBooks, setTrendingBooks] = useState<Book[]>([]);
   const [newBooks, setNewBooks] = useState<Book[]>([]);
-  
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const newBooksResponse = await fetch('http://localhost:8080/books?sortType=PUBLISHED_DATE');
+        const newBooksResponse = await fetch(
+          'http://localhost:8080/books?bookSortType=PUBLISHED_DATE',
+        );
         const newBooksData: PageResponse<Book> = await newBooksResponse.json();
         setNewBooks(newBooksData.content);
 
-        const trendingBooksResponse = await fetch('http://localhost:8080/books?sortType=RATING');
+        const trendingBooksResponse = await fetch(
+          'http://localhost:8080/books?bookSortType=RATING',
+        );
         const trendingBooksData: PageResponse<Book> = await trendingBooksResponse.json();
         setTrendingBooks(trendingBooksData.content);
       } catch (error) {
