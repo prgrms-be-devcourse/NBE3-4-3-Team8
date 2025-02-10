@@ -25,6 +25,8 @@ public class DetailOrder extends BaseTime {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
+    private Long memberId;
+
     private int bookQuantity;
 
     @Enumerated(EnumType.STRING)

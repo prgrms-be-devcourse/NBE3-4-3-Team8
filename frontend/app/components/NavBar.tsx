@@ -1,4 +1,3 @@
-//app/components/NavBar.tsx
 'use client';
 import React, { useState, KeyboardEvent } from 'react';
 import { useRouter } from 'next/navigation';
@@ -52,25 +51,31 @@ export default function NavBar() {
               🔍
             </button>
           </div>
-          <nav className="flex gap-6 text-sm text-black">
-            {user ? ( // ✅ 로그인한 경우
-              <>
-                <span className="cursor-pointer">{user.name}님</span> {/* 사용자 이름 표시 */}
-                <button onClick={handleLogout} className="text-red-500">
-                  로그아웃
-                </button>{' '}
-                {/* ✅ 로그아웃 버튼 */}
-              </>
-            ) : (
-              <KakaoLoginButton /> // ✅ 로그인하지 않은 경우, 카카오 로그인 버튼 표시
-            )}
-            <span className="cursor-pointer" onClick={() => router.push('/cart')}>
-              장바구니
-            </span>
-            <span className="cursor-pointer" onClick={() => router.push('/support')}>
-              고객센터
-            </span>
-          </nav>
+         <nav className="flex gap-6 text-sm text-black">
+           {user ? ( // ✅ 로그인한 경우
+             <>
+               <span className="cursor-pointer">{user.name}님</span> {/* 사용자 이름 표시 */}
+               <button onClick={handleLogout} className="text-red-500">
+                 로그아웃
+               </button>{' '}
+               {/* ✅ 로그아웃 버튼 */}
+               <span
+                 className="cursor-pointer"
+                 onClick={() => router.push('/my/orders')} // 마이페이지 -> 주문내역 페이지로 이동
+               >
+                 마이페이지
+               </span>
+             </>
+           ) : (
+             <KakaoLoginButton /> // ✅ 로그인하지 않은 경우, 카카오 로그인 버튼 표시
+           )}
+           <span className="cursor-pointer" onClick={() => router.push('/cart')}>
+             장바구니
+           </span>
+           <span className="cursor-pointer" onClick={() => router.push('/support')}>
+             고객센터
+           </span>
+         </nav>
         </div>
       </div>
     </header>

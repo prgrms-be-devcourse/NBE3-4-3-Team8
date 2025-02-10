@@ -31,6 +31,9 @@ public class Order extends BaseTime {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@Column(nullable = false)
+	private String oauthId;
+
 	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus;
 
@@ -46,8 +49,9 @@ public class Order extends BaseTime {
 		COMPLETE
 	}
 
-	public Order(Member member, OrderStatus orderStatus, long totalPrice) {
+	public Order(Member member, String oauthId, OrderStatus orderStatus, long totalPrice) {
 		this.member = member;
+		this.oauthId = oauthId;
 		this.orderStatus = orderStatus;
 		this.totalPrice = totalPrice;
 		this.detailOrders = new ArrayList<>(); // 기본 빈 리스트
