@@ -38,24 +38,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/cart/{bookId}/{memberId}": {
+    "/cart": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /** 장바구니 수정 */
-        put: operations["updateCartItem"];
-        post?: never;
-        delete?: never;
+        /** 장바구니 조회 */
+        get: operations["getCart"];
+        /** 장바구니 수정 json */
+        put: operations["updateCartItems"];
+        /** 장바구니 추가 */
+        post: operations["addCart"];
+        /** 장바구니 삭제 */
+        delete: operations["deleteBook"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/auth/my": {
+    "/api/auth/me/my": {
         parameters: {
             query?: never;
             header?: never;
@@ -120,42 +123,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/cart/{memberId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 장바구니 조회 */
-        get: operations["getCart"];
-        put?: never;
-        /** 장바구니 수정 json */
-        post: operations["updateCartItems"];
-        /** 장바구니 삭제 */
-        delete: operations["deleteBook"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/cart/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 장바구니 추가 */
-        post: operations["addCart"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/books/admin/books": {
         parameters: {
             query?: never;
@@ -172,7 +139,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/logout": {
+    "/api/auth/me/logout": {
         parameters: {
             query?: never;
             header?: never;
@@ -218,6 +185,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["updateBookPart"];
+        trace?: never;
+    };
+    "/admin/detail-orders/{detailOrderId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 상세 주문 배송 상태 수정
+         * @description 상세 주문 ID를 이용해 배송 상태를 변경합니다.
+         */
+        patch: operations["updateDetailStatus"];
         trace?: never;
     };
     "/reviews": {
@@ -353,15 +340,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/orders": {
+    "/api/auth/me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 전체 회원 주문 조회 */
-        get: operations["getAllOrdersForAdmin"];
+        get: operations["getUserInfo"];
         put?: never;
         post?: never;
         delete?: never;
@@ -370,14 +356,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/orders/{orderId}": {
+    "/admin/orders": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 주문 ID, 상세 주문 정보 조회 - 관리자 */
+        /** 전체 회원 주문 조회 */
+        get: operations["getAllOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/orders/{orderId}/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 상세 주문 조회
+         * @description 상세 주문 ID를 이용해 정보를 조회합니다.
+         */
         get: operations["getOrderDetails"];
         put?: never;
         post?: never;
@@ -416,6 +422,15 @@ export interface components {
             recipient: string;
             phone: string;
             isDefaultAddress: boolean;
+        };
+        CartItemRequestDto: {
+            /** Format: int64 */
+            bookId?: number;
+            /** Format: int32 */
+            quantity?: number;
+        };
+        CartRequestDto: {
+            cartItems?: components["schemas"]["CartItemRequestDto"][];
         };
         PutReqMemberMyPageDto: {
             name: string;
@@ -501,8 +516,8 @@ export interface components {
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
             username?: string;
-            authorities?: components["schemas"]["GrantedAuthority"][];
             oauthId?: string;
+            authorities?: components["schemas"]["GrantedAuthority"][];
         };
         Review: {
             /** Format: date-time */
@@ -520,15 +535,6 @@ export interface components {
         ReqQuestionDto: {
             content: string;
             title: string;
-        };
-        CartItemRequestDto: {
-            /** Format: int64 */
-            bookId?: number;
-            /** Format: int32 */
-            quantity?: number;
-        };
-        CartRequestDto: {
-            cartItems?: components["schemas"]["CartItemRequestDto"][];
         };
         AdminLoginDto: {
             username?: string;
@@ -606,6 +612,25 @@ export interface components {
             /** Format: double */
             averageRating?: number;
         };
+        UpdateDetailOrderStatusRequest: {
+            /**
+             * @description 변경할 배송 상태
+             * @enum {string}
+             */
+            status?: "PENDING" | "SHIPPED" | "DELIVERED";
+        };
+        AdminDetailOrderDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            orderId?: number;
+            /** Format: date-time */
+            modifyDate?: string;
+            bookTitle?: string;
+            /** Format: int32 */
+            bookQuantity?: number;
+            deliveryStatus?: string;
+        };
         PageReviewResponseDto: {
             /** Format: int64 */
             totalElements?: number;
@@ -619,9 +644,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
@@ -694,22 +719,10 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
-        };
-        AdminDetailOrderDTO: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            orderId?: number;
-            /** Format: date-time */
-            modifyDate?: string;
-            bookTitle?: string;
-            /** Format: int32 */
-            bookQuantity?: number;
-            deliveryStatus?: string;
         };
         AdminOrderDTO: {
             /** Format: int64 */
@@ -734,9 +747,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
@@ -752,9 +765,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
     };
@@ -857,19 +870,82 @@ export interface operations {
             };
         };
     };
-    updateCartItem: {
+    getCart: {
         parameters: {
-            query: {
-                quantity: number;
-            };
+            query?: never;
             header?: never;
-            path: {
-                bookId: number;
-                memberId: number;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["CartResponseDto"][];
+                };
+            };
+        };
+    };
+    updateCartItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartRequestDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addCart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartRequestDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteBook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartRequestDto"];
+            };
+        };
         responses: {
             /** @description OK */
             200: {
@@ -997,98 +1073,6 @@ export interface operations {
             };
         };
     };
-    getCart: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                memberId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["CartResponseDto"][];
-                };
-            };
-        };
-    };
-    updateCartItems: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                memberId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CartRequestDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    deleteBook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                memberId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CartRequestDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    addCart: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CartItemRequestDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     addBook: {
         parameters: {
             query?: {
@@ -1114,9 +1098,7 @@ export interface operations {
     logout: {
         parameters: {
             query?: never;
-            header: {
-                Authorization: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1183,12 +1165,38 @@ export interface operations {
             };
         };
     };
+    updateDetailStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                detailOrderId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDetailOrderStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["AdminDetailOrderDTO"];
+                };
+            };
+        };
+    };
     getAllReviews: {
         parameters: {
             query?: {
                 page?: number;
                 pageSize?: number;
-                reviewSortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC" | "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
+                reviewSortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC";
             };
             header?: never;
             path?: never;
@@ -1212,7 +1220,7 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                reviewSortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC" | "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
+                reviewSortType?: "CREATE_AT_DESC" | "CREATE_AT_ASC" | "RATING_DESC" | "RATING_ASC";
             };
             header?: never;
             path: {
@@ -1369,7 +1377,27 @@ export interface operations {
             };
         };
     };
-    getAllOrdersForAdmin: {
+    getUserInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getAllOrders: {
         parameters: {
             query?: {
                 page?: number;
