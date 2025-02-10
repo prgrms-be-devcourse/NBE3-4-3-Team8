@@ -30,7 +30,7 @@ public class DataInitializer {
     private final DetailOrderRepository detailOrderRepository;
     private final ExternalBookApiService externalBookApiService;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         // Initialize categories
         if (categoryRepository.count() == 0) {
@@ -68,7 +68,7 @@ public class DataInitializer {
                     .name("user1")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER)
-                    .oAuthId("123456789L")
+                    .oauthId("123456789L")
                     .email("chulsoo@example.com")
                     .password("securePassword1")
                     .deliveryInformations(new ArrayList<>())
@@ -77,7 +77,7 @@ public class DataInitializer {
                     .name("user2")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER)
-                    .oAuthId("123456789L")
+                    .oauthId("123456789L")
                     .email("chulsoo11@example.com")
                     .password("securePassword2")
                     .deliveryInformations(new ArrayList<>())
@@ -86,7 +86,7 @@ public class DataInitializer {
                     .name("user3")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER)
-                    .oAuthId("123456789L")
+                    .oauthId("123456789L")
                     .email("chulsoo3@example.com")
                     .password("securePassword3")
                     .deliveryInformations(new ArrayList<>())
@@ -149,7 +149,7 @@ public class DataInitializer {
         }
 
         // Initialize orders
-        if (orderRepository.count() == 0) {
+        if (orderRepository.count() == -1) {
             Member member1 = memberRepository.findById(1L).orElseThrow();
             Member member2 = memberRepository.findById(2L).orElseThrow();
             Member member3 = memberRepository.findById(3L).orElseThrow();

@@ -46,7 +46,7 @@ spring:
         default_batch_fetch_size: 100
         highlight-sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-    show-sql: true  # SQL 쿼리 로그를 출력
+    show-sql: false  # SQL 쿼리 로그를 출력
 
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
@@ -73,6 +73,6 @@ custom:
     backUrl: "${custom.dev.backUrl}"
     name: Book
   jwt:
-    secret: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
+    secretKey: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
 aladin:
   ttbkey: "ttbkumjjick2245001"

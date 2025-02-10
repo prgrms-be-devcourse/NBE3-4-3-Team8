@@ -7,9 +7,9 @@ import { GetMyPage, PutMyPage, PutMyAddress, PostAddress, DeleteAddress } from "
 
 
 export default function Home() {
+    const a = useState(2)
 
     const [responseBody, setResponseBody] = useState<MemberMyPageDto | null>(null);
-
     const [isEditing, setIsEditing] = useState(false);
     const [isAddingAddress, setIsAddingAddress] = useState(false);
     const [formData, setFormData] = useState<MemberMyPageDto>({

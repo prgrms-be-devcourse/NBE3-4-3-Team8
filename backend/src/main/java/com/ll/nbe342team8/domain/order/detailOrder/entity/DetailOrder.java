@@ -26,6 +26,9 @@ public class DetailOrder extends BaseTime {
 
     private int bookQuantity;
 
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status")
     private DeliveryStatus deliveryStatus;
