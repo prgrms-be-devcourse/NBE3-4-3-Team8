@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.ll.nbe342team8.domain.oauth.CustomOAuth2UserService;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -57,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/my/orders").permitAll()
                         .requestMatchers("/books/**","/event/**","/images/**").permitAll() // 카트, 메인페이지 추가
+                        .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService,memberService),

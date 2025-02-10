@@ -2,17 +2,22 @@ package com.ll.nbe342team8.domain.book.review.controller;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
+import com.ll.nbe342team8.domain.book.review.dto.ReviewRequestDto;
 import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.domain.book.review.service.ReviewService;
 import com.ll.nbe342team8.domain.book.review.type.ReviewSortType;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
+import com.ll.nbe342team8.domain.oauth.SecurityUser;
+import com.ll.nbe342team8.global.exceptions.ServiceException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,31 +55,46 @@ public class ReviewController {
 
     @DeleteMapping("/{reviewId}")
     @Operation(summary = "리뷰 삭제")
-    public void deleteReview(@PathVariable Long reviewId) {
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId,
+                             @AuthenticationPrincipal SecurityUser securityUser) {
+
+        Review review = reviewService.getReviewById(reviewId);
+        
+        if(review.getMember().getId() != securityUser.getMember().getId()){
+            return ResponseEntity.badRequest().body("본인의 리뷰만 삭제할 수 있습니다.");
+        }
+        
         reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok("리뷰를 삭제했습니다.");
     }
 
     @PutMapping("/{reviewId}")
     @Operation(summary = "리뷰 수정")
-    public void updateReview(@PathVariable Long reviewId,
+    public ResponseEntity<?> updateReview(@PathVariable Long reviewId,
                              @RequestParam(name = "content") String content,
-                             @RequestParam(name = "rating") Double rating) {
+                             @RequestParam(name = "rating") Double rating,
+                             @AuthenticationPrincipal SecurityUser securityUser) {
 
+        Review review = reviewService.getReviewById(reviewId);
+
+        if(review.getMember().getId() != securityUser.getMember().getId()){
+            return ResponseEntity.badRequest().body("본인의 리뷰만 수정할 수 있습니다.");
+        }
         reviewService.updateReview(reviewId, content, rating);
+        return ResponseEntity.ok("리뷰를 수정했습니다.");
     }
 
-    @PostMapping("/{book-id}/{member-id}")
+    @PostMapping("/{book-id}")
     @Operation(summary = "리뷰 등록")
     public void createReview(@PathVariable("book-id") Long bookId,
-                             @PathVariable("member-id") Long memberId,
-                             @RequestBody Review req){
+                             @AuthenticationPrincipal SecurityUser securityUser,
+                             @RequestBody ReviewRequestDto req){
 
         Book book = bookService.getBookById(bookId);
-        Member member = memberService.getMemberById(memberId);
+        Member member = securityUser.getMember();
 
-        Review review = Review.create(book, member, req.getContent(), req.getRating());
+        Review review = Review.create(book, member, req.content(), req.rating());
 
-
-        reviewService.create(review, req.getRating());
+        reviewService.create(review, req.rating());
     }
 }

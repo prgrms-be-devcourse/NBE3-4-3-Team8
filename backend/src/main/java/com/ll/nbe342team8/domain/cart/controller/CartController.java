@@ -10,11 +10,14 @@ import com.ll.nbe342team8.domain.cart.service.CartService;
 import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
+import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +36,9 @@ public class CartController {
     @Operation(summary = "장바구니 추가")
     @PostMapping
     public void addCart(@RequestBody CartRequestDto cartRequestDto, // CartRequestDto로 변경
-                        @RequestAttribute("member") Member member) {
+                        @AuthenticationPrincipal SecurityUser securityUser) {
+
+        Member member = securityUser.getMember();
 
         if (cartRequestDto != null) {
             cartService.updateCartItems(member, cartRequestDto);
@@ -42,8 +47,10 @@ public class CartController {
 
     @Operation(summary = "장바구니 수정 json")
     @PutMapping
-    public void updateCartItems(@RequestAttribute("member") Member member,
-                                @RequestBody CartRequestDto cartRequestDto){
+    public void updateCartItems(@AuthenticationPrincipal SecurityUser securityUser,
+                                @RequestBody @Valid CartRequestDto cartRequestDto){
+
+        Member member = securityUser.getMember();
 
         if (cartRequestDto != null) {
             cartService.updateCartItems(member, cartRequestDto);
@@ -52,8 +59,10 @@ public class CartController {
 
     @Operation(summary = "장바구니 삭제")
     @DeleteMapping
-    public void deleteBook(@RequestAttribute("member") Member member,
+    public void deleteBook(@AuthenticationPrincipal SecurityUser securityUser,
                            @RequestBody CartRequestDto cartRequestDto) {
+
+        Member member = securityUser.getMember();
 
         if (cartRequestDto != null) {
             cartService.deleteProduct(member, cartRequestDto);
@@ -62,7 +71,9 @@ public class CartController {
 
     @Operation(summary = "장바구니 조회")
     @GetMapping
-    public List<CartResponseDto> getCart(@RequestAttribute("member") Member member) {
+    public List<CartResponseDto> getCart(@AuthenticationPrincipal SecurityUser securityUser) {
+
+        Member member = securityUser.getMember();
         List<Cart> carts = cartService.findCartByMember(member);
 
         return carts.stream()

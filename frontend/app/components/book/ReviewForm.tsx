@@ -29,6 +29,7 @@ export const ReviewForm = ({ bookId, onReviewSubmitted }: ReviewFormProps) => {
           rating,
           content,
         }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
