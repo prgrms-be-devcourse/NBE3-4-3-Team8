@@ -1,22 +1,16 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
-import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -40,7 +34,6 @@ public class Member extends BaseTime {
 
     private String email; // 사용자 이메일
 
-    @Column(nullable = true)
     private String password;
 
 

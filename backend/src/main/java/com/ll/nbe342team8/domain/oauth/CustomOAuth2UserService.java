@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.oauth;
 
 
+import com.ll.nbe342team8.domain.jwt.JwtService;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
@@ -18,6 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final MemberService memberService;
+    private final JwtService jwtService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
@@ -38,6 +40,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         dto.setPhoneNumber(""); // 기본 전화번호 설정 (빈 값)
 
         Member member = memberService.modifyOrJoin(oAuthId, dto, email);
+        String refreshToken = jwtService.generateRefreshToken(member);  // generateRefreshToken에서 리프레시 토큰 값 설정하는건지 확인
 
         return new SecurityUser(member);
     }

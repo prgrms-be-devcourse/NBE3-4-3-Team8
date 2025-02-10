@@ -46,6 +46,7 @@ export default function HomePage() {
       <Banner />
       <BookList title="이달의 신작" books={newBooks} />
       <BookList title="급상승! 많이 보고 있는 상품" books={trendingBooks} />
+      
     </>
   );
 }

@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,10 +39,10 @@ public class MemberService implements UserDetailsService {
                     Member member = Member.builder()
                             .oAuthId(oAuthId)
                             .email(email)
-                            .password("")
                             .name(dto.getName())
                             .phoneNumber(dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
                             .memberType(Member.MemberType.USER)
+                            .password("")
                             .build();
                     return memberRepository.save(member);
                 });
@@ -73,9 +74,9 @@ public class MemberService implements UserDetailsService {
             throw new UsernameNotFoundException("관리자 권한이 없습니다.");
         }
 
-        return new org.springframework.security.core.userdetails.User(
-                member.getUsername(),
-                member.getPassword(),
+        return new User(
+                member.getOAuthId(),
+                "",
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
     }

@@ -1,84 +1,101 @@
 package com.ll.nbe342team8.domain.jwt;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import io.jsonwebtoken.Claims;
-import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class JwtService {
-    @Value("${custom.jwt.secret}")
-    private String secretKey;
-
-    private static final long TOKEN_VALIDITY = 24 * 60 * 60 * 1000;
+    // 서명 키를 한 번만 생성하여 재사용
+    private final Key key;
+    private static final long TOKEN_VALIDITY = 60 * 60 * 1000L;  // 1시간
+    private static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60 * 1000L;  // 7일
     private final Set<String> tokenBlacklist = ConcurrentHashMap.newKeySet();
 
+    // 생성자에서 키를 초기화하여 일관성 보장
+    public JwtService(@Value("${custom.jwt.secretKey}") String secretKey) {
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public String generateToken(Member member) {
-        // 현재 시간과 만료 시간을 설정합니다
         Date now = new Date();
         Date validity = new Date(now.getTime() + TOKEN_VALIDITY);
 
-        // JWT 토큰을 생성합니다. 이때 카카오 ID를 주요 식별자로 사용합니다
-        return Jwts.builder()
-                .setSubject(member.getOAuthId())  // 카카오 ID를 토큰의 주체로 설정
-                .claim("id", member.getId())      // 내부 DB ID는 부가 정보로 포함
+        String token = Jwts.builder()
+                .setSubject(member.getOAuthId())
+                .claim("id", member.getId())
                 .claim("email", member.getEmail())
                 .claim("name", member.getName())
-                .setIssuedAt(now)                 // 토큰 발급 시간
-                .setExpiration(validity)          // 토큰 만료 시간
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(key)
                 .compact();
+
+        // URL 안전한 형태로 인코딩
+        return URLEncoder.encode(token, StandardCharsets.UTF_8);
     }
 
-    // 토큰에서 카카오 ID를 추출하는 메서드를 추가합니다
-    public String getKakaoIdFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();  // setSubject()로 설정한 카카오 ID를 가져옵니다
+    public String generateRefreshToken(Member member) {
+        String token = Jwts.builder()
+                .setSubject(member.getOAuthId())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
+                .signWith(key)
+                .compact();
+
+        return URLEncoder.encode(token, StandardCharsets.UTF_8);
     }
 
-//    public String getKakaoIdFromToken(String token) {
-//        if (token == null || token.isBlank()) {
-//            throw new IllegalArgumentException("JWT token is null or empty");
-//        }
-//
-//        try {
-//            Claims claims = Jwts.parserBuilder()
-//                    .setSigningKey(secretKey)
-//                    .build()
-//                    .parseClaimsJws(token)
-//                    .getBody();
-//            return claims.get("kakaoId", String.class);
-//        } catch (JwtException e) {
-//            throw new IllegalArgumentException("Invalid JWT token", e);
-//        }
-//    }
-
-    // 토큰의 유효성을 검증하는 메서드도 추가합니다
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            // URL 디코딩 후 검증
+            log.debug("받은 토큰: {}", token);
+            String decodedToken = URLDecoder.decode(token, StandardCharsets.UTF_8);
+            log.debug("디코딩된 토큰: {}", decodedToken);
+
+            if (tokenBlacklist.contains(decodedToken)) {
+                log.debug("블랙리스트에 있는 토큰");
+                return false;
+            }
+
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(decodedToken);
+            log.debug("토큰 검증 성공");
             return true;
         } catch (Exception e) {
+            log.error("토큰 검증 실패: ", e);
+            log.error("상세 에러: ", e);
             return false;
         }
     }
 
-    public void invalidateToken(String token) {
-        tokenBlacklist.add(token);
+    public String getKakaoIdFromToken(String token) {
+        try {
+            String decodedToken = URLDecoder.decode(token, StandardCharsets.UTF_8);
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(decodedToken)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            log.error("토큰에서 카카오 ID 추출 실패: ", e);
+            throw e;
+        }
     }
-
-    public boolean isTokenValid(String token) {
-        return !tokenBlacklist.contains(token);
-    }
-
 }

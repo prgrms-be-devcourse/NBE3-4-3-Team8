@@ -5,6 +5,7 @@ spring:
 
   profiles:
     active: dev
+    include: secret
 
   datasource:
     url: jdbc:mysql://localhost:3306/the_book
@@ -34,7 +35,7 @@ spring:
       client:
         registration:
           kakao:
-            clientId: ${KAKAO_CLIENT_ID}
+            clientId: ON_SECRET
             scope:
               - profile_nickname
               - profile_image
@@ -57,7 +58,7 @@ aladin:
 
 custom:
   jwt:
-    secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+    secretKey: ON_SECRET
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
@@ -71,3 +72,5 @@ custom:
     frontUrl: "${custom.dev.frontUrl}"
     backUrl: "${custom.dev.backUrl}"
     name: Book
+  accessToken:
+    expirationSeconds: "#{60 * 20}"

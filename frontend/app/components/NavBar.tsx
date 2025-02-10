@@ -26,9 +26,16 @@ export default function NavBar() {
         setSearchText("");
     };
 
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") handleSearch();
-    };
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout(); // ✅ 로그아웃 요청
+    router.push('/'); // ✅ 로그아웃 후 홈으로 이동
+  };
 
     return (
         <header className="bg-white shadow border-b border-black">
@@ -78,7 +85,7 @@ export default function NavBar() {
                         {user ? (
                             <>
                                 <span className="cursor-pointer">{user.name}님</span>
-                                <button onClick={logout} className="text-red-500">
+                                <button onClick={handleLogout} className="text-red-500">
                                     로그아웃
                                 </button>
                             </>

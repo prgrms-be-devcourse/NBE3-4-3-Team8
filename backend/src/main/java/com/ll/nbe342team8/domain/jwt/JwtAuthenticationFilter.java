@@ -1,7 +1,7 @@
 package com.ll.nbe342team8.domain.jwt;
 
+
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import jakarta.servlet.FilterChain;
@@ -10,15 +10,17 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final MemberService memberService;
@@ -26,51 +28,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        // 1. 토큰 추출
-        String token = extractTokenFromCookie(request);
-
-        // 2. 토큰 없는 경우 즉시 통과 (shouldNotFilter와 중복 방지)
-        if (token == null || token.isBlank()) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         try {
-            // 3. 토큰 유효성 검증 우선 수행
-            if (!jwtService.validateToken(token) || !jwtService.isTokenValid(token)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid token");
-                return;
+            log.info("현재 요청 URI: {}", request.getRequestURI());
+            String token = extractTokenFromCookies(request);
+            log.info("쿠키에서 추출된 토큰 존재 여부: {}", token != null);
+
+            if (token != null && jwtService.validateToken(token)) {
+                String kakaoId = jwtService.getKakaoIdFromToken(token); // findByOauthId랑 기능 비교하기
+                log.info("토큰에서 추출된 카카오 ID: {}", kakaoId);
+
+                Member member = memberService.findByOauthId(kakaoId)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                log.info("회원 조회 성공: {}", member.getEmail());
+
+                SecurityUser securityUser = new SecurityUser(member);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        securityUser, null, securityUser.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("SecurityContextHolder 최종 인증 정보: {}", SecurityContextHolder.getContext().getAuthentication());
+                log.info("인증 정보 설정 완료");
             }
-
-            // 4. 인증 정보 추출
-            String oAuthId = jwtService.getKakaoIdFromToken(token);
-            Optional<Member> opMember = memberService.findByOauthId(oAuthId);
-
-            if (opMember.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Member not found");
-                return;
-            }
-
-            // 5. 인증 객체 설정
-            Member member = opMember.get();
-            SecurityUser securityUser = new SecurityUser(member);
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(securityUser, null, securityUser.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            // 6. 요청 속성에 Member 저장 (선택적)
-            request.setAttribute("member", member);
-
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Authentication failed: " + e.getMessage());
-            return;
+            log.error("JWT 인증 처리 중 오류 발생: ", e);
         }
 
         chain.doFilter(request, response);
+    }
+
+    private String extractTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        log.info("요청에 포함된 쿠키 개수: {}", cookies != null ? cookies.length : 0);
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                log.info("쿠키 정보 - 이름: {}, 값 존재 여부: {}",
+                        cookie.getName(), cookie.getValue() != null);
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -78,17 +75,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return path.startsWith("/books") || path.equals("/login");
     }
-
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwtToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 }
-
