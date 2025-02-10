@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @RequestMapping("/admin/dashboard")
 @PreAuthorize("hasRole('ADMIN')")
 @Data
-@NoArgsConstructor
 public class AnswerDto {
     private Long id;            // 답변의 고유 식별자
 
