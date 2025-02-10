@@ -10,7 +10,15 @@ export interface Book {
   pubDate: string;
   categoryId: number;
   rating: number;
+  averageRating: number;
   reviewCount: number;
   publisher: string;
   description: string;
+}
+
+export enum SearchType {
+  TITLE = "TITLE",
+  AUTHOR = "AUTHOR",
+  ISBN13 = "ISBN13",
+  PUBLISHER = "PUBLISHER"
 }

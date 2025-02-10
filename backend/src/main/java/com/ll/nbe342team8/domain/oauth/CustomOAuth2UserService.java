@@ -30,7 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.getOrDefault("kakao_account", new HashMap<>());
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.getOrDefault("profile", new HashMap<>());
 
-        String oauthId = oauth2User.getName();  // kakaoId -> oauthId
+        String oAuthId = oauth2User.getName();  // kakaoId -> oAuthId
         String email = (String) kakaoAccount.getOrDefault("email", "");
         String name = (String) profile.getOrDefault("nickname", "");  // nickname -> name
 
@@ -39,8 +39,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         dto.setName(name);  // 닉네임 설정
         dto.setPhoneNumber(""); // 기본 전화번호 설정 (빈 값)
 
-        Member member = memberService.modifyOrJoin(oauthId, dto, email);
-        String refreshToken = jwtService.generateRefreshToken(member);
+        Member member = memberService.modifyOrJoin(oAuthId, dto, email);
+        String refreshToken = jwtService.generateRefreshToken(member);  // generateRefreshToken에서 리프레시 토큰 값 설정하는건지 확인
 
         return new SecurityUser(member);
     }

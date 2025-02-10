@@ -85,10 +85,16 @@ export const removeCartItems = async (memberId, cartItems) => {
 };
 
 // 📌 도서 이름 검색 (fetchSearchBooks)
-export const fetchSearchBooks = async (page = 0, pageSize = 10, sortType = "PUBLISHED_DATE", title) => {
+export const fetchSearchBooks = async (
+    page = 0,
+    pageSize = 10,
+    sortType = "PUBLISHED_DATE",
+    searchType = "TITLE", // 기본값 TITLE
+    keyword
+) => {
     try {
         const response = await api.get(`/books/search`, {
-            params: { page, pageSize, sortType, title },
+            params: { page, pageSize, sortType, searchType, keyword },
         });
         return response.data;
     } catch (error) {

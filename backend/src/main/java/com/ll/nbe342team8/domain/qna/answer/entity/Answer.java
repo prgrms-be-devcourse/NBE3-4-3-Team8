@@ -13,6 +13,9 @@ import lombok.*;
 @Builder
 public class Answer extends BaseTime {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
     @Column(columnDefinition = "TEXT")
     private String content;

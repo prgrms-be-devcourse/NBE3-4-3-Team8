@@ -1,16 +1,45 @@
-aladin:
-  ttbkey:
+server:
+  port: 8080
 
 spring:
+
   profiles:
-    active: mysql
+    active: dev
+    include: secret
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/the_book
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+#        format_sql: true
+#        use_sql_comments: true
+        default_batch_fetch_size: 100
+        highlight-sql: true
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+
+  output:
+    ansi:
+      enabled: always #색깔
+
   security:
     oauth2:
       client:
         registration:
           kakao:
-            clientId: c47345d326ca974bf9ce4525ae5ddeef
-            scope: profile_nickname, profile_image
+            clientId: ON_SECRET
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
             client-name: Kakao
             authorization-grant-type: authorization_code
             redirect-uri: "${custom.site.backUrl}/{action}/oauth2/code/{registrationId}"
@@ -20,21 +49,28 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+springdoc:
+  default-produces-media-type: application/json;charset=UTF-8
+
+aladin:
+  ttbkey: ${TTBKEY}
+
 custom:
+  jwt:
+    secretKey: ON_SECRET
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
     backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
   prod:
-    cookieDomain: glog.oa.gg
+    cookieDomain: book.oa.gg
     frontUrl: "https://www.${custom.prod.cookieDomain}"
     backUrl: "https://api.${custom.prod.cookieDomain}"
   site:
     cookieDomain: "${custom.dev.cookieDomain}"
     frontUrl: "${custom.dev.frontUrl}"
     backUrl: "${custom.dev.backUrl}"
-    name: GLOG
-  jwt:
-    secretKey: ON_SECRET
+    name: Book
   accessToken:
     expirationSeconds: "#{60 * 20}"
