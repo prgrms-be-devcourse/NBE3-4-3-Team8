@@ -1,16 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function OrderDetailPage() {
-  const { orderId } = useParams();
+  const searchParams = useSearchParams(); // URL의 쿼리 파라미터를 가져옴
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    if (!orderId) return;
+    const oauthId = searchParams.get("oauthId"); // oauthId로 변경
+    const orderId = searchParams.get("orderId"); // orderId도 쿼리 파라미터로 가져옴
+    if (!oauthId || !orderId) return;
 
-    fetch(`http://localhost:8080/my/orders/${orderId}/details`)
+    fetch(`http://localhost:8080/my/orders/${orderId}/details?oauthId=${oauthId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP 오류! 상태: ${res.status}`);
@@ -29,7 +32,7 @@ export default function OrderDetailPage() {
         console.error("주문 상세 정보 불러오기 실패", err);
         setError("주문 상세 정보를 불러오는 데 실패했습니다.");
       });
-  }, [orderId]);
+  }, [searchParams]);
 
   if (error) {
     return <p>{error}</p>;

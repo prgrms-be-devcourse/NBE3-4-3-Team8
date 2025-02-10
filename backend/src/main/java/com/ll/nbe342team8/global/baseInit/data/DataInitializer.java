@@ -148,32 +148,36 @@ public class DataInitializer {
             bookRepository.save(book2);
         }
 
-        // Initialize orders
-        if (orderRepository.count() == -1) {
+        // Initialize orders (주문 생성)
+        if (orderRepository.count() == 0) {
             Member member1 = memberRepository.findById(1L).orElseThrow();
             Member member2 = memberRepository.findById(2L).orElseThrow();
             Member member3 = memberRepository.findById(3L).orElseThrow();
 
             Order order1 = Order.builder()
                     .member(member1)
+                    .oauthId("oauth1")
                     .orderStatus(Order.OrderStatus.COMPLETE)
-                    .totalPrice(2500)
+                    .totalPrice(25000)
                     .build();
             Order order2 = Order.builder()
                     .member(member2)
+                    .oauthId("oauth2")
                     .orderStatus(Order.OrderStatus.ORDERED)
-                    .totalPrice(4500)
+                    .totalPrice(45000)
                     .build();
             Order order3 = Order.builder()
                     .member(member3)
+                    .oauthId("oauth3")
                     .orderStatus(Order.OrderStatus.ORDERED)
-                    .totalPrice(3500)
+                    .totalPrice(35000)
                     .build();
+
             orderRepository.save(order1);
             orderRepository.save(order2);
             orderRepository.save(order3);
 
-            // Initialize detail orders
+            // Initialize detail orders (상세 주문 생성)
             Book book1 = bookRepository.findById(1L).orElseThrow();
             Book book2 = bookRepository.findById(2L).orElseThrow();
 
@@ -181,20 +185,26 @@ public class DataInitializer {
                     .order(order1)
                     .book(book1)
                     .bookQuantity(2)
+                    .memberId(member1.getId()) // 주문한 회원의 ID
                     .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
                     .build();
+
             DetailOrder detailOrder2 = DetailOrder.builder()
                     .order(order2)
                     .book(book2)
                     .bookQuantity(3)
+                    .memberId(member2.getId()) // 주문한 회원의 ID
                     .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
                     .build();
+
             DetailOrder detailOrder3 = DetailOrder.builder()
                     .order(order3)
                     .book(book1)
                     .bookQuantity(1)
+                    .memberId(member3.getId()) // 주문한 회원의 ID
                     .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
                     .build();
+
             detailOrderRepository.save(detailOrder1);
             detailOrderRepository.save(detailOrder2);
             detailOrderRepository.save(detailOrder3);

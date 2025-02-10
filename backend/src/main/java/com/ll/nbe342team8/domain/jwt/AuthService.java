@@ -76,6 +76,11 @@ public class AuthService {
 
     }
 
+    public Member getMemberByOauthId(String oauthId) {
+        return memberRepository.findByOauthId(oauthId)
+                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
+    }
+
     // ✅ 로그아웃 - `Set-Cookie`로 `accessToken`, `refreshToken` 삭제
     public ResponseEntity<?> logout() {
         ResponseCookie deleteAccessToken = ResponseCookie.from("accessToken", "")
