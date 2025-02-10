@@ -1,29 +1,42 @@
-<<<<<<< HEAD
 aladin:
   ttbkey: ${TTBKEY}
-=======
 server:
   port: 8080
->>>>>>> fd94d04b325396805d818486d9c0e8c7a48cf3c7
-
 spring:
-  application:
-    name: next-js-oauth2-2025-01-20
+
   profiles:
     active: dev
     include: secret
-  web:
-    resources:
-      add-mappings: false
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/the_book
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        #        format_sql: true
+        #        use_sql_comments: true
+        default_batch_fetch_size: 100
+        highlight-sql: true
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+
   output:
     ansi:
-      enabled: always
+      enabled: always #색깔
+
   security:
     oauth2:
       client:
         registration:
           kakao:
-            clientId: c47345d326ca974bf9ce4525ae5ddeef
+            clientId: ON_SECRET
             scope:
               - profile_nickname
               - profile_image
@@ -37,33 +50,13 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-  datasource:
-    url: jdbc:mysql://localhost:3306/test_db
-    username: root
-    password: jjevt3Hsy0331@
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
-        highlight-sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-    show-sql: false  # SQL 쿼리 로그를 출력
 
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.hibernate.orm.jdbc.extract: TRACE
-    org.springframework.transaction.interceptor: TRACE
-
 custom:
+  jwt:
+    secretKey: ${SECRETKEY}
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
@@ -77,7 +70,5 @@ custom:
     frontUrl: "${custom.dev.frontUrl}"
     backUrl: "${custom.dev.backUrl}"
     name: Book
-  jwt:
-    secretKey: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
-aladin:
-  ttbkey: "ttbkumjjick2245001"
+  accessToken:
+    expirationSeconds: "#{60 * 20}"
