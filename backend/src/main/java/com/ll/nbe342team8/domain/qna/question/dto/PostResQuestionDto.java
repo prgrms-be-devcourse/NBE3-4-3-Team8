@@ -13,17 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class PostResQuestionDto {
-
-    private List<QuestionDto> questions;
-
+public record PostResQuestionDto(List<QuestionDto> questions) {
     public PostResQuestionDto(Member member) {
-        this.questions = member.getQuestions().stream()
-                .map(QuestionDto::new) // QuestionDto 생성자로 매핑
-                .collect(Collectors.toList()); // 리스트로 변환
-
+        this(List.copyOf(member.getQuestions().stream()
+                .map(QuestionDto::new)
+                .collect(Collectors.toList()))); // 🔥 불변 리스트 적용
     }
 }

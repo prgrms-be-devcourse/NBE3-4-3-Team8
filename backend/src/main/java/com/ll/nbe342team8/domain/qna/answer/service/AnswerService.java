@@ -27,7 +27,7 @@ public class AnswerService {
     public void createAnswer(Question question, Member member, ReqAnswerDto dto) {
 
         //이스케이프 처리후 저장
-        String sanitizedContent = Ut.XSSSanitizer.sanitize(dto.getContent());
+        String sanitizedContent = Ut.XSSSanitizer.sanitize(dto.content());
 
         Answer answer = Answer.builder()
                 .content(sanitizedContent)

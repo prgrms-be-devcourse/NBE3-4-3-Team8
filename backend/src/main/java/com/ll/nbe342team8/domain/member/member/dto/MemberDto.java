@@ -8,32 +8,22 @@ import lombok.NoArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
-@NoArgsConstructor
-public class MemberDto {
-   private String oAuthId;
-   private String name;
-   private String email;
-   private Member.MemberType memberType;
+public record MemberDto(
+        String oauthId,
+        String name,
+        String email,
+        Member.MemberType memberType
+) {
+    public MemberDto(Member member) {
+        this(member.getOauthId(), member.getName(), member.getEmail(), member.getMemberType());
+    }
 
-   public MemberDto(Member entity) {
-       this.oAuthId = entity.getOauthId();
-       this.name = entity.getName();
-       this.email = entity.getEmail();
-       this.memberType = entity.getMemberType();
-   }
-
-   public Map<String, Object> getAttributes() {
-       Map<String, Object> attributes = new HashMap<>();
-       attributes.put("oAuthId", this.oAuthId);
-       attributes.put("name", this.name);
-       attributes.put("email", this.email);
-       attributes.put("memberType", this.memberType);
-       return attributes;
-   }
-
-   public enum MemberType {
-       USER,
-       ADMIN
-   }
+    public Map<String, Object> getAttributes() {
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("oauthId", oauthId);
+        attributes.put("name", name);
+        attributes.put("email", email);
+        attributes.put("memberType", memberType);
+        return attributes;
+    }
 }

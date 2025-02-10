@@ -38,8 +38,8 @@ public class Question extends BaseTime {
 
 
     public void updateQuestionInfo(ReqQuestionDto dto) {
-        this.title= Ut.XSSSanitizer.sanitize(dto.getTitle());
-        this.content=Ut.XSSSanitizer.sanitize(dto.getContent());
+        this.title= Ut.XSSSanitizer.sanitize(dto.title());
+        this.content=Ut.XSSSanitizer.sanitize(dto.content());
     }
 
 }

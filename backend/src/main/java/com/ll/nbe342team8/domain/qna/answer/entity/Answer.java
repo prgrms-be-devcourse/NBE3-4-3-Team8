@@ -31,7 +31,7 @@ public class Answer extends BaseTime {
     private Member member;
 
     public void updateAnswerInfo(ReqAnswerDto dto) {
-        this.content=Ut.XSSSanitizer.sanitize(dto.getContent());
+        this.content=Ut.XSSSanitizer.sanitize(dto.content());
     }
 
 }

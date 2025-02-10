@@ -44,7 +44,7 @@ public class DeliveryInformationService {
         //isDefaultAddress 값을 모두 false로 만든 후 deliveryInformation을 갱신 -> 언제나 기본 배송지 1개로 유지 가능하다.
         //dto의 isDefaultAddress가 false인 경우 그냥 데이터 갱신한다.
         //더티 체킹을 이용한 개체 갱신
-        if(dto.getIsDefaultAddress()) {
+        if(dto.isDefaultAddress()) {
             member.convertFalseDeliveryInformationsIsDefaultAddress();
         }
         deliveryInformation.updateDeliveryInfo(dto);

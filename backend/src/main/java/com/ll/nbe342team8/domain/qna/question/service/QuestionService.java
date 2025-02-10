@@ -28,8 +28,8 @@ public class QuestionService {
     @Transactional
     public void createQuestion(Member member, ReqQuestionDto dto) {
         //이스케이프 처리
-        String sanitizedTitle = Ut.XSSSanitizer.sanitize(dto.getTitle());
-        String sanitizedContent = Ut.XSSSanitizer.sanitize(dto.getContent());
+        String sanitizedTitle = Ut.XSSSanitizer.sanitize(dto.title());
+        String sanitizedContent = Ut.XSSSanitizer.sanitize(dto.content());
         Question question = Question.builder()
                 .title(sanitizedTitle)
                 .content(sanitizedContent)
