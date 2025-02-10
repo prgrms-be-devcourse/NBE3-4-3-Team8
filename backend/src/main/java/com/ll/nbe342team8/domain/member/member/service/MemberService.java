@@ -27,7 +27,7 @@ public class MemberService implements UserDetailsService {
 
     @Transactional
     public Member modifyOrJoin(String oAuthId, PutReqMemberMyPageDto dto, String email) {
-        return memberRepository.findByoAuthId(oAuthId) // 기존 회원인지 확인 (oAuthId 기준으로 검색)
+        return memberRepository.findByOauthId(oAuthId) // 기존 회원인지 확인 (oAuthId 기준으로 검색)
                 .map(member -> {
                     // 기존 회원 정보 업데이트
                     member.updateMemberInfo(dto);
@@ -37,17 +37,16 @@ public class MemberService implements UserDetailsService {
                 .orElseGet(() -> {
                     // 새 회원 생성 시 기본값으로 USER 타입 설정
                     Member member = Member.builder()
-                            .oAuthId(oAuthId)
+                            .oauthId(oAuthId)
                             .email(email)
-                            .name(dto.getName())
-                            .phoneNumber(dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
+                            .name(dto.name())
+                            .phoneNumber(dto.phoneNumber() != null ? dto.phoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
                             .memberType(Member.MemberType.USER)
                             .password("")
                             .build();
                     return memberRepository.save(member);
                 });
     }
-
 
     public Member getMemberById(Long id){
         return memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
@@ -62,7 +61,7 @@ public class MemberService implements UserDetailsService {
     }
 
     public Optional<Member> findByOauthId(String oAuthId) {
-        return memberRepository.findByoAuthId(oAuthId);
+        return memberRepository.findByOauthId(oAuthId);
     }
 
     @Override
@@ -75,7 +74,7 @@ public class MemberService implements UserDetailsService {
         }
 
         return new User(
-                member.getOAuthId(),
+                member.getOauthId(),
                 "",
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );

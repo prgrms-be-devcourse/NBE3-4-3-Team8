@@ -7,7 +7,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ll.nbe342team8.domain.order.detailOrder.dto.AdminDetailOrderDTO;
-import com.ll.nbe342team8.domain.order.detailOrder.entity.DeliveryStatus;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
 
@@ -42,7 +41,7 @@ public class AdminDetailOrderService {
 
 	// 상세 주문 배송 상태 수정
 	@Transactional
-	public AdminDetailOrderDTO updateDetailStatus(Long detailOrderId, DeliveryStatus status) {
+	public AdminDetailOrderDTO updateDetailStatus(Long detailOrderId, DetailOrder.DeliveryStatus status) {
 		DetailOrder detailOrder = detailOrderRepository.findById(detailOrderId)
 				.orElseThrow(() -> new EntityNotFoundException("해당 상세 주문을 찾을 수 없습니다."));
 

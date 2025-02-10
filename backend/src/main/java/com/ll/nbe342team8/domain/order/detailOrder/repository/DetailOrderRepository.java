@@ -17,4 +17,6 @@ public interface DetailOrderRepository extends JpaRepository<DetailOrder, Long> 
 	Page<DetailOrder> findByOrderId(Long orderId, Pageable pageable);
 
 	void deleteByOrderId(Long orderId);
+
+	List<DetailOrder> findByOrderIdAndMemberId(Long orderId, Long memberId);
 }

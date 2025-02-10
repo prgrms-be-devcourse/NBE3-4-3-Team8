@@ -2,18 +2,18 @@
 import { useState, useEffect } from 'react';
 
 interface User {
-  name: string;
-  phoneNumber: string;
-  memberType: 'USER' | 'ADMIN';
-  oauthId: string;
-  email: string;
-  deliveryInformations: DeliveryInformation[];
+name: string;
+phoneNumber: string;
+memberType: 'USER' | 'ADMIN';
+oauthId: string;
+email: string;
+deliveryInformations: DeliveryInformation[];
 }
 
 interface DeliveryInformation {
-  id: number;
-  address: string;
-  isDefaultAddress: boolean;
+id: number;
+address: string;
+isDefaultAddress: boolean;
 }
 
 export function useAuth() {

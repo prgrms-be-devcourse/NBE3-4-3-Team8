@@ -3,6 +3,7 @@ package com.ll.nbe342team8.domain.member.member.entity;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
+import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,11 +31,14 @@ public class Member extends BaseTime {
     @Enumerated(EnumType.STRING)
     private MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-    private String oAuthId;
+    private String oauthId;
 
     private String email; // 사용자 이메일
 
     private String password;
+
+    private String username;
+
 
 
     // Enum 사용자 역할
@@ -49,30 +53,36 @@ public class Member extends BaseTime {
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     private List<Cart> carts;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Question> questions;
+
 
     public void updateMemberInfo(PutReqMemberMyPageDto dto) {
-        this.name = dto.getName();
-        this.phoneNumber = dto.getPhoneNumber();
+        this.name = dto.name();
+        this.phoneNumber = dto.phoneNumber();
 
     }
 
-    public void addDeliveryInformaiton(DeliveryInformation deliveryInformation) {
+    public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
         this.deliveryInformations.add(deliveryInformation);
     }
 
-    public void convertFalseDeliveryInformaitonsIsDefaultAddress() {
+    public void convertFalseDeliveryInformationsIsDefaultAddress() {
         deliveryInformations.forEach(info -> info.setIsDefaultAddress(false));
     }
 
-    public void deleteDeliveryInformaiton(Long id) {
-        deliveryInformations.removeIf(deliveryInfo -> deliveryInfo.getId().equals(id));
-    }
+    
 
     public String getUsername() {
-        return oAuthId;
+        return oauthId;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
     }
+
+    public String getOauthId() {
+        return oauthId;
+    }
 }
+

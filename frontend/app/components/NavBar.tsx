@@ -1,9 +1,9 @@
-"use client";
-import React, { useState, KeyboardEvent } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../hooks/useAuth";
-import KakaoLoginButton from "./KakaoLoginButton";
-import { SearchType } from "@/types/book";
+'use client';
+import React, { useState, KeyboardEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../hooks/useAuth';
+import KakaoLoginButton from './KakaoLoginButton';
+import { SearchType } from '@/types/book';
 
 const searchOptions = [
     { label: "제목", value: SearchType.TITLE },
@@ -26,30 +26,27 @@ export default function NavBar() {
         setSearchText("");
     };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
-  const handleLogout = async () => {
-    await logout(); // ✅ 로그아웃 요청
-    router.push('/'); // ✅ 로그아웃 후 홈으로 이동
-  };
+    const handleLogout = async () => {
+        await logout();
+        router.push('/');
+    };
 
     return (
         <header className="bg-white shadow border-b border-black">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
-                    {/* 로고 영역 */}
                     <div
                         className="text-2xl font-bold text-gray-800 cursor-pointer"
                         onClick={() => router.push("/")}
                     >
                         THE BOOK
                     </div>
-
-                    {/* 검색 영역 */}
                     <div className="flex-1 max-w-2xl mx-10 flex items-center">
                         <div className="flex w-full max-w-2xl">
                             <select
@@ -79,8 +76,6 @@ export default function NavBar() {
                             </button>
                         </div>
                     </div>
-
-                    {/* 우측 네비게이션 */}
                     <nav className="flex gap-6 text-sm text-gray-700">
                         {user ? (
                             <>
@@ -88,6 +83,12 @@ export default function NavBar() {
                                 <button onClick={handleLogout} className="text-red-500">
                                     로그아웃
                                 </button>
+                                <span
+                                    className="cursor-pointer"
+                                    onClick={() => router.push('/my/orders')}
+                                >
+                                    마이페이지
+                                </span>
                             </>
                         ) : (
                             <KakaoLoginButton />
