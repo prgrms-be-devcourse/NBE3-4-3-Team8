@@ -29,13 +29,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByOauthId(String oauthId) {
+    public List<OrderDTO> getOrdersByOAuthId(String oAuthId) {
         // 회원이 존재하는지 먼저 체크
-        Member member = memberRepository.findByoAuthId(oauthId)
+        Member member = memberRepository.findByoAuthId(oAuthId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         // 주문 조회
-        List<Order> orders = orderRepository.findByOauthId(oauthId);
+        List<Order> orders = orderRepository.findByOauthId(oAuthId);
         if (orders.isEmpty()) {
             throw new IllegalArgumentException("주문이 존재하지 않습니다.");
         }

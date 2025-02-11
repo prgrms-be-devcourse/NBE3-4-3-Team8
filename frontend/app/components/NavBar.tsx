@@ -85,6 +85,9 @@ export default function NavBar() {
                         {user ? (
                             <>
                                 <span className="cursor-pointer">{user.name}님</span>
+                                <button onClick={() => router.push("/my")} className="cursor-pointer hover:text-blue-500 transition-colors">
+                                    마이페이지
+                                </button>
                                 <button onClick={handleLogout} className="text-red-500">
                                     로그아웃
                                 </button>
@@ -104,6 +107,7 @@ export default function NavBar() {
                         >
                             고객센터
                         </span>
+                        
                     </nav>
                 </div>
             </div>
