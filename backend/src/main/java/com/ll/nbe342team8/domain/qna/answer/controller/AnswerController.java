@@ -37,8 +37,7 @@ public class AnswerController {
 
     @Operation(summary = "사용자가 작성한 qna 질문에 대한 답변 조회")
     @GetMapping("/question/{questionId}/answer")
-    public ResponseEntity<?> getAnswers(@RequestParam Long questionId
-    ) {
+    public ResponseEntity<?> getAnswers(@PathVariable Long questionId) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -67,9 +66,8 @@ public class AnswerController {
     //관리자가 상세 답변 데이터 조회
     @Operation(summary = "사용자가 작성한 qna 질문의 상세 답변 조회")
     @GetMapping("/question/{questionId}/answer/{answerId}")
-    public ResponseEntity<?> getAnswer(@RequestParam Long questionId,
-                                       @RequestParam Long answerId
-    ) {
+    public ResponseEntity<?> getAnswer(@PathVariable Long questionId,
+                                       @PathVariable Long answerId) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -102,7 +100,7 @@ public class AnswerController {
     //관리자가 질문에 답변 등록
     @Operation(summary = "사용자가 작성한 qna 질문에 답변 등록(관리자 전용)")
     @PostMapping("/question/{questionId}/answer")
-    public ResponseEntity<?> postAnswer(@RequestParam(name = "questionId") Long questionId,
+    public ResponseEntity<?> postAnswer(@PathVariable Long questionId,
                                         @RequestBody @Valid ReqAnswerDto reqAnswerDto ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -133,9 +131,9 @@ public class AnswerController {
 
     //관리자가 질문에 답변 수정
     @Operation(summary = "사용자가 작성한 qna 질문에 답변 수정(관리자 전용)")
-    @PutMapping("/my/question/{questionId}/answer/{answerId}")
-    public ResponseEntity<?> modifyAnswer(@RequestParam(name = "questionId") Long questionId,
-                                          @RequestParam(name = "answerId") Long answerId,
+    @PutMapping("/question/{questionId}/answer/{answerId}")
+    public ResponseEntity<?> modifyAnswer(@PathVariable Long questionId,
+                                          @PathVariable Long answerId,
                                           @RequestBody @Valid ReqAnswerDto reqAnswerDto ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -166,9 +164,9 @@ public class AnswerController {
 
     //관리자가 답변 삭제
     @Operation(summary = "사용자가 작성한 qna 질문에 답변 삭제(관리자 전용)")
-    @DeleteMapping("/my/question/{questionId}/answer/{answerId}")
-    public ResponseEntity<?> modifyAnswer(@RequestParam(name = "questionId") Long questionId,
-                                          @RequestParam(name = "answerId") Long answerId ) {
+    @DeleteMapping("/question/{questionId}/answer/{answerId}")
+    public ResponseEntity<?> deleteAnswer(@PathVariable Long questionId,
+                                          @PathVariable Long answerId) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
