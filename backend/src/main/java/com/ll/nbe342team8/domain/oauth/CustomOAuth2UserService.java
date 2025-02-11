@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +36,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String name = (String) profile.getOrDefault("nickname", "");  // nickname -> name
 
 
-        PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto();
-        dto.setName(name);  // 닉네임 설정
-        dto.setPhoneNumber(""); // 기본 전화번호 설정 (빈 값)
+        Optional<Member> existingMember = memberService.findByOauthId(oAuthId);
+        String phoneNumber = (existingMember != null) ? existingMember.get().getPhoneNumber() : ""; // 기존 유저면 phoneNumber 유지, 없으면 빈 값
+
+        PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto(name,phoneNumber);
 
         Member member = memberService.modifyOrJoin(oAuthId, dto, email);
         String refreshToken = jwtService.generateRefreshToken(member);  // generateRefreshToken에서 리프레시 토큰 값 설정하는건지 확인
