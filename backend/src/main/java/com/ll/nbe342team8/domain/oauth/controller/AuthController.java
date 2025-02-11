@@ -36,7 +36,7 @@ public class AuthController {
 
         try {
             String kakaoId = jwtService.getKakaoIdFromToken(refreshToken);
-            Member member = memberRepository.findByOauthId(kakaoId)
+            Member member = memberRepository.findByoAuthId(kakaoId)
                     .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
 
             // 새로운 액세스 토큰 생성
