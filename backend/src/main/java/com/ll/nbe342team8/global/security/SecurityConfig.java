@@ -54,8 +54,9 @@ public class SecurityConfig {
                 .csrf(csrf-> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/api/auth/me", "/api/auth/me/**").permitAll()
                         .requestMatchers("/my/orders").permitAll()
                         .requestMatchers("/books/**","/event/**","/images/**", "/cart/**").permitAll() // 카트, 메인페이지 추가
                         .requestMatchers(HttpMethod.GET, "/reviews/**", "/cart").permitAll()

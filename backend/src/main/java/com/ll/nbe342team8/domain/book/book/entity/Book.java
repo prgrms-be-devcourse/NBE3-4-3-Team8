@@ -54,7 +54,7 @@ public class Book extends BaseTime {
     @NotNull
     private Integer status;         // 판매 상태
 
-    private Double rating;      // 평점
+    private Double rating = 0.0;      // 평점
 
     @Formula("CASE WHEN review_count = 0 THEN 0 ELSE rating / review_count END")
     private Double averageRating;        //평균 평점
@@ -69,7 +69,7 @@ public class Book extends BaseTime {
 
     private Long salesPoint;
 
-    private Long reviewCount;
+    private Long reviewCount = 0L;
 
     private String publisher;
 

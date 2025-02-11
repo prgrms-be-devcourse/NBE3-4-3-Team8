@@ -24,7 +24,7 @@ public class DevInitData {
         return args -> {
             Ut.file.downloadByHttp("http://localhost:8080/v3/api-docs", ".");
 
-            String cmd = "yes | npx --package typescript --package openapi-typescript --package punycode openapi-typescript api-docs.json -o ./frontend/types/schema.d.ts";
+            String cmd = "yes | npx --package typescript --package openapi-typescript --package punycode openapi-typescript api-docs.json -o ./frontend/app/backend/api/schema.d.ts";
             Ut.cmd.runAsync(cmd);
         };
     }

@@ -1,5 +1,7 @@
-//app/hooks/useAuth.ts
-import { useState, useEffect } from 'react';
+'use client';
+
+import { useState, useEffect, createContext, useContext } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   name: string;
@@ -16,9 +18,24 @@ interface DeliveryInformation {
   isDefaultAddress: boolean;
 }
 
-export function useAuth() {
+interface AuthContextProps {
+  user: User | null;
+  loading: boolean;
+  logout: () => Promise<void>;
+}
+
+// Context 생성
+const AuthContext = createContext<AuthContextProps>({
+  user: null,
+  loading: true,
+  logout: async () => {},
+});
+
+// Provider 컴포넌트
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -49,16 +66,19 @@ export function useAuth() {
   const logout = async () => {
     try {
       // ✅ 백엔드 로그아웃 API 호출
-      await fetch('http://localhost:8080/api/auth/logout', {
+      await fetch('http://localhost:8080/api/auth/me/logout', {
         method: 'POST',
         credentials: 'include', // ✅ 쿠키 포함 요청
       });
+      setUser(null);
+      router.replace('/'); // 로그아웃 후 홈으로 이동
     } catch (error) {
       console.error('로그아웃 실패:', error);
-    } finally {
-      setUser(null);
     }
   };
 
-  return { user, loading, logout };
-}
+  return <AuthContext.Provider value={{ user, loading, logout }}>{children}</AuthContext.Provider>;
+};
+
+// Context를 활용하는 커스텀 훅
+export const useAuth = () => useContext(AuthContext);
