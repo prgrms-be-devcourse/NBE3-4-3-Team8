@@ -51,6 +51,19 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
+    //주문등록
+    @PostMapping("/create/fast")
+    public ResponseEntity<OrderResponseDto> createFastOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
+                                                        @AuthenticationPrincipal SecurityUser securityUser) {
+
+        System.out.println("orderRequestDto = " + orderRequestDto);
+
+        Member member = securityUser.getMember();
+        Order order = orderService.createFastOrder(member, orderRequestDto);
+
+        return ResponseEntity.ok(OrderResponseDto.from(order));
+    }
+
     @GetMapping("/payment")
     public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser) {
 

@@ -101,6 +101,37 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
+    public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO) {
+        List<Cart> cartList = cartService.findCartByMember(member);
+
+        Order order = Order.builder()
+                .member(member)
+                .orderStatus(OrderStatus.ORDERED)
+                .fullAddress(orderRequestDTO.fullAddress())
+                .postCode(orderRequestDTO.postCode())
+                .phone(orderRequestDTO.phone())
+                .recipient(orderRequestDTO.recipient())
+                .paymentMethod(orderRequestDTO.paymentMethod())
+                .totalPrice(calculateTotalPriceSales(cartList))
+                .build();
+
+        orderRepository.save(order);
+
+        List<DetailOrder> detailOrders = cartList.stream()
+                .map(cart -> DetailOrder.builder()
+                        .order(order)
+                        .deliveryStatus(DeliveryStatus.PENDING)
+                        .book(cart.getBook())
+                        .bookQuantity(cart.getQuantity())
+                        .build())
+                .collect(Collectors.toList());
+
+        detailOrderRepository.saveAll(detailOrders);
+
+        return order;
+    }
+
     private Long calculateTotalPriceSales(List<Cart> cartList) {
         return cartList.stream()
                 .mapToLong(cart -> (long) cart.getBook().getPricesSales() * cart.getQuantity())

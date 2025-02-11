@@ -177,4 +177,15 @@ export const createOrder = async (orderData) => {
     }
 };
 
+// 📌 주문생성 (바로구매)
+export const createFastOrder = async (orderData) => {
+    try {
+        const response = await api.post('/my/orders/create/fast', orderData);
+        return response.data;
+    } catch (error) {
+        console.error("주문 생성 오류:", error);
+        throw error;
+    }
+};
+
 export default api;
