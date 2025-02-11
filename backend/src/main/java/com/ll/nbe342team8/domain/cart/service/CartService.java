@@ -11,10 +11,16 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,31 +38,62 @@ public class CartService {
         cartRepository.save(cart);
     }
 
+    @Transactional
     public void updateCartItems(Member member, CartRequestDto cartRequestDto) {
+        // 기존 장바구니 데이터를 맵으로 변환 (bookId 기준)
+        Map<Long, Cart> cartMap = member.getCarts().stream()
+                .collect(Collectors.toMap(cart -> cart.getBook().getId(), cart -> cart));
+
+        // 변경된 Cart 객체를 저장할 리스트
+        List<Cart> cartsToSave = new ArrayList<>();
+
         cartRequestDto.cartItems().forEach(item -> {
             Book book = bookService.getBookById(item.bookId());
-            Cart cart = findCartByBook(member, item.bookId());
+            Cart cart = cartMap.get(book.getId());
 
             if (cart == null) {
+                // 새로운 Cart 객체 생성
                 cart = Cart.builder()
                         .member(member)
                         .book(book)
                         .quantity(item.quantity())
                         .build();
             } else {
+                // 기존 Cart 객체 업데이트
                 int newQuantity = item.isAddToCart() ? cart.getQuantity() + item.quantity() : item.quantity();
                 cart.updateCart(newQuantity);
             }
 
-            cartRepository.save(cart);
+            cartsToSave.add(cart);
         });
+
+        // saveAll로 한 번에 저장
+        cartRepository.saveAll(cartsToSave);
     }
 
-
+//    public void updateCartItems(Member member, CartRequestDto cartRequestDto) {
+//        cartRequestDto.cartItems().forEach(item -> {
+//            Book book = bookService.getBookById(item.bookId());
+//            Cart cart = findCartByBook(member, book.getId());
+//
+//            if (cart == null) {
+//                cart = Cart.builder()
+//                        .member(member)
+//                        .book(book)
+//                        .quantity(item.quantity())
+//                        .build();
+//            } else {
+//                int newQuantity = item.isAddToCart() ? cart.getQuantity() + item.quantity() : item.quantity();
+//                cart.updateCart(newQuantity);
+//            }
+//
+//            cartRepository.save(cart);
+//        });
+//    }
 
     private Cart findCartByBook(Member member, Long bookId) {
         for (Cart cart : member.getCarts()) {
-            if (cart.getBook().getId().equals(bookId)) {
+            if (cart.getBook().getId() == bookId) {
                 return cart;
             }
         }

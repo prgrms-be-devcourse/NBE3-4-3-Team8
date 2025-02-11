@@ -107,9 +107,9 @@ public class BaseInitData {
             categoryRepository.save(category);
 
             Book book = Book.builder()
-                    .title("제목")
-                    .author("작가")
-                    .priceStandard(10000)
+                    .title("제목" + i)
+                    .author("작가" + i)
+                    .priceStandard(10000 + i)
                     .pricesSales(9000)
                     .stock(100)
                     .coverImage(coverUrls.get(i-1))
@@ -117,8 +117,11 @@ public class BaseInitData {
                     .pubDate(date.plusDays(i))
                     .publisher("출판사")
                     .salesPoint(50L + i)
+                    .rating(0.0)
+                    .reviewCount(0L)
                     .categoryId(category)
                     .isbn13("isbn13")
+                    .status(1)
                     .build();
 
             bookService.create(book);

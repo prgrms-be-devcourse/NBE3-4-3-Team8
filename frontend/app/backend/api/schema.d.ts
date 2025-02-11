@@ -594,8 +594,8 @@ export interface components {
             password?: string;
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
-            username?: string;
             oauthId?: string;
+            username?: string;
             authorities?: components["schemas"]["GrantedAuthority"][];
         };
         Review: {
@@ -668,16 +668,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -685,11 +685,11 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            paged?: boolean;
-            /** Format: int32 */
-            pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            paged?: boolean;
             unpaged?: boolean;
         };
         ReviewResponseDto: {
@@ -734,16 +734,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -762,16 +762,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -780,16 +780,16 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
@@ -1406,7 +1406,7 @@ export interface operations {
             query: {
                 page?: number;
                 pageSize?: number;
-                bookSortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
+                sortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
                 searchType?: "TITLE" | "AUTHOR" | "ISBN13" | "PUBLISHER";
                 keyword: string;
             };
