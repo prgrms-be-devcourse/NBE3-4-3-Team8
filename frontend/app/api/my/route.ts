@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 export async function GET(req : Request)  {
-    
+
     console.log("-----------------------------------------------");
     console.log("GET MyPage");
     console.log("-----------------------------------------------");
-    
+
     const cookies = req.headers.get("cookie") || "";
 
     const response = await fetch(`http://localhost:8080/api/auth/me/my`, {
@@ -17,18 +17,18 @@ export async function GET(req : Request)  {
 
     console.log("Backend response status:", response.status);
     console.log("Backend response headers:", response.headers);
-      
+
 
     // 🔹 백엔드 응답을 그대로 반환
     return new Response(response.body, {
         status: response.status,
         headers: response.headers,
     });
-    
+
 }
 
 export async function PUT(req: Request) {
-    
+
 
     console.log("-----------------------------------------------");
     console.log(`api/my/route.ts - Put MyPage `);
@@ -36,7 +36,7 @@ export async function PUT(req: Request) {
 
     const cookies = req.headers.get("cookie") || "";
 
-    
+
 
     try {
         const requestBody = await req.json(); // 🔹 요청의 body 데이터 가져오기
@@ -67,5 +67,4 @@ export async function PUT(req: Request) {
         });
     }
 }
-
 
