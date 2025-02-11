@@ -1,29 +1,24 @@
 package com.ll.nbe342team8.domain.book.book.dto;
 
-import com.ll.nbe342team8.domain.book.category.entity.Category;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDate;
 
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-public class ExternalBookDto {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-    private String title;             // 제목
-    private String author;            // 저자
-    private String publisher;         // 출판사
-    private String pubDate;           // 출판일
-    private String isbn;              // ISBN
-    private String isbn13;            // ISBN13
-    private int priceStandard;        // 정가
-    private int priceSales;           // 판매가
-    private String toc;               // 목차
-    private String cover;             // 커버 이미지 URL
-    private String description;       // 상세 설명
-    private String descriptionImage;  // 상세 설명 이미지 URL
-    private Category categoryId;      // 카테고리
-
+// 외부 API에서 받아온 도서 정보를 담는 DTO
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ExternalBookDto(
+		String title,             // 제목
+		String author,            // 저자
+		String publisher,         // 출판사
+		LocalDate pubDate,        // 출판일
+		String isbn,              // ISBN
+		String isbn13,            // ISBN13
+		Integer priceStandard,    // 정가
+		Integer priceSales,       // 판매가
+		String toc,               // 목차
+		String cover,             // 커버 이미지 URL
+		String description,       // 상세 설명
+		String descriptionImage,  // 상세 설명 이미지 URL
+		Integer categoryId        // 알라딘 API에서 받아온 카테고리 ID (Category Pk 아님)
+) {
 }
