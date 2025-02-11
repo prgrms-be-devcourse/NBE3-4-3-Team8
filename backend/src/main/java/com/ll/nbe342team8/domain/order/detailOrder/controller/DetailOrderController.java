@@ -23,6 +23,12 @@ public class DetailOrderController {
             @AuthenticationPrincipal SecurityUser securityUser) {
 
         Member member = securityUser.getMember();
-        return detailOrderService.getDetailOrdersByOrderIdAndMember(orderId, member);
+        List<DetailOrderDto> detailOrderDtoList = detailOrderService.getDetailOrdersByOrderIdAndMember(orderId, member);
+        System.out.println("실행됨");
+        System.out.println("orderId = " + orderId);
+        System.out.println("detailOrderDtoList = " + detailOrderDtoList.toString());
+        System.out.println("출력 결과 end");
+
+        return detailOrderDtoList;
     }
 }

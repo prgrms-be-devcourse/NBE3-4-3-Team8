@@ -27,7 +27,6 @@ public class Order extends BaseTime {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "member_id")
 	private Member member;
 
 	@Enumerated(EnumType.STRING)

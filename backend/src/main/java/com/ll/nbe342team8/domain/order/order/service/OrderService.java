@@ -28,12 +28,6 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final CartService cartService;
 
-    // 임의의 데이터 추가 메서드
-    public void addDummyOrders(Member member) {
-        Order order1 = new Order(member, OrderStatus.ORDERED, 100);
-        Order order2 = new Order(member, OrderStatus.ORDERED, 200);
-        orderRepository.saveAll(List.of(order1, order2));
-    }
 
     @Autowired
     public OrderService(OrderRepository orderRepository, DetailOrderRepository detailOrderRepository, MemberRepository memberRepository, CartService cartService) {

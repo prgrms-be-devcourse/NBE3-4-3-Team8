@@ -11,50 +11,35 @@ export default function OrdersPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // 임의로 주문 데이터를 넣어줌 (테스트용)
-    const testOrders = [
-      {
-        orderId: '12345',
-        totalPrice: 25000,
-        orderDate: '2025-02-10', // 주문 날짜 추가
-      },
-      {
-        orderId: '12346',
-        totalPrice: 30000,
-        orderDate: '2025-02-11', // 주문 날짜 추가
-      },
-    ];
-    setOrders(testOrders); // 임의 데이터로 orders 업데이트
-    setFilteredOrders(testOrders); // 처음에는 전체 주문 목록을 표시
+//     const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
+//     const accessToken = token ? token.split('=')[1] : null;
+//
+//     if (!accessToken) {
+//       setError('Access token is missing');
+//       return;
+//     }
 
-    // 실제 API 요청 부분
-    const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
-    const accessToken = token ? token.split('=')[1] : null;
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/my/orders', {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-    if (!accessToken) {
-      console.log('No access token found');
-      setError('Access token is missing');
-      return;
-    }
-
-    fetch('http://localhost:8080/my/orders', {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
-        return res.json();
-      })
-      .then((data) => {
-        setOrders(data); // 실제 데이터로 업데이트
+
+        const data = await res.json();
+        setOrders(data);
         setFilteredOrders(data); // 전체 주문 목록을 필터링된 목록으로 초기화
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('Failed to load order list', err);
         setError('주문 목록을 불러오는 데 실패했습니다.');
-      });
+      }
+    };
+
+    fetchOrders();
   }, []); // 처음에만 실행되도록 빈 배열
 
   // 날짜 변경 시 주문 목록을 필터링하는 함수
@@ -89,20 +74,22 @@ export default function OrdersPage() {
           />
         </div>
 
+        {error && <p className="text-red-500">{error}</p>}
+
         <ul>
-          {Array.isArray(filteredOrders) && filteredOrders.length === 0 ? (
+          {filteredOrders.length === 0 ? (
             <p>No orders found for this date.</p>
           ) : (
-            Array.isArray(filteredOrders) && filteredOrders.map((order) => (
+            filteredOrders.map((order) => (
               <li
                 key={order.orderId}
-                className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative" // relative 클래스 추가
+                className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative"
               >
-                <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div> {/* 주문 날짜를 왼쪽 상단에 작은 글씨로 표시 */}
+                <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div>
                 <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
                 <p className="text-xl font-semibold">Total Price: {order.totalPrice}원</p>
                 <button
-                  className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6" // 간결한 디자인
+                  className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
                   onClick={() => {
                     if (order.orderId) {
                       router.push(`/my/orders/${order.orderId}/details`);
@@ -111,8 +98,8 @@ export default function OrdersPage() {
                     }
                   }}
                 >
-                  <span role="img" aria-label="detail" className="text-xl">🔍</span> {/* 이모티콘 크기 키움 */}
-                  <span className="text-lg font-medium">상세 조회</span> {/* 텍스트 크기 조정 */}
+                  <span role="img" aria-label="detail" className="text-xl">🔍</span>
+                  <span className="text-lg font-medium">상세 조회</span>
                 </button>
               </li>
             ))

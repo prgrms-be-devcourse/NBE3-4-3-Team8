@@ -19,5 +19,6 @@ public interface DetailOrderRepository extends JpaRepository<DetailOrder, Long> 
 
 	void deleteByOrderId(Long orderId);
 
-	List<DetailOrder> findByOrderIdAndMember(Long orderId, Member member);
+//	List<DetailOrder> findByOrderIdAndMember(Long orderId, Member member);
+
 }

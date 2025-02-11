@@ -40,7 +40,7 @@ const Sidebar: React.FC = () => {
         <p className="text-gray-700 font-semibold">{username || "유저 이름"}</p> {/* ✅ JWT에서 가져온 유저 이름 표시 */}
       </div>
       <nav className="space-y-2">
-        <SidebarItem to="/orders" label="쇼핑내역" subLabel="주문/배송목록" />
+        <SidebarItem to="/my/orders" label="쇼핑내역" subLabel="주문/배송목록" />
         <SidebarItem to="/library" label="라이브러리" subLabel="리뷰" />
         <SidebarItem to="/my/question" label="문의내역" subLabel="나의 문의내역" />
         <SidebarItem to="/my" label="회원정보" subLabel="회원정보 수정" />

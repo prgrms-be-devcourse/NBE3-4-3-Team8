@@ -20,11 +20,11 @@ public class DetailOrderService {
         this.authService = authService;
     }
 
-    // 주문상세조회 - Member와 orderId로 주문 상세 조회
+    // 주문상세조회
     public List<DetailOrderDto> getDetailOrdersByOrderIdAndMember(Long orderId, Member member) {
         // 레포지토리에서 orderId와 member로 주문 상세 조회
-        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderIdAndMember(orderId, member);
-
+        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderId(orderId);
+        System.out.println("detailOrders = " + detailOrders.toString());
         // 주문 상세 정보를 DetailOrderDto로 변환하여 반환
         return detailOrders.stream()
                 .map(detailOrder -> new DetailOrderDto(

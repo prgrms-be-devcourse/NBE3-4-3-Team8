@@ -18,15 +18,14 @@ public class DetailOrder extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+//    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+//    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     private int bookQuantity;
