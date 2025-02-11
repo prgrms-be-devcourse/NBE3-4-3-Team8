@@ -73,6 +73,6 @@ custom:
     backUrl: "${custom.dev.backUrl}"
     name: Book
   jwt:
-    secreKey: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
+    secretKey: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
 aladin:
   ttbkey: "ttbkumjjick2245001"

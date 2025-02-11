@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.order.detailOrder.entity;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
+import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
@@ -23,6 +24,10 @@ public class DetailOrder extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     private int bookQuantity;
 
