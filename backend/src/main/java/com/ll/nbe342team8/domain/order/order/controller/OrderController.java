@@ -32,9 +32,8 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getOrders(@CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
-        String oauthId = member.getOauthId(); // 여기서 oauthId를 가져옵니다.
 
-        List<OrderDTO> orders = orderService.getOrdersByOauthId(oauthId);
+        List<OrderDTO> orders = orderService.getOrdersByMember(member);
         return ResponseEntity.ok(orders);
     }
 
@@ -42,13 +41,12 @@ public class OrderController {
     @DeleteMapping("/{orderId}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long orderId, @CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
-        String oauthId = member.getOauthId(); // 여기서 oauthId를 가져옵니다.
 
-        orderService.deleteOrder(orderId, oauthId);
+        orderService.deleteOrder(orderId, member);
         return ResponseEntity.ok("주문 삭제 완료");
     }
 
-    //주문등록
+    // 주문등록
     @PostMapping("/create")
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
                                                         @AuthenticationPrincipal SecurityUser securityUser) {
@@ -61,10 +59,10 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
-    //주문등록
+    // 주문등록
     @PostMapping("/create/fast")
     public ResponseEntity<OrderResponseDto> createFastOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
-                                                        @AuthenticationPrincipal SecurityUser securityUser) {
+                                                            @AuthenticationPrincipal SecurityUser securityUser) {
 
         System.out.println("orderRequestDto = " + orderRequestDto);
 

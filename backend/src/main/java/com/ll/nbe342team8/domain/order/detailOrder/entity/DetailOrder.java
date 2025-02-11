@@ -26,19 +26,8 @@ public class DetailOrder extends BaseTime {
 
     private int bookQuantity;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "delivery_status")
     private DeliveryStatus deliveryStatus;
-
-    public enum DeliveryStatus {
-        PENDING, // 대기중
-        SHIPPING, // 배송중
-        DELIVERED, // 배송완료
-        RETURNED // 반품
-    }
 
     public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;

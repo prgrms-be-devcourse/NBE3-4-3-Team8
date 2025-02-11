@@ -8,6 +8,7 @@ import com.ll.nbe342team8.domain.book.category.entity.Category;
 import com.ll.nbe342team8.domain.book.category.repository.CategoryRepository;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DeliveryStatus;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
@@ -68,7 +69,7 @@ public class DataInitializer {
                     .name("user1")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER)
-                    .oauthId("123456789L")
+                    .oAuthId("123456789L")
                     .email("chulsoo@example.com")
                     .password("securePassword1")
                     .deliveryInformations(new ArrayList<>())
@@ -77,7 +78,7 @@ public class DataInitializer {
                     .name("user2")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER)
-                    .oauthId("123456789L")
+                    .oAuthId("123456789L")
                     .email("chulsoo11@example.com")
                     .password("securePassword2")
                     .deliveryInformations(new ArrayList<>())
@@ -86,7 +87,7 @@ public class DataInitializer {
                     .name("user3")
                     .phoneNumber("010-1234-5678")
                     .memberType(Member.MemberType.USER)
-                    .oauthId("123456789L")
+                    .oAuthId("123456789L")
                     .email("chulsoo3@example.com")
                     .password("securePassword3")
                     .deliveryInformations(new ArrayList<>())
@@ -100,7 +101,6 @@ public class DataInitializer {
         if (bookRepository.count() == 0) {
             Category category1 = categoryRepository.findById(1L).orElseThrow();
             Category category2 = categoryRepository.findById(2L).orElseThrow();
-            ExternalBookDto beingRich = externalBookApiService.searchBook("9791162227022");
             Book book1 = Book.builder()
                     .title("부자 되는 법")
                     .author("홍길동")
@@ -156,19 +156,16 @@ public class DataInitializer {
 
             Order order1 = Order.builder()
                     .member(member1)
-                    .oauthId("oauth1")
                     .orderStatus(Order.OrderStatus.COMPLETE)
                     .totalPrice(25000)
                     .build();
             Order order2 = Order.builder()
                     .member(member2)
-                    .oauthId("oauth2")
                     .orderStatus(Order.OrderStatus.ORDERED)
                     .totalPrice(45000)
                     .build();
             Order order3 = Order.builder()
                     .member(member3)
-                    .oauthId("oauth3")
                     .orderStatus(Order.OrderStatus.ORDERED)
                     .totalPrice(35000)
                     .build();
@@ -185,24 +182,21 @@ public class DataInitializer {
                     .order(order1)
                     .book(book1)
                     .bookQuantity(2)
-                    .memberId(member1.getId()) // 주문한 회원의 ID
-                    .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
+                    .deliveryStatus(DeliveryStatus.PENDING)
                     .build();
 
             DetailOrder detailOrder2 = DetailOrder.builder()
                     .order(order2)
                     .book(book2)
                     .bookQuantity(3)
-                    .memberId(member2.getId()) // 주문한 회원의 ID
-                    .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
+                    .deliveryStatus(DeliveryStatus.PENDING)
                     .build();
 
             DetailOrder detailOrder3 = DetailOrder.builder()
                     .order(order3)
                     .book(book1)
                     .bookQuantity(1)
-                    .memberId(member3.getId()) // 주문한 회원의 ID
-                    .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
+                    .deliveryStatus(DeliveryStatus.PENDING)
                     .build();
 
             detailOrderRepository.save(detailOrder1);

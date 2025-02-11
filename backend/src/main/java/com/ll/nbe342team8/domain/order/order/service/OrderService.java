@@ -29,12 +29,9 @@ public class OrderService {
     private final CartService cartService;
 
     // 임의의 데이터 추가 메서드
-    public void addDummyOrders(String oauthId) {
-        Member member = memberRepository.findByOauthId(oauthId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-        Order order1 = new Order(member, oauthId, OrderStatus.ORDERED, 100);
-        Order order2 = new Order(member, oauthId, OrderStatus.ORDERED, 200);
+    public void addDummyOrders(Member member) {
+        Order order1 = new Order(member, OrderStatus.ORDERED, 100);
+        Order order2 = new Order(member, OrderStatus.ORDERED, 200);
         orderRepository.saveAll(List.of(order1, order2));
     }
 
@@ -47,13 +44,9 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByOauthId(String oauthId) {
-        // 회원이 존재하는지 먼저 체크
-        Member member = memberRepository.findByoAuthId(oauthId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
+    public List<OrderDTO> getOrdersByMember(Member member) {
         // 주문 조회
-        List<Order> orders = orderRepository.findByOauthId(oauthId);
+        List<Order> orders = orderRepository.findByMember(member);
         if (orders.isEmpty()) {
             throw new IllegalArgumentException("주문이 존재하지 않습니다.");
         }
@@ -68,11 +61,8 @@ public class OrderService {
     }
 
     @Transactional
-    public void deleteOrder(Long orderId, String oauthId) {
-        Member member = memberRepository.findByoAuthId(oauthId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-        Order order = orderRepository.findByIdAndOauthId(orderId, oauthId)
+    public void deleteOrder(Long orderId, Member member) {
+        Order order = orderRepository.findByIdAndMember(orderId, member)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
 
         if (order.getOrderStatus() != OrderStatus.COMPLETE) {
@@ -158,7 +148,7 @@ public class OrderService {
                 .mapToLong(cart -> (long) cart.getBook().getPriceStandard() * cart.getQuantity())
                 .sum();
     }
-    
+
     public PaymentResponseDto createPaymentInfo(Member member) {
         List<Cart> cartList = cartService.findCartByMember(member);
         List<CartResponseDto> cartResponseDtoList = cartList.stream()

@@ -31,16 +31,13 @@ public class Member extends BaseTime {
     @Enumerated(EnumType.STRING)
     private MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-    private String oAuthId; //??
-    private String oauthId;
+    private String oAuthId; // 필드 이름 변경
 
     private String email; // 사용자 이메일
 
     private String password;
 
     private String username;
-
-
 
     // Enum 사용자 역할
     public enum MemberType {
@@ -57,11 +54,9 @@ public class Member extends BaseTime {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Question> questions;
 
-
     public void updateMemberInfo(PutReqMemberMyPageDto dto) {
         this.name = dto.name();
         this.phoneNumber = dto.phoneNumber();
-
     }
 
     public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
@@ -72,7 +67,6 @@ public class Member extends BaseTime {
         deliveryInformations.forEach(info -> info.setIsDefaultAddress(false));
     }
 
-
     public String getUsername() {
         return oAuthId;
     }
@@ -81,9 +75,7 @@ public class Member extends BaseTime {
         return Collections.emptyList();
     }
 
-    public String getOauthId() {
-        return oauthId;
+    public String getOAuthId() {
+        return oAuthId;
     }
-
-
 }

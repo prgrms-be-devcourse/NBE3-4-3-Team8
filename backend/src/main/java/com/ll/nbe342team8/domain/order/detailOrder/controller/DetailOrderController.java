@@ -1,8 +1,11 @@
 package com.ll.nbe342team8.domain.order.detailOrder.controller;
 
+import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import com.ll.nbe342team8.domain.order.detailOrder.dto.DetailOrderDto;
 import com.ll.nbe342team8.domain.order.detailOrder.service.DetailOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,12 +16,13 @@ import java.util.List;
 public class DetailOrderController {
     private final DetailOrderService detailOrderService;
 
-    // 주문 상세 조회 - oauthId와 orderId를 기반으로 조회
+    // 주문 상세 조회 - Member와 orderId를 기반으로 조회
     @GetMapping("/{orderId}/details")
-    public List<DetailOrderDto> getDetailOrdersByOrderIdAndOauthId(
+    public List<DetailOrderDto> getDetailOrdersByOrderIdAndMember(
             @PathVariable Long orderId,
-            @RequestParam String oauthId) {
+            @AuthenticationPrincipal SecurityUser securityUser) {
 
-        return detailOrderService.getDetailOrdersByOrderIdAndOauthId(orderId, oauthId);
+        Member member = securityUser.getMember();
+        return detailOrderService.getDetailOrdersByOrderIdAndMember(orderId, member);
     }
 }

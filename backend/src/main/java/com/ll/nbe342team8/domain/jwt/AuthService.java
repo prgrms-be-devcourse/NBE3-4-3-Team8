@@ -41,7 +41,7 @@ public class AuthService {
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", newAccessToken)
                 .httpOnly(true)
                 .secure(false)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(60 * 60) // 1시간
                 .build();
@@ -49,7 +49,7 @@ public class AuthService {
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", newRefreshToken)
                 .httpOnly(true)
                 .secure(false)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/api/auth/refresh")
                 .maxAge(7 * 24 * 60 * 60) // 7일
                 .build();
@@ -74,11 +74,6 @@ public class AuthService {
         return memberRepository.findByoAuthId(kakaoId)
                 .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
 
-    }
-
-    public Member getMemberByOauthId(String oauthId) {
-        return memberRepository.findByOauthId(oauthId)
-                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
     }
 
     // ✅ 로그아웃 - `Set-Cookie`로 `accessToken`, `refreshToken` 삭제

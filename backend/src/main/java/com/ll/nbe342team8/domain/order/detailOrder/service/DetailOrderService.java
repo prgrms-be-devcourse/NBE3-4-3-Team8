@@ -1,4 +1,5 @@
 package com.ll.nbe342team8.domain.order.detailOrder.service;
+
 import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.order.detailOrder.dto.DetailOrderDto;
@@ -19,14 +20,10 @@ public class DetailOrderService {
         this.authService = authService;
     }
 
-    // 주문상세조회 - oauthId로 회원을 찾고, orderId로 주문 상세 조회
-    public List<DetailOrderDto> getDetailOrdersByOrderIdAndOauthId(Long orderId, String oauthId) {
-        // oauthId로 Member를 찾기
-        Member member = authService.getMemberByOauthId(oauthId);  // oauthId로 Member 찾기
-        Long memberId = member.getId();  // 회원의 ID
-
-        // 레포지토리에서 orderId와 memberId로 주문 상세 조회
-        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderIdAndOauthId(orderId, oauthId);
+    // 주문상세조회 - Member와 orderId로 주문 상세 조회
+    public List<DetailOrderDto> getDetailOrdersByOrderIdAndMember(Long orderId, Member member) {
+        // 레포지토리에서 orderId와 member로 주문 상세 조회
+        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderIdAndMember(orderId, member);
 
         // 주문 상세 정보를 DetailOrderDto로 변환하여 반환
         return detailOrders.stream()
@@ -38,4 +35,3 @@ public class DetailOrderService {
                 .collect(Collectors.toList());
     }
 }
-
