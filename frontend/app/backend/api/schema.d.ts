@@ -107,6 +107,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my/orders/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/my/deliveryInformation": {
         parameters: {
             query?: never;
@@ -289,6 +305,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my/orders/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["payment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/event/banners": {
         parameters: {
             query?: never;
@@ -462,6 +494,17 @@ export interface components {
             content: string;
             title: string;
         };
+        OrderRequestDto: {
+            postCode?: string;
+            fullAddress?: string;
+            recipient?: string;
+            phone?: string;
+            paymentMethod?: string;
+        };
+        OrderResponseDto: {
+            /** Format: int64 */
+            orderId?: number;
+        };
         CartResponseDto: {
             /** Format: int64 */
             bookId?: number;
@@ -594,8 +637,8 @@ export interface components {
             password?: string;
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
-            oauthId?: string;
             username?: string;
+            oauthId?: string;
             authorities?: components["schemas"]["GrantedAuthority"][];
         };
         Review: {
@@ -664,10 +707,10 @@ export interface components {
             deliveryStatus?: string;
         };
         PageReviewResponseDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
@@ -685,11 +728,11 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
             /** Format: int32 */
             pageNumber?: number;
-            paged?: boolean;
             unpaged?: boolean;
         };
         ReviewResponseDto: {
@@ -729,11 +772,18 @@ export interface components {
             /** @enum {string} */
             deliveryStatus?: "PENDING" | "SHIPPED" | "DELIVERED";
         };
-        PageBookResponseDto: {
+        PaymentResponseDto: {
+            cartList?: components["schemas"]["CartResponseDto"][];
             /** Format: int64 */
-            totalElements?: number;
+            priceStandard?: number;
+            /** Format: int64 */
+            pricesSales?: number;
+        };
+        PageBookResponseDto: {
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
@@ -758,10 +808,10 @@ export interface components {
             detailOrders?: components["schemas"]["AdminDetailOrderDTO"][];
         };
         PageAdminOrderDTO: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
@@ -776,10 +826,10 @@ export interface components {
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
@@ -1075,6 +1125,30 @@ export interface operations {
             };
         };
     };
+    createOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderRequestDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
     postDeliveryInformation: {
         parameters: {
             query?: never;
@@ -1331,6 +1405,26 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["DetailOrderDto"][];
+                };
+            };
+        };
+    };
+    payment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["PaymentResponseDto"];
                 };
             };
         };
