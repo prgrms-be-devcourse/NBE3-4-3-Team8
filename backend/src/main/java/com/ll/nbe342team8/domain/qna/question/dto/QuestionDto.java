@@ -1,22 +1,26 @@
 package com.ll.nbe342team8.domain.qna.question.dto;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ll.nbe342team8.domain.qna.answer.dto.AnswerDto;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
+=======
+>>>>>>> dev
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record QuestionDto(
+<<<<<<< HEAD
         Long id,
+=======
+        @NotNull Long id,
+>>>>>>> dev
         LocalDateTime createDate,
         LocalDateTime modifyDate,
         String title,

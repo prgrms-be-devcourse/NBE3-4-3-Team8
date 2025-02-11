@@ -35,6 +35,7 @@ public class AnswerService {
                 .question(question)
                 .build();
 
+        question.addAnswer(answer);
         answerRepository.save(answer);
     }
 
@@ -46,6 +47,8 @@ public class AnswerService {
 
     @Transactional
     public void deleteAnswer(Answer answer) {
+        Question question = answer.getQuestion();
+        question.removeAnswer(answer);
         answerRepository.delete(answer);
     }
 

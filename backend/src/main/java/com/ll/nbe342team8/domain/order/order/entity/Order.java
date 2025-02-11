@@ -39,6 +39,16 @@ public class Order extends BaseTime {
 
 	private long totalPrice;
 
+	private String fullAddress;
+
+	private String postCode;
+
+	private String recipient;
+
+	private String phone;
+
+	private String paymentMethod;
+
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<DetailOrder> detailOrders = new ArrayList<>();
