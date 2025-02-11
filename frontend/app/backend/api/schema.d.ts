@@ -637,8 +637,8 @@ export interface components {
             password?: string;
             deliveryInformations?: components["schemas"]["DeliveryInformation"][];
             carts?: components["schemas"]["Cart"][];
-            username?: string;
             oauthId?: string;
+            username?: string;
             authorities?: components["schemas"]["GrantedAuthority"][];
         };
         Review: {
@@ -730,9 +730,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             paged?: boolean;
             /** Format: int32 */
-            pageSize?: number;
-            /** Format: int32 */
             pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
             unpaged?: boolean;
         };
         ReviewResponseDto: {

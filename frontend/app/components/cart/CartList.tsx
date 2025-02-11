@@ -94,7 +94,7 @@ const CartList = () => {
         await loadCart();
       } else {
         const updatedItems = items.map((item) =>
-            item.bookId === bookId ? { ...item, quantity: newQuantity } : item
+          item.bookId === bookId ? { ...item, quantity: newQuantity } : item,
         );
         setItems(updatedItems);
         localStorage.setItem('localCart', JSON.stringify(updatedItems));
@@ -124,7 +124,11 @@ const CartList = () => {
 
   // "구매하기" 버튼 클릭 시 주문 페이지로 이동
   const handlePurchase = () => {
-    router.push('/order');
+    if (user) {
+      router.push('/order');
+    } else {
+      alert('로그인 후 이용해주세요.');
+    }
   };
 
   useEffect(() => {
@@ -141,43 +145,43 @@ const CartList = () => {
   if (error) return <div>{error}</div>;
 
   return (
-      <div className="max-w-6xl mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-6">장바구니 ({items.length})</h1>
-        {items.length === 0 ? (
-            <div className="text-center py-10">장바구니가 비어 있습니다.</div>
-        ) : (
-            <div className="flex flex-col md:flex-row gap-10">
-              {/* 좌측: 장바구니 상품 목록 */}
-              <div className="flex-1 space-y-6 max-h-[80vh] overflow-y-auto">
-                {items.map((item) => (
-                    <CartItem
-                        key={item.bookId}
-                        title={item.title}
-                        quantity={item.quantity}
-                        price={item.price}
-                        coverImage={item.coverImage}
-                        onQuantityChange={(newQuantity) => handleQuantityChange(item.bookId, newQuantity)}
-                        onRemove={() => handleRemove(item.bookId)}
-                    />
-                ))}
-              </div>
-              {/* 우측: 결제 요약 및 구매하기 버튼 */}
-              <div className="w-full md:w-96 border border-gray-200 rounded p-6">
-                <h2 className="text-lg font-medium mb-4">상품 금액</h2>
-                <div className="flex justify-between mb-4">
-                  <span>총 상품 금액</span>
-                  <span>{totalPrice.toLocaleString()}원</span>
-                </div>
-                <button
-                    onClick={handlePurchase}
-                    className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
-                >
-                  구매하기
-                </button>
-              </div>
+    <div className="max-w-6xl mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-6">장바구니 ({items.length})</h1>
+      {items.length === 0 ? (
+        <div className="text-center py-10">장바구니가 비어 있습니다.</div>
+      ) : (
+        <div className="flex flex-col md:flex-row gap-10">
+          {/* 좌측: 장바구니 상품 목록 */}
+          <div className="flex-1 space-y-6 max-h-[80vh] overflow-y-auto">
+            {items.map((item) => (
+              <CartItem
+                key={item.bookId}
+                title={item.title}
+                quantity={item.quantity}
+                price={item.price}
+                coverImage={item.coverImage}
+                onQuantityChange={(newQuantity) => handleQuantityChange(item.bookId, newQuantity)}
+                onRemove={() => handleRemove(item.bookId)}
+              />
+            ))}
+          </div>
+          {/* 우측: 결제 요약 및 구매하기 버튼 */}
+          <div className="w-full md:w-96 border border-gray-200 rounded p-6">
+            <h2 className="text-lg font-medium mb-4">상품 금액</h2>
+            <div className="flex justify-between mb-4">
+              <span>총 상품 금액</span>
+              <span>{totalPrice.toLocaleString()}원</span>
             </div>
-        )}
-      </div>
+            <button
+              onClick={handlePurchase}
+              className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
+            >
+              구매하기
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
