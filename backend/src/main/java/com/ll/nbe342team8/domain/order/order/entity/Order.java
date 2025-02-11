@@ -33,6 +33,7 @@ public class Order extends BaseTime {
 	@Column(nullable = false)
 	private String oauthId;
 
+
 	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus;
 

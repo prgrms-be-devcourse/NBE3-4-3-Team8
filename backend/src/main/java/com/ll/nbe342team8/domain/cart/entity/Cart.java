@@ -13,6 +13,13 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        name = "cart",
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_member_book",
+                columnNames = {"member_id", "book_id"}
+        )
+)
 public class Cart extends BaseTime {
 
     @Id
@@ -31,5 +38,25 @@ public class Cart extends BaseTime {
 
     public void updateCart(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Cart(Member member, Book book, int quantity) {
+        this.member = member;
+        this.book = book;
+        this.quantity = quantity;
+    }
+
+    public static Cart create(Book book, int quantity) {
+        return new Cart(null, book, quantity);
+    }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+               "id=" + id +
+               ", member=" + member +
+               ", book=" + book +
+               ", quantity=" + quantity +
+               '}';
     }
 }

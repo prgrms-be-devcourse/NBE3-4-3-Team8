@@ -97,7 +97,7 @@ public class DataInitializer {
 //
 //            Book book1 = Book.builder()
 //                    .title("부자 되는 법") // 책 제목
-//                    .author("홍길동") // 저자
+//                    .memberId("홍길동") // 저자
 //                    .isbn("978-89-1234-567-8") // ISBN
 //                    .isbn13("9788912345678") // ISBN13
 //                    .pubDate(LocalDate.of(2023, 10, 15)) // 출판일
@@ -118,7 +118,7 @@ public class DataInitializer {
 //                    .build();
 //            Book book2 = Book.builder()
 //                    .title("거지 되는 법") // 책 제목
-//                    .author("홍길동") // 저자
+//                    .memberId("홍길동") // 저자
 //                    .isbn("978-89-1234-567-8") // ISBN
 //                    .isbn13("9788912345678") // ISBN13
 //                    .pubDate(LocalDate.of(2023, 10, 15)) // 출판일

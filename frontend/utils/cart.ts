@@ -1,103 +1,85 @@
-// utils/cart.ts
+import api from './api';
 
-const CART_KEY = 'guest_cart';
-const API_URL = 'http://localhost:8080/cart/';
-const JWT_COOKIE_NAME = 'jwtToken';
+const LOCAL_STORAGE_CART_KEY = 'localCart';
 
 interface CartItem {
   bookId: number;
   quantity: number;
+  isAddToCart: boolean;
 }
 
-// JWT 토큰 쿠키 존재 여부로 로그인 상태 확인
-const isLoggedIn = () => {
-  return document.cookie
-    .split(';')
-    .map((item) => item.trim())
-    .some((item) => item.startsWith(`${JWT_COOKIE_NAME}=`));
+const getLocalCart = (): CartItem[] => {
+  const localCart = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+  return localCart ? JSON.parse(localCart) : [];
 };
 
-export const getGuestCart = (): CartItem[] => {
-  if (typeof window === 'undefined') return [];
-  const cart = localStorage.getItem(CART_KEY);
-  return cart ? JSON.parse(cart) : [];
+const saveLocalCart = (cart: CartItem[]) => {
+  localStorage.setItem(LOCAL_STORAGE_CART_KEY, JSON.stringify(cart));
 };
 
-export const saveGuestCart = (cart: CartItem[]) => {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-};
-
-export const addToCart = async (bookId: number, quantity: number) => {
+export const addToCart = async (cartItems: CartItem[]) => {
   try {
-    console.log('JWT 쿠키 존재:', isLoggedIn());
-    if (isLoggedIn()) {
-      // 로그인 사용자: API 서버 연동
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ bookId, quantity }),
-        credentials: 'include', // 쿠키 포함 설정
+    await api.post('/cart', { cartItems });
+  } catch (error: any) {
+    if (error.response && error.response.status === 401) {
+      // 인증되지 않은 사용자의 경우 로컬 스토리지에 저장
+      const localCart = getLocalCart();
+      cartItems.forEach((item) => {
+        const existingItemIndex = localCart.findIndex(
+          (localItem) => localItem.bookId === item.bookId,
+        );
+        if (existingItemIndex !== -1) {
+          localCart[existingItemIndex].quantity += item.quantity;
+        } else {
+          localCart.push(item);
+        }
       });
-
-      if (!response.ok) throw new Error('장바구니 추가 실패');
+      saveLocalCart(localCart);
     } else {
-      // 비로그인 사용자: 로컬 스토리지 사용
-      const cart = getGuestCart();
-      const existingItem = cart.find((item) => item.bookId === bookId);
-
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push({ bookId, quantity });
-      }
-      saveGuestCart(cart);
+      throw error;
     }
-  } catch (error) {
-    console.error('장바구니 처리 중 오류:', error);
-    throw error;
   }
 };
 
-export const syncGuestCart = async () => {
-  if (!isLoggedIn()) return;
-
-  const guestCart = getGuestCart();
-  if (guestCart.length === 0) return;
-
+export const fetchCart = async () => {
   try {
-    await Promise.all(
-      guestCart.map((item) =>
-        fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            bookId: item.bookId,
-            quantity: item.quantity,
-          }),
-          credentials: 'include', // 쿠키 포함 설정
-        }),
-      ),
-    );
-    localStorage.removeItem(CART_KEY);
-  } catch (error) {
-    console.error('장바구니 동기화 실패', error);
+    const response = await api.get('/cart');
+    return response.data;
+  } catch (error: any) {
+    if (error.response && error.response.status === 401) {
+      // 인증되지 않은 사용자의 경우 로컬 스토리지에서 데이터 반환
+      return getLocalCart();
+    }
     throw error;
   }
 };
 
-export const fetchCart = async (): Promise<CartItem[]> => {
-  if (isLoggedIn()) {
-    const response = await fetch(API_URL, {
-      credentials: 'include', // 쿠키 포함 설정
-    });
+export const updateCartItem = async (cartItems: CartItem[]) => {
+  try {
+    await api.put('/cart', { cartItems });
+  } catch (error: any) {
+    if (error.response && error.response.status === 401) {
+      // 인증되지 않은 사용자의 경우 로컬 스토리지 업데이트
+      saveLocalCart(cartItems);
+    } else {
+      throw error;
+    }
+  }
+};
 
-    if (!response.ok) throw new Error('장바구니 조회 실패');
-    return response.json();
-  } else {
-    return getGuestCart();
+export const removeCartItems = async (cartItems: CartItem[]) => {
+  try {
+    await api.delete('/cart', { data: { cartItems } });
+  } catch (error: any) {
+    if (error.response && error.response.status === 401) {
+      // 인증되지 않은 사용자의 경우 로컬 스토리지에서 제거
+      const localCart = getLocalCart();
+      const updatedCart = localCart.filter(
+        (item) => !cartItems.some((cartItem) => cartItem.bookId === item.bookId),
+      );
+      saveLocalCart(updatedCart);
+    } else {
+      throw error;
+    }
   }
 };

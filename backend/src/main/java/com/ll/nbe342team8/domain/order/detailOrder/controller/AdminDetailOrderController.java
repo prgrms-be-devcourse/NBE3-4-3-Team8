@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.order.detailOrder.controller;
 
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ll.nbe342team8.domain.order.detailOrder.dto.AdminDetailOrderDTO;
 import com.ll.nbe342team8.domain.order.detailOrder.dto.UpdateDetailOrderStatusRequest;
 import com.ll.nbe342team8.domain.order.detailOrder.service.AdminDetailOrderService;
-import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -46,7 +46,7 @@ public class OAuthAttributes {
 
     public Member toEntity() {
         return Member.builder()
-                .oauthId(oAuthId)
+                .oAuthId(oAuthId)
                 .name(name)
                 .email(email)
                 .phoneNumber("")

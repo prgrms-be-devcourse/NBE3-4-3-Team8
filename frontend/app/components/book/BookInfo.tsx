@@ -1,13 +1,13 @@
-// components/book/BookInfo.tsx
 'use client';
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import type { Book } from '@/types/book';
 import { addToCart } from '@/utils/api';
-import { getJwtToken, isLoggedIn } from '@/utils/auth';
 import { AddToCartButton } from '@/app/components/common/AddToCartButton';
 import StarRating from '@/app/search/components/StarRating';
+import { useAuth } from '@/app/hooks/useAuth'; // useAuth 훅 가져오기
 
 interface BookInfoProps {
   book: Book;
@@ -16,6 +16,7 @@ interface BookInfoProps {
 export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
+  const { user, loading } = useAuth(); // useAuth 훅 사용하여 로그인 상태 확인
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -26,15 +27,38 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
 
   const handleAddToCart = async () => {
     try {
-      if (isLoggedIn()) {
-        const jwtToken = getJwtToken();
-        if (!jwtToken) throw new Error('로그인 정보가 없습니다');
-        await addToCart(book.id, jwtToken, quantity);
+      if (loading) {
+        alert('로그인 상태를 확인 중입니다. 잠시만 기다려주세요.');
+        return;
+      }
+
+      if (user) {
+        // 로그인된 사용자일 경우
+        await addToCart([{ bookId: book.id, quantity, isAddToCart: true }]); // 서버에 장바구니 추가 요청
+        alert('장바구니에 추가되었습니다.');
       } else {
-        await addToCart(book.id, null, quantity);
+        // 비로그인 사용자일 경우 로컬 스토리지에 저장
+        const localCart = localStorage.getItem('localCart');
+        const cartItems = localCart ? JSON.parse(localCart) : [];
+
+        // 동일한 bookId가 있는지 확인
+        const existingItemIndex = cartItems.findIndex(
+          (item: { bookId: number }) => item.bookId === book.id,
+        );
+
+        if (existingItemIndex > -1) {
+          // 이미 존재하는 항목이면 수량 업데이트
+          cartItems[existingItemIndex].quantity += quantity;
+        } else {
+          // 새 항목 추가
+          cartItems.push({ bookId: book.id, quantity });
+        }
+
+        localStorage.setItem('localCart', JSON.stringify(cartItems));
+        alert('장바구니에 추가되었습니다.');
       }
     } catch (error) {
-      alert(error instanceof Error ? error.message : '장바구니 추가에 실패했습니다');
+      alert(error instanceof Error ? error.message : '장바구니 추가에 실패했습니다.');
     }
   };
 
@@ -92,12 +116,12 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <AddToCartButton
-              bookId={book.id}
-              jwtToken={isLoggedIn() ? getJwtToken() : null}
-              quantity={quantity}
-              className="w-full py-3"
-            />
+            <button
+              onClick={handleAddToCart}
+              className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+              장바구니 추가
+            </button>
             <button
               className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600"
               onClick={() => router.push('/cart')}

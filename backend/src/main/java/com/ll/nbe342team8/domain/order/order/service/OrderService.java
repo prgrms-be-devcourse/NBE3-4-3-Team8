@@ -7,9 +7,10 @@ import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByOauthId(String oauthId) {
         // 회원이 존재하는지 먼저 체크
-        Member member = memberRepository.findByOauthId(oauthId)
+        Member member = memberRepository.findByoAuthId(oauthId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         // 주문 조회
@@ -60,7 +61,7 @@ public class OrderService {
 
     @Transactional
     public void deleteOrder(Long orderId, String oauthId) {
-        Member member = memberRepository.findByOauthId(oauthId)
+        Member member = memberRepository.findByoAuthId(oauthId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Order order = orderRepository.findByIdAndOauthId(orderId, oauthId)
