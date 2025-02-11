@@ -41,7 +41,7 @@ public class AuthService {
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", newAccessToken)
                 .httpOnly(true)
                 .secure(false)
-                .sameSite("None")
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(60 * 60) // 1시간
                 .build();
@@ -49,7 +49,7 @@ public class AuthService {
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", newRefreshToken)
                 .httpOnly(true)
                 .secure(false)
-                .sameSite("None")
+                .sameSite("Lax")
                 .path("/api/auth/refresh")
                 .maxAge(7 * 24 * 60 * 60) // 7일
                 .build();

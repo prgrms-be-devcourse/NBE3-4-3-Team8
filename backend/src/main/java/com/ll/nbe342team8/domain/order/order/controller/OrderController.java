@@ -3,6 +3,7 @@ package com.ll.nbe342team8.domain.order.order.controller;
 import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
+import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/my/orders")
+@CrossOrigin(origins = "http://localhost:3000")
 public class OrderController {
     private final OrderService orderService;
     private final AuthService authService;
@@ -38,5 +40,15 @@ public class OrderController {
 
         orderService.deleteOrder(orderId, oauthId);
         return ResponseEntity.ok("주문 삭제 완료");
+    }
+
+    // 임의의 데이터 추가
+    @PostMapping("/add-dummy")
+    public ResponseEntity<String> addDummyOrders(@CookieValue(value = "accessToken", required = false) String token) {
+        Member member = authService.validateTokenAndGetMember(token);
+        String oauthId = member.getOauthId();
+
+        orderService.addDummyOrders(oauthId);
+        return ResponseEntity.ok("임의의 주문 데이터 추가 완료");
     }
 }

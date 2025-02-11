@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/my/orders").permitAll()
-                        .requestMatchers("/books/**","/event/**","/images/**").permitAll() // 카트, 메인페이지 추가
+                        .requestMatchers("/books/**","/event/**","/images/**","/check-cookies").permitAll() // 카트, 메인페이지 추가
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService,memberService),

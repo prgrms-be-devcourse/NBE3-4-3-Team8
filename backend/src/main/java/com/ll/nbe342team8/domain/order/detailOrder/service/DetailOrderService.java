@@ -26,7 +26,7 @@ public class DetailOrderService {
         Long memberId = member.getId();  // 회원의 ID
 
         // 레포지토리에서 orderId와 memberId로 주문 상세 조회
-        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderIdAndMemberId(orderId, memberId);
+        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderIdAndOauthId(orderId, oauthId);
 
         // 주문 상세 정보를 DetailOrderDto로 변환하여 반환
         return detailOrders.stream()

@@ -20,6 +20,16 @@ public class OrderService {
     private final DetailOrderRepository detailOrderRepository;
     private final MemberRepository memberRepository;
 
+    // 임의의 데이터 추가 메서드
+    public void addDummyOrders(String oauthId) {
+        Member member = memberRepository.findByOauthId(oauthId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        Order order1 = new Order(member, oauthId, OrderStatus.ORDERED, 100);
+        Order order2 = new Order(member, oauthId, OrderStatus.ORDERED, 200);
+        orderRepository.saveAll(List.of(order1, order2));
+    }
+
     @Autowired
     public OrderService(OrderRepository orderRepository, DetailOrderRepository detailOrderRepository, MemberRepository memberRepository) {
         this.orderRepository = orderRepository;
