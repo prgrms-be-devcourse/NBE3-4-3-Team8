@@ -37,7 +37,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
         Optional<Member> existingMember = memberService.findByOauthId(oAuthId);
-        String phoneNumber = (existingMember != null) ? existingMember.get().getPhoneNumber() : ""; // 기존 유저면 phoneNumber 유지, 없으면 빈 값
+        String phoneNumber = (existingMember.isPresent()) ? existingMember.get().getPhoneNumber() : ""; // 기존 유저면 phoneNumber 유지, 없으면 빈 값
 
         PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto(name,phoneNumber);
 
