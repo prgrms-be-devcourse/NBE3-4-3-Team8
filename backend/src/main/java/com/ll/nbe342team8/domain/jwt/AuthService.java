@@ -76,25 +76,8 @@ public class AuthService {
 
     }
 
-    // ✅ 로그아웃 - `Set-Cookie`로 `accessToken`, `refreshToken` 삭제
+    //프론트에서 삭제하는 걸로 변경
     public ResponseEntity<?> logout() {
-        ResponseCookie deleteAccessToken = ResponseCookie.from("accessToken", "")
-                .path("/")
-                .maxAge(0)
-                .httpOnly(true)
-                .secure(true)
-                .build();
-
-        ResponseCookie deleteRefreshToken = ResponseCookie.from("refreshToken", "")
-                .path("/api/auth/refresh")
-                .maxAge(0)
-                .httpOnly(true)
-                .secure(true)
-                .build();
-
-        return ResponseEntity.ok()
-                .header("Set-Cookie", deleteAccessToken.toString())
-                .header("Set-Cookie", deleteRefreshToken.toString())
-                .body("로그아웃 되었습니다.");
+        return ResponseEntity.ok().body("로그아웃 되었습니다.");
     }
 }
