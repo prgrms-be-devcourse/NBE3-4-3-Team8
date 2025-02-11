@@ -11,6 +11,16 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
+    Page<Question> findByTitleContainingOrContentContaining(String title, String content, Pageable pageable);
+
+    Page<Question> findByAnswersIsNotEmptyAndTitleContainingOrContentContaining(
+            String title, String content, Pageable pageable);
+
+    Page<Question> findByAnswersIsEmptyAndTitleContainingOrContentContaining(
+            String title, String content, Pageable pageable);
+
+    Page<Question> findByAnswersIsNotEmpty(Pageable pageable);
+    Page<Question> findByAnswersIsEmpty(Pageable pageable);
 
     Page<Question> findByMember(Pageable pageable, Member member);
     boolean existsByMemberAndTitleAndContentAndCreateDateAfter( Member member, String title,String content, LocalDateTime cutoffTime);

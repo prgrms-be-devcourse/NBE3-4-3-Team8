@@ -2,8 +2,10 @@ package com.ll.nbe342team8.domain.qna.question.entity;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
+import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
+import jakarta.persistence.*;
 import com.ll.nbe342team8.standard.util.Ut;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -42,4 +45,15 @@ public class Question extends BaseTime {
         this.content=Ut.XSSSanitizer.sanitize(dto.content());
     }
 
+    public void addAnswer(Answer answer) {
+        this.answers.add(answer);
+        if (answer.getQuestion() != this) {
+            answer.setQuestion(this);
+        }
+    }
+
+    public void removeAnswer(Answer answer) {
+        this.answers.remove(answer);
+        answer.setQuestion(null);
+    }
 }

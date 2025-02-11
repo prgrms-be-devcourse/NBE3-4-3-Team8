@@ -1,84 +1,171 @@
-'use client';
-
-import { useState, useEffect, createContext, useContext } from 'react';
-import { useRouter } from 'next/navigation';
-
-interface User {
-  name: string;
-  phoneNumber: string;
-  memberType: 'USER' | 'ADMIN';
-  oauthId: string;
-  email: string;
-  deliveryInformations: DeliveryInformation[];
-}
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface DeliveryInformation {
   id: number;
+  addressName: string;
   address: string;
+  detailAddress: string;
+  phoneNumber: string;
   isDefaultAddress: boolean;
 }
 
-interface AuthContextProps {
-  user: User | null;
-  loading: boolean;
-  logout: () => Promise<void>;
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  memberType: 'USER' | 'ADMIN';
+  oauthId: string;
+  deliveryInformations: DeliveryInformation[];
 }
 
-// Context 생성
-const AuthContext = createContext<AuthContextProps>({
-  user: null,
-  loading: true,
-  logout: async () => {},
-});
+interface AuthState {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+}
 
-// Provider 컴포넌트
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+const API_BASE_URL = 'http://localhost:8080';
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        // ✅ 쿠키 포함 요청 (credentials: 'include' 추가)
-        const res = await fetch('http://localhost:8080/api/auth/me', {
-          method: 'GET',
-          credentials: 'include', // ✅ 쿠키를 자동으로 포함하도록 설정
-        });
+export function useAuth() {
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    loading: true,
+    error: null,
+    isAuthenticated: false,
+  });
 
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('로그인 정보 가져오기 실패:', error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  const logout = async () => {
+  const fetchUser = async () => {
     try {
-      // ✅ 백엔드 로그아웃 API 호출
-      await fetch('http://localhost:8080/api/auth/me/logout', {
-        method: 'POST',
-        credentials: 'include', // ✅ 쿠키 포함 요청
+      const response = await axios.get<User>(`${API_BASE_URL}/api/auth/me`, {
+        withCredentials: true,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
       });
-      setUser(null);
-      router.replace('/'); // 로그아웃 후 홈으로 이동
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
+
+      setAuthState({
+        user: response.data,
+        loading: false,
+        error: null,
+        isAuthenticated: true,
+      });
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        // 토큰이 만료되었을 수 있으므로 토큰 갱신 시도
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          // 토큰 갱신 성공시 사용자 정보 다시 요청
+          return fetchUser();
+        }
+
+        setAuthState({
+          user: null,
+          loading: false,
+          error: '로그인이 필요합니다',
+          isAuthenticated: false,
+        });
+        return;
+      }
+
+      setAuthState({
+        user: null,
+        loading: false,
+        error: '인증에 실패했습니다',
+        isAuthenticated: false,
+      });
     }
   };
 
-  return <AuthContext.Provider value={{ user, loading, logout }}>{children}</AuthContext.Provider>;
-};
+  const refreshAccessToken = async (): Promise<boolean> => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/auth/refresh`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
-// Context를 활용하는 커스텀 훅
-export const useAuth = () => useContext(AuthContext);
+      return response.status === 200;
+    } catch (error) {
+      console.error('토큰 갱신 실패:', error);
+      return false;
+    }
+  };
+
+  const logout = async (): Promise<boolean> => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/api/auth/me/logout`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      setAuthState({
+        user: null,
+        loading: false,
+        error: null,
+        isAuthenticated: false,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      return false;
+    }
+  };
+
+  const updateUserInfo = async (updates: Partial<User>): Promise<boolean> => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/api/auth/me/my`, updates, {
+        withCredentials: true,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        setAuthState((prev) => ({
+          ...prev,
+          user: response.data,
+        }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('사용자 정보 업데이트 실패:', error);
+      return false;
+    }
+  };
+
+  const refreshAuth = () => {
+    setAuthState((prev) => ({ ...prev, loading: true }));
+    return fetchUser();
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  return {
+    ...authState,
+    refreshAuth,
+    logout,
+    updateUserInfo,
+  };
+}

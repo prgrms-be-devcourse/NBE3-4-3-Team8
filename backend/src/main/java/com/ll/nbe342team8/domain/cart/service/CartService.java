@@ -112,6 +112,10 @@ public class CartService {
                 });
     }
 
+    public void deleteProduct(Member member) {
+        cartRepository.deleteByMember(member);
+    }
+
     public List<Cart> findCartByMember(Member member) {
         return cartRepository.findAllByMember(member);
     }

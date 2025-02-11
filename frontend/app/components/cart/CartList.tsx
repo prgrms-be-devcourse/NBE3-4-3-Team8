@@ -10,6 +10,7 @@ import {
   addToCart,
 } from '@/utils/api.js';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 interface CartItemData {
   bookId: number;
@@ -20,7 +21,8 @@ interface CartItemData {
 }
 
 const CartList = () => {
-  const { user, loading: authLoading } = useAuth(); // useAuth 훅 사용
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [items, setItems] = useState<CartItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,11 +34,11 @@ const CartList = () => {
 
     try {
       if (user) {
-        // 로그인 상태에서 DB에서 장바구니 데이터 불러오기
+        // 로그인 상태: DB에서 장바구니 데이터 불러오기
         const cartData = await fetchCart();
         setItems(cartData);
       } else {
-        // 비로그인 상태에서 로컬 스토리지 장바구니 데이터 불러오기
+        // 비로그인 상태: 로컬 스토리지에서 장바구니 데이터 불러오기
         await loadLocalCart();
       }
     } catch (error) {
@@ -47,7 +49,7 @@ const CartList = () => {
     }
   };
 
-  // 로컬 스토리지에서 장바구니 데이터를 불러오는 함수
+  // 로컬 스토리지에서 장바구니 데이터 불러오기
   const loadLocalCart = async () => {
     const localCart = localStorage.getItem('localCart');
     if (localCart) {
@@ -64,22 +66,18 @@ const CartList = () => {
     }
   };
 
-  // 로컬 스토리지와 DB 동기화
+  // 로컬 스토리지와 DB 동기화 (로그인 시)
   const syncLocalCartWithDB = async () => {
-    if (!user) return; // 로그인하지 않은 경우 동기화하지 않음
+    if (!user) return;
 
     const localCart = localStorage.getItem('localCart');
     if (localCart) {
       try {
         const parsedLocalCart = JSON.parse(localCart);
+        // 서버 업데이트를 위한 플래그 설정 (필요에 따라 값 조정)
         parsedLocalCart.isAddToCart = true;
-        // 로컬 스토리지 초기화
         localStorage.removeItem('localCart');
-
-        // 로컬 스토리지 데이터를 서버에 업데이트
         await updateCartItem(parsedLocalCart);
-
-        // 최신 데이터 다시 불러오기
         await loadCart();
       } catch (error) {
         console.error('로컬 장바구니 동기화 실패:', error);
@@ -89,13 +87,12 @@ const CartList = () => {
 
   // 수량 변경 처리
   const handleQuantityChange = async (bookId: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
     try {
       if (user) {
-        // 로그인 상태에서는 DB 업데이트
         await updateCartItem([{ bookId, quantity: newQuantity, isAddToCart: false }]);
         await loadCart();
       } else {
-        // 비로그인 상태에서는 로컬 스토리지 업데이트
         const updatedItems = items.map((item) =>
           item.bookId === bookId ? { ...item, quantity: newQuantity } : item,
         );
@@ -112,11 +109,9 @@ const CartList = () => {
   const handleRemove = async (bookId: number) => {
     try {
       if (user) {
-        // 로그인 상태에서는 DB에서 삭제
         await removeCartItems([{ bookId, quantity: 1 }]);
         await loadCart();
       } else {
-        // 비로그인 상태에서는 로컬 스토리지에서 삭제
         const updatedItems = items.filter((item) => item.bookId !== bookId);
         setItems(updatedItems);
         localStorage.setItem('localCart', JSON.stringify(updatedItems));
@@ -127,12 +122,21 @@ const CartList = () => {
     }
   };
 
+  // "구매하기" 버튼 클릭 시 주문 페이지로 이동
+  const handlePurchase = () => {
+    if (user) {
+      router.push('/order');
+    } else {
+      alert('로그인 후 이용해주세요.');
+    }
+  };
+
   useEffect(() => {
-    if (!authLoading) loadCart(); // 인증 상태 확인 후 장바구니 불러오기
+    if (!authLoading) loadCart();
   }, [authLoading]);
 
   useEffect(() => {
-    if (user) syncLocalCartWithDB(); // 로그인 시 로컬 장바구니와 동기화
+    if (user) syncLocalCartWithDB();
   }, [user]);
 
   const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -143,11 +147,11 @@ const CartList = () => {
   return (
     <div className="max-w-6xl mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">장바구니 ({items.length})</h1>
-
       {items.length === 0 ? (
         <div className="text-center py-10">장바구니가 비어 있습니다.</div>
       ) : (
         <div className="flex flex-col md:flex-row gap-10">
+          {/* 좌측: 장바구니 상품 목록 */}
           <div className="flex-1 space-y-6 max-h-[80vh] overflow-y-auto">
             {items.map((item) => (
               <CartItem
@@ -161,14 +165,17 @@ const CartList = () => {
               />
             ))}
           </div>
-
+          {/* 우측: 결제 요약 및 구매하기 버튼 */}
           <div className="w-full md:w-96 border border-gray-200 rounded p-6">
             <h2 className="text-lg font-medium mb-4">상품 금액</h2>
             <div className="flex justify-between mb-4">
               <span>총 상품 금액</span>
               <span>{totalPrice.toLocaleString()}원</span>
             </div>
-            <button className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors">
+            <button
+              onClick={handlePurchase}
+              className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
+            >
               구매하기
             </button>
           </div>
