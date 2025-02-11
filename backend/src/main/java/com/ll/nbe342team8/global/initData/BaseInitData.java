@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.global.baseInit.data;
+package com.ll.nbe342team8.global.initData;
 
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
 public class BaseInitData {
 
@@ -51,6 +51,7 @@ public class BaseInitData {
         for (int i = 1; i <= 10; i++) {
             Member member = Member.builder()
                     .name("test" + i)
+                    .password("")
                     .phoneNumber("01012345678")
                     .memberType(Member.MemberType.USER)
                     .build();
@@ -106,17 +107,21 @@ public class BaseInitData {
             categoryRepository.save(category);
 
             Book book = Book.builder()
-                    .title("제목")
-                    .author("작가")
-                    .priceStandard(10000)
+                    .title("제목" + i)
+                    .author("작가" + i)
+                    .priceStandard(10000 + i)
                     .pricesSales(9000)
                     .stock(100)
                     .coverImage(coverUrls.get(i-1))
 //                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
                     .publisher("출판사")
+                    .salesPoint(50L + i)
+                    .rating(0.0)
+                    .reviewCount(0L)
                     .categoryId(category)
                     .isbn13("isbn13")
+                    .status(1)
                     .build();
 
             bookService.create(book);
@@ -136,7 +141,7 @@ public class BaseInitData {
             Member member = memberService.getMemberById((long) i);
 
             for (int j = 1; j <= 10; j++) {
-                float rating = (float) (random.nextInt(11) * 0.5);
+                Double rating = random.nextInt(11) * 0.5;
                 Review review = Review.builder()
                         .book(book)
                         .member(member)

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +31,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.getOrDefault("kakao_account", new HashMap<>());
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.getOrDefault("profile", new HashMap<>());
 
-        String oauthId = oauth2User.getName();  // kakaoId -> oauthId
+        String oAuthId = oauth2User.getName();  // kakaoId -> oAuthId
         String email = (String) kakaoAccount.getOrDefault("email", "");
         String name = (String) profile.getOrDefault("nickname", "");  // nickname -> name
 
 
-        PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto();
-        dto.setName(name);  // 닉네임 설정
-        dto.setPhoneNumber(""); // 기본 전화번호 설정 (빈 값)
+        Optional<Member> existingMember = memberService.findByOauthId(oAuthId);
+        String phoneNumber = (existingMember.isPresent()) ? existingMember.get().getPhoneNumber() : ""; // 기존 유저면 phoneNumber 유지, 없으면 빈 값
 
-        Member member = memberService.modifyOrJoin(oauthId, dto, email);
-        String refreshToken = jwtService.generateRefreshToken(member);
+        PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto(name,phoneNumber);
+
+        Member member = memberService.modifyOrJoin(oAuthId, dto, email);
+        String refreshToken = jwtService.generateRefreshToken(member);  // generateRefreshToken에서 리프레시 토큰 값 설정하는건지 확인
 
         return new SecurityUser(member);
     }

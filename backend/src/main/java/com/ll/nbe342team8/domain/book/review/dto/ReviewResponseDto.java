@@ -8,20 +8,22 @@ import java.time.LocalDateTime;
 public record ReviewResponseDto(
         Long bookId,
         Long reviewId,
-        String author,
+        Long memberId,
         String content,
-        float rating,
-        LocalDateTime createDate
+        Double rating,
+        LocalDateTime createDate,
+        LocalDateTime modifyDate
 ) {
 
     public static ReviewResponseDto from(Review review){
         return new ReviewResponseDto(
                 review.getBook().getId(),
                 review.getId(),
-                review.getMember().getName(),
+                review.getMember().getId(),
                 review.getContent(),
                 review.getRating(),
-                review.getCreateDate()
+                review.getCreateDate(),
+                review.getModifyDate()
         );
     }
 }

@@ -23,17 +23,14 @@ export default function HomePage() {
     const fetchBooks = async () => {
       try {
         const newBooksResponse = await fetch(
-          'http://localhost:8080/books?sortType=PUBLISHED_DATE',
-          {
-            credentials: 'include',
-          },
+          'http://localhost:8080/books?bookSortType=PUBLISHED_DATE',
         );
         const newBooksData: PageResponse<Book> = await newBooksResponse.json();
         setNewBooks(newBooksData.content);
 
-        const trendingBooksResponse = await fetch('http://localhost:8080/books?sortType=RATING', {
-          credentials: 'include',
-        });
+        const trendingBooksResponse = await fetch(
+          'http://localhost:8080/books?bookSortType=RATING',
+        );
         const trendingBooksData: PageResponse<Book> = await trendingBooksResponse.json();
         setTrendingBooks(trendingBooksData.content);
       } catch (error) {
@@ -49,6 +46,7 @@ export default function HomePage() {
       <Banner />
       <BookList title="이달의 신작" books={newBooks} />
       <BookList title="급상승! 많이 보고 있는 상품" books={trendingBooks} />
+      
     </>
   );
 }

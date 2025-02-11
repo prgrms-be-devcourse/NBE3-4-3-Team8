@@ -39,7 +39,7 @@ public class BookPatchRequestDto {
     private Integer status;
 
     @DecimalMin(value = "0.0", message = "평점은 0 이상이어야 합니다.")
-    private Float rating;
+    private Double rating;
 
     private String toc;
     private String cover;

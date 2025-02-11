@@ -2,7 +2,11 @@ package com.ll.nbe342team8.domain.qna.question.entity;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
+import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
+import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
+import jakarta.persistence.*;
+import com.ll.nbe342team8.standard.util.Ut;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +23,9 @@ import java.util.List;
 @Builder
 public class Question extends BaseTime {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
     @Column(nullable = true) // 질문 제목
     private String title;
@@ -29,11 +36,15 @@ public class Question extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    private List<Answer> answers;
 
-    /*@OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Answer> answers = new ArrayList<>();
 
+    public void updateQuestionInfo(ReqQuestionDto dto) {
+        this.title= Ut.XSSSanitizer.sanitize(dto.title());
+        this.content=Ut.XSSSanitizer.sanitize(dto.content());
+    }
+/*
     public void addAnswer(Answer answer) {
         this.answers.add(answer);
         if (answer.getQuestion() != this) {

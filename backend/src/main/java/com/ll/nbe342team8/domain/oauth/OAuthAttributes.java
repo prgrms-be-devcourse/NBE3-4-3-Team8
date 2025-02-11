@@ -11,19 +11,19 @@ import java.util.Map;
 public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;
-    private String oauthId;  // kakaoId를 oauthId로 변경
+    private String oAuthId;  // kakaoId를 oAuthId로 변경
     private String name;
     private String email;   //
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes,
                            String nameAttributeKey,
-                           String oauthId,
+                           String oAuthId,
                            String name,
                            String email) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
-        this.oauthId = oauthId;
+        this.oAuthId = oAuthId;
         this.name = name;
         this.email = email;
     }
@@ -38,7 +38,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) profile.get("nickname"))
                 .email((String) kakaoAccount.get("email"))
-                .oauthId(String.valueOf(attributes.get("id")))  //
+                .oAuthId(String.valueOf(attributes.get("id")))  //
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -46,7 +46,7 @@ public class OAuthAttributes {
 
     public Member toEntity() {
         return Member.builder()
-                .oauthId(oauthId)
+                .oAuthId(oAuthId)
                 .name(name)
                 .email(email)
                 .phoneNumber("")
@@ -58,7 +58,7 @@ public class OAuthAttributes {
     // OAuth2User의 attributes를 만들기 위한 메소드 추가
     public Map<String, Object> getAttributes() {
         return Map.of(
-                "id", oauthId,
+                "id", oAuthId,
                 "name", name,
                 "email", email
         );

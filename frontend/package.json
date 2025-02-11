@@ -9,23 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@js-joda/core": "^5.6.4",
-    "axios": "^1.7.9",
-    "next": "^15.1.6",
+    "next": "15.1.6",
+    "openapi-fetch": "^0.13.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwind-scrollbar-hide": "^2.0.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@js-joda/core": "^5.6.4",
     "@openapitools/openapi-generator-cli": "^2.16.3",
     "@types/node": "^20",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19",
+    "axios": "^1.7.9",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "next": "15.1.6",
     "postcss": "^8",
     "prettier": "^3.4.2",
+    "tailwind-scrollbar-hide": "^2.0.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
