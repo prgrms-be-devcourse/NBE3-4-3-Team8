@@ -6,11 +6,13 @@ export async function DELETE(req: Request, { params }: { params: { id: number } 
     console.log("-----------------------------------------------");
     console.log("DELETE DeliveryInformation");
     console.log("-----------------------------------------------");
-    
+    const cookies = req.headers.get("cookie") || "";
        
     const response = await fetch(`http://localhost:8080/my/deliveryInformation/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          cookie: cookies,  
+         },
     });
 
     console.log("Backend response status:", response.status);
@@ -30,14 +32,16 @@ export async function PUT(req: Request, { params }: { params: { id: number } }){
     console.log("-----------------------------------------------");
     console.log(`api/my/route.ts - PUT DeliveryInformation `);
     console.log("-----------------------------------------------");
-  
+    const cookies = req.headers.get("cookie") || "";
     try {
       const requestBody = await req.json(); // 🔹 요청 데이터 가져오기
       console.log("Received request body:", requestBody);
   
       const response = await fetch(`http://localhost:8080/my/deliveryInformation/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+          cookie: cookies,
+        },
         body: JSON.stringify(requestBody),
       });
   

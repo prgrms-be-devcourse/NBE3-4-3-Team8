@@ -39,8 +39,8 @@ public class MemberService implements UserDetailsService {
                     Member member = Member.builder()
                             .oAuthId(oAuthId)
                             .email(email)
-                            .name(dto.getName())
-                            .phoneNumber(dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
+                            .name(dto.name())
+                            .phoneNumber(dto.phoneNumber() != null ? dto.phoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
                             .memberType(Member.MemberType.USER)
                             .password("")
                             .build();
