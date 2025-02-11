@@ -30,7 +30,7 @@ public class Question extends BaseTime {
     private Member member;
 
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    /*@OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     @Builder.Default
     private List<Answer> answers = new ArrayList<>();
 
@@ -44,5 +44,5 @@ public class Question extends BaseTime {
     public void removeAnswer(Answer answer) {
         this.answers.remove(answer);
         answer.setQuestion(null);
-    }
+    }*/
 }

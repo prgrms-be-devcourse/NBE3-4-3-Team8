@@ -20,13 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class AnswerController {
     private final AnswerService answerService;
 
-    @GetMapping("/answers")
-    public ResponseEntity<PageDto<AnswerDto>> getAllAnswers(Pageable pageable) {
-        Page<AnswerDto> dtoPage = answerService.getAllAnswers(pageable)
-                .map(AnswerDto::new);
-        return ResponseEntity.ok(new PageDto<>(dtoPage));
-    }
-
     @PostMapping("/questions/{questionId}/answer")
     public ResponseEntity<AnswerDto> createAnswer(
             @PathVariable Long questionId,
