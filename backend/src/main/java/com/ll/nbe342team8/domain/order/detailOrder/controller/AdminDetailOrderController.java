@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.order.detailOrder.controller;
 
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +45,7 @@ public class AdminDetailOrderController {
 			@RequestBody UpdateDetailOrderStatusRequest request) {
 
 		AdminDetailOrderDTO updatedOrder
-				= adminDetailOrderService.updateDetailStatus(detailOrderId, request.getStatus());
+				= adminDetailOrderService.updateDetailStatus(detailOrderId, DetailOrder.DeliveryStatus.valueOf(request.getStatus().name()));
 
 		return ResponseEntity.ok(updatedOrder);
 	}

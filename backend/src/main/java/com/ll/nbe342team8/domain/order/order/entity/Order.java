@@ -30,11 +30,13 @@ public class Order extends BaseTime {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@Column(nullable = false)
+	private String oauthId;
+
+
 	@Enumerated(EnumType.STRING)
-	@Column(name = "order_status")
 	private OrderStatus orderStatus;
 
-	@Column(name = "total_price")
 	private long totalPrice;
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -43,12 +45,13 @@ public class Order extends BaseTime {
 
 	public enum OrderStatus {
 		ORDERED,
-		DELIVERY,
-		COMPLETE;
+		CANCELLED,
+		COMPLETE
 	}
 
-	public Order(Member member, OrderStatus orderStatus, long totalPrice) {
+	public Order(Member member, String oauthId, OrderStatus orderStatus, long totalPrice) {
 		this.member = member;
+		this.oauthId = oauthId;
 		this.orderStatus = orderStatus;
 		this.totalPrice = totalPrice;
 		this.detailOrders = new ArrayList<>(); // 기본 빈 리스트

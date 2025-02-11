@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 
-export async function GET()  {
+export async function GET(req : Request)  {
     
     console.log("-----------------------------------------------");
     console.log("GET MyPage");
     console.log("-----------------------------------------------");
     
-       
-    const response = await fetch(`http://localhost:8080/my`, {
+    const cookies = req.headers.get("cookie") || "";
+
+    const response = await fetch(`http://localhost:8080/api/auth/me/my`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+                    cookie: cookies,
+         },
     });
 
     console.log("Backend response status:", response.status);
@@ -31,13 +34,19 @@ export async function PUT(req: Request) {
     console.log(`api/my/route.ts - Put MyPage `);
     console.log("-----------------------------------------------");
 
+    const cookies = req.headers.get("cookie") || "";
+
+    
+
     try {
         const requestBody = await req.json(); // 🔹 요청의 body 데이터 가져오기
         console.log("Received request body:", requestBody);
 
-        const response = await fetch(`http://localhost:8080/my`, {
+        const response = await fetch(`http://localhost:8080/api/auth/me/my`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json",
+                        cookie: cookies,
+             },
             body: JSON.stringify(requestBody), // 🔹 받은 body 데이터를 그대로 백엔드로 전달
         });
 

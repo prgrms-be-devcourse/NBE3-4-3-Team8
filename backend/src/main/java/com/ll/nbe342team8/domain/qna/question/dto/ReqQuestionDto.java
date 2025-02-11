@@ -8,17 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class ReqQuestionDto {
-
-    @NotBlank
-    @JsonProperty("title")
-    private String title;
-
-    @NotNull
-    private String content;
-
-
-}
+public record ReqQuestionDto(
+        @NotBlank String title,
+        @NotNull String content
+) {}

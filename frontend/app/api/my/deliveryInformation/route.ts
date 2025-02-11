@@ -4,14 +4,16 @@ export const POST = async (req: Request) => {
     console.log("-----------------------------------------------");
     console.log(`api/my/route.ts - Post DeliveryInformation `);
     console.log("-----------------------------------------------");
-  
+    const cookies = req.headers.get("cookie") || "";
     try {
       const requestBody = await req.json(); // 🔹 요청 데이터 가져오기
       console.log("Received request body:", requestBody);
   
       const response = await fetch(`http://localhost:8080/my/deliveryInformation`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+                      cookie: cookies,
+         },
         body: JSON.stringify(requestBody),
       });
   
