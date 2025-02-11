@@ -42,11 +42,10 @@ export default function HomePage() {
   }, []);
 
   return (
-    <>
-      <Banner />
-      <BookList title="이달의 신작" books={newBooks} />
-      <BookList title="급상승! 많이 보고 있는 상품" books={trendingBooks} />
-      
-    </>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <Banner/>
+        <BookList title="이달의 신작" books={newBooks}/>
+        <BookList title="급상승! 많이 보고 있는 상품" books={trendingBooks}/>
+      </div>
   );
 }
