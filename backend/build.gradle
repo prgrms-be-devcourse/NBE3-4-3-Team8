@@ -47,7 +47,6 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0' //Swagger
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0' // Jackson JSR310
 }
 
 tasks.named('test') {
