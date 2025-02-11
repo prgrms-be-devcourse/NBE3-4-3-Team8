@@ -24,10 +24,8 @@ public class Question extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
     private Long id;
 
-    @Column(nullable = true) // 질문 제목
     private String title;
 
-    @Column(nullable = true) // 질문 내용
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,10 +34,8 @@ public class Question extends BaseTime {
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
     private List<Answer> answers;
 
-
     public void updateQuestionInfo(ReqQuestionDto dto) {
         this.title= Ut.XSSSanitizer.sanitize(dto.title());
         this.content=Ut.XSSSanitizer.sanitize(dto.content());
     }
-
 }

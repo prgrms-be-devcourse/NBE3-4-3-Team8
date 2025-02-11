@@ -42,7 +42,7 @@ public class AdminDetailOrderService {
 
 	// 상세 주문 배송 상태 수정
 	@Transactional
-	public AdminDetailOrderDTO updateDetailStatus(Long detailOrderId, DetailOrder.DeliveryStatus status) {
+	public AdminDetailOrderDTO updateDetailStatus(Long detailOrderId, DeliveryStatus status) {
 		DetailOrder detailOrder = detailOrderRepository.findById(detailOrderId)
 				.orElseThrow(() -> new EntityNotFoundException("해당 상세 주문을 찾을 수 없습니다."));
 

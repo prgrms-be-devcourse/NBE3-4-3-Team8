@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    List<Order> findByOauthId(String oauthId);
-
-    Optional<Order> findByIdAndOauthId(Long orderId, String oauthId);
+//    List<Order> findByOauthId(String oauthId);
+//
+//    Optional<Order> findByIdAndOauthId(Long orderId, String oauthId);
 
 
 }

@@ -17,28 +17,17 @@ public class DetailOrder extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     private int bookQuantity;
 
-    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "delivery_status")
     private DeliveryStatus deliveryStatus;
-
-    public enum DeliveryStatus {
-        PENDING, // 대기중
-        SHIPPING, // 배송중
-        DELIVERED, // 배송완료
-        RETURNED // 반품
-    }
 
     public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
