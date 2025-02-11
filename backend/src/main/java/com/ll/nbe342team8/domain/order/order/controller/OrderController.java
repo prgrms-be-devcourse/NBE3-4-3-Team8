@@ -1,10 +1,17 @@
 package com.ll.nbe342team8.domain.order.order.controller;
 
-import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.oauth.SecurityUser;
+import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
+import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto;
+import com.ll.nbe342team8.domain.order.order.dto.OrderResponseDto;
+import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
+import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +45,42 @@ public class OrderController {
 
         orderService.deleteOrder(orderId, oauthId);
         return ResponseEntity.ok("주문 삭제 완료");
+    }
+
+    //주문등록
+    @PostMapping("/create")
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
+                                                        @AuthenticationPrincipal SecurityUser securityUser) {
+
+        System.out.println("orderRequestDto = " + orderRequestDto);
+
+        Member member = securityUser.getMember();
+        Order order = orderService.createOrder(member, orderRequestDto);
+
+        return ResponseEntity.ok(OrderResponseDto.from(order));
+    }
+
+    //주문등록
+    @PostMapping("/create/fast")
+    public ResponseEntity<OrderResponseDto> createFastOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
+                                                        @AuthenticationPrincipal SecurityUser securityUser) {
+
+        System.out.println("orderRequestDto = " + orderRequestDto);
+
+        Member member = securityUser.getMember();
+        Order order = orderService.createFastOrder(member, orderRequestDto);
+
+        return ResponseEntity.ok(OrderResponseDto.from(order));
+    }
+
+    @GetMapping("/payment")
+    public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser) {
+
+        Member member = securityUser.getMember();
+
+        PaymentResponseDto paymentResponseDto = orderService.createPaymentInfo(member);
+
+        return ResponseEntity.ok(paymentResponseDto);
     }
 }
 
