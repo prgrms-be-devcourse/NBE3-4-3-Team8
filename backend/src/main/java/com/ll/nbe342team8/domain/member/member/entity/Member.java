@@ -39,6 +39,8 @@ public class Member extends BaseTime {
 
     private String username;
 
+    private String profileImageUrl;
+
     // Enum 사용자 역할
     public enum MemberType {
         USER,

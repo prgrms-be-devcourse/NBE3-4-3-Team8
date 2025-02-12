@@ -3,7 +3,10 @@ package com.ll.nbe342team8.domain.order.detailOrder.entity;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum DeliveryStatus {
-	PENDING, SHIPPED, DELIVERED;
+	PENDING, // 대기중
+	SHIPPING, // 배송중
+	DELIVERED, // 배송완료
+	RETURNED; // 반품
 
 	@JsonCreator
 	public static DeliveryStatus from(String value) {

@@ -34,12 +34,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String oAuthId = oauth2User.getName();  // kakaoId -> oAuthId
         String email = (String) kakaoAccount.getOrDefault("email", "");
         String name = (String) profile.getOrDefault("nickname", "");  // nickname -> name
-
+        String profileImageUrl = (String) profile.getOrDefault("profile_image_url", "");
 
         Optional<Member> existingMember = memberService.findByOauthId(oAuthId);
         String phoneNumber = (existingMember.isPresent()) ? existingMember.get().getPhoneNumber() : ""; // 기존 유저면 phoneNumber 유지, 없으면 빈 값
 
-        PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto(name,phoneNumber);
+        PutReqMemberMyPageDto dto = new PutReqMemberMyPageDto(name,phoneNumber, profileImageUrl);
 
         Member member = memberService.modifyOrJoin(oAuthId, dto, email);
         String refreshToken = jwtService.generateRefreshToken(member);  // generateRefreshToken에서 리프레시 토큰 값 설정하는건지 확인
