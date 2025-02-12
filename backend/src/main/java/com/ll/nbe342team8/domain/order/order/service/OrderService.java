@@ -14,7 +14,9 @@ import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
+import com.ll.nbe342team8.global.exceptions.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,6 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final CartService cartService;
 
-
     @Autowired
     public OrderService(OrderRepository orderRepository, DetailOrderRepository detailOrderRepository, MemberRepository memberRepository, CartService cartService) {
         this.orderRepository = orderRepository;
@@ -41,6 +42,7 @@ public class OrderService {
     public List<OrderDTO> getOrdersByMember(Member member) {
         // 주문 조회
         List<Order> orders = orderRepository.findByMember(member);
+
         if (orders.isEmpty()) {
             throw new IllegalArgumentException("주문이 존재하지 않습니다.");
         }
@@ -57,10 +59,10 @@ public class OrderService {
     @Transactional
     public void deleteOrder(Long orderId, Member member) {
         Order order = orderRepository.findByIdAndMember(orderId, member)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
+                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "주문이 존재하지 않습니다."));
 
         if (order.getOrderStatus() != OrderStatus.COMPLETE) {
-            throw new IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.");
+            throw new ServiceException(HttpStatus.BAD_REQUEST.value(), "주문이 완료되지 않아 삭제할 수 없습니다.");
         }
 
         detailOrderRepository.deleteByOrderId(orderId);
@@ -69,32 +71,7 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(Member member, OrderRequestDto orderRequestDTO) {
-        List<Cart> cartList = cartService.findCartByMember(member);
-
-        Order order = Order.builder()
-                .member(member)
-                .orderStatus(OrderStatus.ORDERED)
-                .fullAddress(orderRequestDTO.fullAddress())
-                .postCode(orderRequestDTO.postCode())
-                .phone(orderRequestDTO.phone())
-                .recipient(orderRequestDTO.recipient())
-                .paymentMethod(orderRequestDTO.paymentMethod())
-                .totalPrice(calculateTotalPriceSales(cartList))
-                .build();
-
-        orderRepository.save(order);
-
-        List<DetailOrder> detailOrders = cartList.stream()
-                .map(cart -> DetailOrder.builder()
-                        .order(order)
-                        .deliveryStatus(DeliveryStatus.PENDING)
-                        .book(cart.getBook())
-                        .bookQuantity(cart.getQuantity())
-                        .build())
-                .collect(Collectors.toList());
-
-        detailOrderRepository.saveAll(detailOrders);
-
+        Order order = createOrderInternal(member, orderRequestDTO);
         cartService.deleteProduct(member); // 주문 완료 후 장바구니 비우기
 
         return order;
@@ -102,6 +79,10 @@ public class OrderService {
 
     @Transactional
     public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO) {
+        return createOrderInternal(member, orderRequestDTO);
+    }
+
+    private Order createOrderInternal(Member member, OrderRequestDto orderRequestDTO) {
         List<Cart> cartList = cartService.findCartByMember(member);
 
         Order order = Order.builder()

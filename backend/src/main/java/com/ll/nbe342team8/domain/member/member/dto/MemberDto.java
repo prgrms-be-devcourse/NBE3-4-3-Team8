@@ -16,6 +16,7 @@ public class MemberDto {
    private String name;
    private String email;
    private Member.MemberType memberType;
+   private String profileImageUrl;
 
    public MemberDto(Member entity) {
        this.id = entity.getId();
@@ -23,6 +24,7 @@ public class MemberDto {
        this.name = entity.getName();
        this.email = entity.getEmail();
        this.memberType = entity.getMemberType();
+       this.profileImageUrl = entity.getProfileImageUrl();
    }
 
    public Map<String, Object> getAttributes() {
@@ -32,6 +34,7 @@ public class MemberDto {
        attributes.put("name", this.name);
        attributes.put("email", this.email);
        attributes.put("memberType", this.memberType);
+       attributes.put("profileImageUrl", this.profileImageUrl);
        return attributes;
    }
 

@@ -47,11 +47,10 @@ public class Question extends BaseTime {
 	@OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
 	private List<Answer> answers;
 
-
-	public void updateQuestionInfo(ReqQuestionDto dto) {
-		this.title = Ut.XSSSanitizer.sanitize(dto.title());
-		this.content = Ut.XSSSanitizer.sanitize(dto.content());
-	}
+  public void updateQuestionInfo(ReqQuestionDto dto) {
+      this.title= Ut.XSSSanitizer.sanitize(dto.title());
+      this.content=Ut.XSSSanitizer.sanitize(dto.content());
+  }
 
 	public void addAnswer(Answer answer) {
 		this.answers.add(answer);

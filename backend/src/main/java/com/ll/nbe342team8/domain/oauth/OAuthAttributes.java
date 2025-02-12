@@ -14,18 +14,21 @@ public class OAuthAttributes {
     private String oAuthId;  // kakaoId를 oAuthId로 변경
     private String name;
     private String email;   //
+    private String profileImageUrl;
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes,
                            String nameAttributeKey,
                            String oAuthId,
                            String name,
-                           String email) {
+                           String email,
+                           String profileImageUrl) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.oAuthId = oAuthId;
         this.name = name;
         this.email = email;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public static OAuthAttributes of(String registrationId,
@@ -37,6 +40,7 @@ public class OAuthAttributes {
 
         return OAuthAttributes.builder()
                 .name((String) profile.get("nickname"))
+                .profileImageUrl((String) profile.get("profile_image_url"))
                 .email((String) kakaoAccount.get("email"))
                 .oAuthId(String.valueOf(attributes.get("id")))  //
                 .attributes(attributes)
@@ -52,6 +56,7 @@ public class OAuthAttributes {
                 .phoneNumber("")
                 .memberType(Member.MemberType.USER)
                 .deliveryInformations(Collections.emptyList())
+                .profileImageUrl(profileImageUrl)
                 .build();
     }
 
@@ -60,7 +65,8 @@ public class OAuthAttributes {
         return Map.of(
                 "id", oAuthId,
                 "name", name,
-                "email", email
+                "email", email,
+                "profileImageUrl", profileImageUrl
         );
     }
 }

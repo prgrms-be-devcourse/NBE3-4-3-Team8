@@ -38,7 +38,8 @@ public class OrderController {
 
     // 주문삭제
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId, @CookieValue(value = "accessToken", required = false) String token) {
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId,
+                                              @CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
 
         orderService.deleteOrder(orderId, member);
