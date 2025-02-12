@@ -2,23 +2,40 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: next-js-oauth2-2025-01-20
+
   profiles:
     active: dev
     include: secret
-  web:
-    resources:
-      add-mappings: false
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/the_book
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+#        format_sql: true
+#        use_sql_comments: true
+        default_batch_fetch_size: 100
+        highlight-sql: true
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+
   output:
     ansi:
-      enabled: always
+      enabled: always #색깔
+
   security:
     oauth2:
       client:
         registration:
           kakao:
-            clientId: c47345d326ca974bf9ce4525ae5ddeef
+            clientId: ${KAKAO_CLIENT_ID}
             scope:
               - profile_nickname
               - profile_image
@@ -35,7 +52,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/test_db
     username: root
-    password: ${MYSQLPASSWORD}
+    password: jjevt3Hsy0331@
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -51,14 +68,12 @@ spring:
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.hibernate.orm.jdbc.extract: TRACE
-    org.springframework.transaction.interceptor: TRACE
+aladin:
+  ttbkey: ${TTBKEY}
 
 custom:
+  jwt:
+    secretKey: ${SECRETKEY}
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
@@ -72,7 +87,5 @@ custom:
     frontUrl: "${custom.dev.frontUrl}"
     backUrl: "${custom.dev.backUrl}"
     name: Book
-  jwt:
-    secretKey: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
-aladin:
-  ttbkey: "ttbkumjjick2245001"
+  accessToken:
+    expirationSeconds: "#{60 * 20}"

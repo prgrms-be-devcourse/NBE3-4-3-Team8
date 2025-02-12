@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 //@Component
-public class DataInitializer {
-
+//public class DataInitializer {
+//
 //    private final CategoryRepository categoryRepository;
 //    private final MemberRepository memberRepository;
 //    private final BookRepository bookRepository;
@@ -186,4 +186,4 @@ public class DataInitializer {
 //            detailOrderRepository.save(detailOrder3);
 //        }
 //    }
-}
+//}

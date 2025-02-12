@@ -2,49 +2,24 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MemberDto } from "./types"; // ✅ MemberDto 타입 불러오기
+import { useAuth } from '@/app/hooks/useAuth';
 
 const Sidebar = () => {
-  // ✅ 사용자 정보 상태
-  const [user, setUser] = useState<MemberDto | null>(null);
+  const { user, logout } = useAuth();
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/auth/me", {
-          method: "GET",
-          credentials: "include", // JWT 쿠키 포함
-        });
 
-        if (!response.ok) {
-          throw new Error("사용자 정보를 불러올 수 없습니다.");
-        }
-
-        const data: MemberDto = await response.json();
-
-        // ✅ 사용자 정보 설정
-        setUser(data);
-      } catch (error) {
-        console.error("사용자 정보를 불러오는 중 오류 발생:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
+  
   return (
     <aside className="w-64 p-4 bg-gray-100 min-h-screen">
       <div className="flex flex-col items-center mb-6">
         <Image
-          src={ "/default-profile.png"} // ✅ 프로필 이미지 표시
+          src={user?.profileImageUrl || '/images/default-profile.png'}
           alt="User Profile"
           width={80}
           height={80}
           className="rounded-full border border-gray-300"
         />
-        <p className="mt-2 font-semibold">
-          {user?.name || "회원이름"} {/* ✅ 사용자 이름 표시 */}
-        </p>
+        <p className="mt-2 font-semibold">{user?.name || '게스트'}</p>
       </div>
       <nav>
         <ul className="space-y-4">
