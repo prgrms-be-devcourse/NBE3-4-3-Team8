@@ -405,7 +405,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrders"];
+        get: operations["getOrdersByMember"];
         put?: never;
         post?: never;
         delete?: never;
@@ -790,19 +790,19 @@ export interface components {
             reviewCount?: number;
         };
         PageReviewResponseDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -838,6 +838,84 @@ export interface components {
             sorted?: boolean;
             unsorted?: boolean;
         };
+        Answer: {
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
+            content?: string;
+            question?: components["schemas"]["Question"];
+            member?: components["schemas"]["Member"];
+        };
+        Cart: {
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            quantity?: number;
+        };
+        DeliveryInformation: {
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
+            addressName?: string;
+            postCode?: string;
+            detailAddress?: string;
+            isDefaultAddress?: boolean;
+            recipient?: string;
+            phone?: string;
+            member?: components["schemas"]["Member"];
+        };
+        GrantedAuthority: {
+            authority?: string;
+        };
+        Member: {
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            phoneNumber?: string;
+            /** @enum {string} */
+            memberType?: "USER" | "ADMIN";
+            email?: string;
+            password?: string;
+            username?: string;
+            deliveryInformations?: components["schemas"]["DeliveryInformation"][];
+            carts?: components["schemas"]["Cart"][];
+            questions?: components["schemas"]["Question"][];
+            oauthId?: string;
+            authorities?: components["schemas"]["GrantedAuthority"][];
+        };
+        Question: {
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            content?: string;
+            member?: components["schemas"]["Member"];
+            answers?: components["schemas"]["Answer"][];
+        };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
         OrderDTO: {
             /** Format: int64 */
             orderId?: number;
@@ -846,6 +924,24 @@ export interface components {
             totalPrice?: number;
             /** Format: date-time */
             createDate?: string;
+        };
+        PageOrderDTO: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["OrderDTO"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            empty?: boolean;
         };
         DetailOrderDto: {
             /** Format: int64 */
@@ -898,19 +994,19 @@ export interface components {
             averageRating?: number;
         };
         PageBookResponseDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -926,47 +1022,40 @@ export interface components {
             detailOrders?: components["schemas"]["AdminDetailOrderDTO"][];
         };
         PageAdminOrderDTO: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
-        };
-        Pageable: {
-            /** Format: int32 */
-            page?: number;
-            /** Format: int32 */
-            size?: number;
-            sort?: string[];
         };
         AdminQuestionDto: {
             /** Format: int64 */
@@ -1018,19 +1107,19 @@ export interface components {
             status?: number;
         };
         PageAdminBookListDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminBookListDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -1886,14 +1975,15 @@ export interface operations {
             };
         };
     };
-    getOrders: {
+    getOrdersByMember: {
         parameters: {
-            query?: never;
+            query: {
+                member: components["schemas"]["Member"];
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
-            cookie?: {
-                accessToken?: string;
-            };
+            cookie?: never;
         };
         requestBody?: never;
         responses: {
@@ -1903,7 +1993,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["OrderDTO"][];
+                    "application/json;charset=UTF-8": components["schemas"]["PageOrderDTO"];
                 };
             };
         };

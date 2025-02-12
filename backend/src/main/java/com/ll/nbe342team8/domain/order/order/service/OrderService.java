@@ -15,6 +15,8 @@ import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,21 +40,17 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByMember(Member member) {
-        // 주문 조회
-        List<Order> orders = orderRepository.findByMember(member);
-        if (orders.isEmpty()) {
+    public Page<OrderDTO> getOrdersByMember(Member member, Pageable pageable) {
+        Page<Order> ordersPage = orderRepository.findByMember(member, pageable);
+        if (ordersPage.isEmpty()) {
             throw new IllegalArgumentException("주문이 존재하지 않습니다.");
         }
 
-        // DTO로 변환하여 반환
-        return orders.stream()
-                .map(order -> new OrderDTO(
-                        order.getId(),
-                        order.getOrderStatus().name(),
-                        order.getTotalPrice(),
-                        order.getCreateDate()))
-                .collect(Collectors.toList());
+        return ordersPage.map(order -> new OrderDTO(
+                order.getId(),
+                order.getOrderStatus().name(),
+                order.getTotalPrice(),
+                order.getCreateDate()));
     }
 
     @Transactional

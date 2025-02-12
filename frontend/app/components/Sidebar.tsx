@@ -1,13 +1,3 @@
-@controller
-
-void putData() {
-       // oauthid 로 member 호출
-       DetailOrder=new(, , , );
-       Order=new (, , , )
-       //서비스 호출해 order과 detailOrder 데이터 db에 등록
-}
-NEW
-[오후 4:26]
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
