@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+'use client';
+
+import { useState, useEffect, createContext, useContext } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 interface DeliveryInformation {
@@ -27,15 +30,32 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
+interface AuthContextProps extends AuthState {
+  logout: () => Promise<boolean>;
+  refreshAuth: () => Promise<void>;
+  updateUserInfo: (updates: Partial<User>) => Promise<boolean>;
+}
+
 const API_BASE_URL = 'http://localhost:8080';
 
-export function useAuth() {
+const AuthContext = createContext<AuthContextProps>({
+  user: null,
+  loading: true,
+  error: null,
+  isAuthenticated: false,
+  logout: async () => false,
+  refreshAuth: async () => {},
+  updateUserInfo: async () => false,
+});
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     loading: true,
     error: null,
     isAuthenticated: false,
   });
+  const router = useRouter();
 
   const fetchUser = async () => {
     try {
@@ -55,10 +75,8 @@ export function useAuth() {
       });
     } catch (error: any) {
       if (error.response?.status === 401) {
-        // 토큰이 만료되었을 수 있으므로 토큰 갱신 시도
         const refreshed = await refreshAccessToken();
         if (refreshed) {
-          // 토큰 갱신 성공시 사용자 정보 다시 요청
           return fetchUser();
         }
 
@@ -122,6 +140,7 @@ export function useAuth() {
         isAuthenticated: false,
       });
 
+      router.replace('/');
       return true;
     } catch (error) {
       console.error('로그아웃 실패:', error);
@@ -153,19 +172,27 @@ export function useAuth() {
     }
   };
 
-  const refreshAuth = () => {
+  const refreshAuth = async () => {
     setAuthState((prev) => ({ ...prev, loading: true }));
-    return fetchUser();
+    await fetchUser();
   };
 
   useEffect(() => {
     fetchUser();
   }, []);
 
-  return {
-    ...authState,
-    refreshAuth,
-    logout,
-    updateUserInfo,
-  };
-}
+  return (
+    <AuthContext.Provider
+      value={{
+        ...authState,
+        logout,
+        refreshAuth,
+        updateUserInfo,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

@@ -78,6 +78,21 @@ public class AuthService {
 
     //프론트에서 삭제하는 걸로 변경
     public ResponseEntity<?> logout() {
-        return ResponseEntity.ok().body("로그아웃 되었습니다.");
+        ResponseCookie deleteAccessToken = ResponseCookie.from("accessToken", "")
+                .path("/")
+                .maxAge(0)
+                .secure(true)
+                .build();
+
+        ResponseCookie deleteRefreshToken = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .maxAge(0)
+                .secure(true)
+                .build();
+
+        return ResponseEntity.ok()
+                .header("Set-Cookie", deleteAccessToken.toString())
+                .header("Set-Cookie", deleteRefreshToken.toString())
+                .body("로그아웃 되었습니다.");
     }
 }

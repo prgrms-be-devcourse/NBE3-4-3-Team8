@@ -27,6 +27,7 @@ public class DetailOrderController {
         Long memberId = member.getId();
 
         List<DetailOrderDto> detailOrders = detailOrderService.getDetailOrdersByOrderIdAndMemberId(orderId, memberId);
+
         return ResponseEntity.ok(detailOrders);
     }
 }

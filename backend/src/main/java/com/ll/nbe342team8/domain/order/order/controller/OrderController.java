@@ -31,19 +31,18 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getOrders(@CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
-        String oauthId = member.getOAuthId(); // 여기서 oauthId를 가져옵니다.
 
-        List<OrderDTO> orders = orderService.getOrdersByOAuthId(oauthId);
+        List<OrderDTO> orders = orderService.getOrdersByMember(member);
         return ResponseEntity.ok(orders);
     }
 
     // 주문삭제
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId, @CookieValue(value = "accessToken", required = false) String token) {
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId,
+                                              @CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
-        String oauthId = member.getOAuthId(); // 여기서 oauthId를 가져옵니다.
 
-        orderService.deleteOrder(orderId, oauthId);
+        orderService.deleteOrder(orderId, member);
         return ResponseEntity.ok("주문 삭제 완료");
     }
 

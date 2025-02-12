@@ -22,25 +22,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/my/question/{questionId}/answer/{answerId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 사용자가 작성한 qna 질문의 상세 답변 조회 */
-        get: operations["getAnswer"];
-        /** 사용자가 작성한 qna 질문에 답변 수정(관리자 전용) */
-        put: operations["modifyAnswer"];
-        post?: never;
-        /** 사용자가 작성한 qna 질문에 답변 삭제(관리자 전용) */
-        delete: operations["modifyAnswer_1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/my/question/{id}": {
         parameters: {
             query?: never;
@@ -116,6 +97,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/dashboard/question/{questionId}/answer/{answerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 사용자가 작성한 qna 질문의 상세 답변 조회 */
+        get: operations["getAnswer"];
+        /** 사용자가 작성한 qna 질문에 답변 수정(관리자 전용) */
+        put: operations["modifyAnswer"];
+        post?: never;
+        /** 사용자가 작성한 qna 질문에 답변 삭제(관리자 전용) */
+        delete: operations["deleteAnswer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reviews/{book-id}": {
         parameters: {
             query?: never;
@@ -145,24 +145,6 @@ export interface paths {
         put?: never;
         /** 사용자가 qna 질문 등록 */
         post: operations["postQuesiton"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/my/question/{questionId}/answer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 사용자가 작성한 qna 질문에 대한 답변 조회 */
-        get: operations["getAnswers"];
-        put?: never;
-        /** 사용자가 작성한 qna 질문에 답변 등록(관리자 전용) */
-        post: operations["postAnswer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -234,6 +216,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refreshAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me/logout": {
         parameters: {
             query?: never;
@@ -260,6 +258,24 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["adminLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/dashboard/question/{questionId}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 사용자가 작성한 qna 질문에 대한 답변 조회 */
+        get: operations["getAnswers"];
+        put?: never;
+        /** 사용자가 작성한 qna 질문에 답변 등록(관리자 전용) */
+        post: operations["postAnswer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -374,6 +390,22 @@ export interface paths {
         };
         /** 특정 도서 리뷰 조회 */
         get: operations["getReviewsById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrders"];
         put?: never;
         post?: never;
         delete?: never;
@@ -534,6 +566,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/dashboard/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAdminQuestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/dashboard/questions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAdminQuestion"];
+        put?: never;
+        post?: never;
+        delete: operations["deleteQuestion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/books": {
         parameters: {
             query?: never;
@@ -554,13 +618,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my/orders/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteOrder"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        ReqAnswerDto: {
-            content: string;
-        };
         ReqQuestionDto: {
             title: string;
             content: string;
@@ -588,6 +665,9 @@ export interface components {
         PutReqMemberMyPageDto: {
             name: string;
             phoneNumber: string;
+        };
+        ReqAnswerDto: {
+            content: string;
         };
         ReviewRequestDto: {
             content?: string;
@@ -758,6 +838,13 @@ export interface components {
             sorted?: boolean;
             unsorted?: boolean;
         };
+        OrderDTO: {
+            /** Format: int64 */
+            orderId?: number;
+            orderStatus?: string;
+            /** Format: int64 */
+            totalPrice?: number;
+        };
         DetailOrderDto: {
             /** Format: int64 */
             orderId?: number;
@@ -872,6 +959,43 @@ export interface components {
             pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
+        AdminQuestionDto: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            content?: string;
+            memberEmail?: string;
+            createDate?: string;
+            hasAnswer?: boolean;
+            answer?: components["schemas"]["AnswerDto"];
+        };
+        AnswerDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            content: string;
+        };
+        PageDtoAdminQuestionDto: {
+            /** Format: int32 */
+            currentPageNumber: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int64 */
+            totalPages: number;
+            /** Format: int64 */
+            totalItems: number;
+            items: components["schemas"]["AdminQuestionDto"][];
+        };
         AdminBookListDto: {
             /** Format: int64 */
             id?: number;
@@ -965,86 +1089,13 @@ export interface operations {
             };
         };
     };
-    getAnswer: {
-        parameters: {
-            query: {
-                questionId: number;
-                answerId: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
-            };
-        };
-    };
-    modifyAnswer: {
-        parameters: {
-            query: {
-                questionId: number;
-                answerId: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReqAnswerDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
-            };
-        };
-    };
-    modifyAnswer_1: {
-        parameters: {
-            query: {
-                questionId: number;
-                answerId: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
-            };
-        };
-    };
     getQuestion: {
         parameters: {
-            query: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
             };
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1062,11 +1113,11 @@ export interface operations {
     };
     modifyQuesiton: {
         parameters: {
-            query: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
             };
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody: {
@@ -1088,11 +1139,11 @@ export interface operations {
     };
     removeQuesiton: {
         parameters: {
-            query: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
             };
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1286,6 +1337,79 @@ export interface operations {
             };
         };
     };
+    getAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                answerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    modifyAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                answerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReqAnswerDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    deleteAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                answerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
     createReview: {
         parameters: {
             query?: never;
@@ -1342,54 +1466,6 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ReqQuestionDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
-            };
-        };
-    };
-    getAnswers: {
-        parameters: {
-            query: {
-                questionId: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
-            };
-        };
-    };
-    postAnswer: {
-        parameters: {
-            query: {
-                questionId: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReqAnswerDto"];
             };
         };
         responses: {
@@ -1500,6 +1576,28 @@ export interface operations {
             };
         };
     };
+    refreshAccessToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                refreshToken?: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
     logout: {
         parameters: {
             query?: never;
@@ -1530,6 +1628,54 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["AdminLoginDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getAnswers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    postAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReqAnswerDto"];
             };
         };
         responses: {
@@ -1734,6 +1880,28 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["PageReviewResponseDto"];
+                };
+            };
+        };
+    };
+    getOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                accessToken?: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["OrderDTO"][];
                 };
             };
         };
@@ -1944,6 +2112,72 @@ export interface operations {
             };
         };
     };
+    getAdminQuestions: {
+        parameters: {
+            query: {
+                keyword?: string;
+                hasAnswer?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["PageDtoAdminQuestionDto"];
+                };
+            };
+        };
+    };
+    getAdminQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    deleteQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getAllBooks_1: {
         parameters: {
             query?: {
@@ -1964,6 +2198,30 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["PageAdminBookListDto"];
+                };
+            };
+        };
+    };
+    deleteOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: number;
+            };
+            cookie?: {
+                accessToken?: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };
