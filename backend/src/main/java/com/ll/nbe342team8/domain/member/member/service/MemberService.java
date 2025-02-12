@@ -42,6 +42,7 @@ public class MemberService implements UserDetailsService {
                             .name(dto.name())
                             .phoneNumber(dto.phoneNumber() != null ? dto.phoneNumber() : "")//전화번호가 없으면 빈 문자열("") 저장
                             .memberType(Member.MemberType.USER)
+                            .profileImageUrl(dto.profileImageUrl())
                             .password("")
                             .build();
                     return memberRepository.save(member);

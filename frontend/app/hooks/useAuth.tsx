@@ -21,6 +21,7 @@ interface User {
   memberType: 'USER' | 'ADMIN';
   oauthId: string;
   deliveryInformations: DeliveryInformation[];
+  profileImageUrl: string;
 }
 
 interface AuthState {
