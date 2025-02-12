@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, KeyboardEvent } from "react";
+import React, { useState, KeyboardEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 import KakaoLoginButton from "./KakaoLoginButton";
@@ -33,8 +33,20 @@ export default function NavBar() {
   };
 
   const handleLogout = async () => {
-    await logout(); // ✅ 로그아웃 요청
-    router.push('/'); // ✅ 로그아웃 후 홈으로 이동
+    try {
+      const success = await logout();
+      if (success) {
+        // 쿠키 직접 삭제
+        document.cookie =
+          'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;';
+        document.cookie =
+          'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;';
+
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
     return (
@@ -85,6 +97,9 @@ export default function NavBar() {
                         {user ? (
                             <>
                                 <span className="cursor-pointer">{user.name}님</span>
+                                <button onClick={() => router.push("/my")} className="cursor-pointer hover:text-blue-500 transition-colors">
+                                    마이페이지
+                                </button>
                                 <button onClick={handleLogout} className="text-red-500">
                                     로그아웃
                                 </button>
@@ -104,6 +119,7 @@ export default function NavBar() {
                         >
                             고객센터
                         </span>
+                        
                     </nav>
                 </div>
             </div>

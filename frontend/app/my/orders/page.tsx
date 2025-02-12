@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/app/components/Sidebar';
+import Sidebar from './Sidebar';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]); // orders 기본값을 빈 배열로 설정
@@ -28,7 +28,7 @@ export default function OrdersPage() {
     setFilteredOrders(testOrders); // 처음에는 전체 주문 목록을 표시
 
     // 실제 API 요청 부분
-    const token = document.cookie.split('; ').find((row) => row.startsWith('accessToken='));
+    const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
     const accessToken = token ? token.split('=')[1] : null;
 
     if (!accessToken) {
@@ -79,9 +79,7 @@ export default function OrdersPage() {
         <h1 className="text-2xl font-bold">나의 주문 내역</h1>
 
         <div className="my-4">
-          <label htmlFor="dateFilter" className="mr-2">
-            날짜별 조회:
-          </label>
+          <label htmlFor="dateFilter" className="mr-2">날짜별 조회:</label>
           <input
             id="dateFilter"
             type="date"
@@ -95,14 +93,12 @@ export default function OrdersPage() {
           {Array.isArray(filteredOrders) && filteredOrders.length === 0 ? (
             <p>No orders found for this date.</p>
           ) : (
-            Array.isArray(filteredOrders) &&
-            filteredOrders.map((order) => (
+            Array.isArray(filteredOrders) && filteredOrders.map((order) => (
               <li
                 key={order.orderId}
                 className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative" // relative 클래스 추가
               >
-                <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div>{' '}
-                {/* 주문 날짜를 왼쪽 상단에 작은 글씨로 표시 */}
+                <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div> {/* 주문 날짜를 왼쪽 상단에 작은 글씨로 표시 */}
                 <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
                 <p className="text-xl font-semibold">Total Price: {order.totalPrice}원</p>
                 <button
@@ -115,10 +111,7 @@ export default function OrdersPage() {
                     }
                   }}
                 >
-                  <span role="img" aria-label="detail" className="text-xl">
-                    🔍
-                  </span>{' '}
-                  {/* 이모티콘 크기 키움 */}
+                  <span role="img" aria-label="detail" className="text-xl">🔍</span> {/* 이모티콘 크기 키움 */}
                   <span className="text-lg font-medium">상세 조회</span> {/* 텍스트 크기 조정 */}
                 </button>
               </li>

@@ -38,4 +38,16 @@ public class Question extends BaseTime {
         this.title= Ut.XSSSanitizer.sanitize(dto.title());
         this.content=Ut.XSSSanitizer.sanitize(dto.content());
     }
+
+    public void addAnswer(Answer answer) {
+        this.answers.add(answer);
+        if (answer.getQuestion() != this) {
+            answer.setQuestion(this);
+        }
+    }
+
+    public void removeAnswer(Answer answer) {
+        this.answers.remove(answer);
+        answer.setQuestion(null);
+    }
 }
