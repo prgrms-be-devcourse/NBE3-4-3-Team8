@@ -50,7 +50,8 @@ public class OrderService {
                 .map(order -> new OrderDTO(
                         order.getId(),
                         order.getOrderStatus().name(),
-                        order.getTotalPrice()))
+                        order.getTotalPrice(),
+                        order.getCreateDate()))
                 .collect(Collectors.toList());
     }
 

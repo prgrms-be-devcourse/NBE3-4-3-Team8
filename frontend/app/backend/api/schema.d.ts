@@ -790,19 +790,19 @@ export interface components {
             reviewCount?: number;
         };
         PageReviewResponseDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["ReviewResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -811,12 +811,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            unpaged?: boolean;
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
+            unpaged?: boolean;
         };
         ReviewResponseDto: {
             /** Format: int64 */
@@ -835,8 +835,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
         };
         OrderDTO: {
             /** Format: int64 */
@@ -844,6 +844,8 @@ export interface components {
             orderStatus?: string;
             /** Format: int64 */
             totalPrice?: number;
+            /** Format: date-time */
+            createDate?: string;
         };
         DetailOrderDto: {
             /** Format: int64 */
@@ -896,19 +898,19 @@ export interface components {
             averageRating?: number;
         };
         PageBookResponseDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookResponseDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -924,37 +926,37 @@ export interface components {
             detailOrders?: components["schemas"]["AdminDetailOrderDTO"][];
         };
         PageAdminOrderDTO: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminDetailOrderDTO"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -1016,19 +1018,19 @@ export interface components {
             status?: number;
         };
         PageAdminBookListDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminBookListDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -1091,11 +1093,11 @@ export interface operations {
     };
     getQuestion: {
         parameters: {
-            query: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
             };
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1113,11 +1115,11 @@ export interface operations {
     };
     modifyQuesiton: {
         parameters: {
-            query: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
             };
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody: {
@@ -1139,11 +1141,11 @@ export interface operations {
     };
     removeQuesiton: {
         parameters: {
-            query: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
             };
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
