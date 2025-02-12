@@ -56,7 +56,7 @@ public class QuestionController {
 
     @Operation(summary = "사용자의 특정 qna 질문 조회")
     @GetMapping("/my/question/{id}")
-    public ResponseEntity<?> getQuestion(@RequestParam(name = "id") Long id) {
+    public ResponseEntity<?> getQuestion(@PathVariable(name = "id") Long id) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -103,7 +103,7 @@ public class QuestionController {
 
     @Operation(summary = "사용자의 특정 qna 질문 수정")
     @PutMapping("/my/question/{id}")
-    public ResponseEntity<?> modifyQuesiton(@RequestParam(name = "id") Long id
+    public ResponseEntity<?> modifyQuesiton(@PathVariable(name = "id") Long id
             ,@RequestBody @Valid ReqQuestionDto reqQuestionDto) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -129,7 +129,7 @@ public class QuestionController {
 
     @Operation(summary = "사용자의 특정 qna 질문 삭제")
     @DeleteMapping("/my/question/{id}")
-    public ResponseEntity<?> removeQuesiton(@RequestParam(name = "id") Long id
+    public ResponseEntity<?> removeQuesiton(@PathVariable(name = "id") Long id
     ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
