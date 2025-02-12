@@ -49,21 +49,7 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-  datasource:
-    url: jdbc:mysql://localhost:3306/test_db
-    username: root
-    password: jjevt3Hsy0331@
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
-        highlight-sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-    show-sql: true  # SQL 쿼리 로그를 출력
+
 
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
