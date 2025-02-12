@@ -1,27 +1,22 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/app/components/my/Sidebar';
+import Sidebar from '../Sidebar'; //변경하니까 사이즈가 이상해ㅛ ㅠ추후수정
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]); // orders 기본값을 빈 배열로 설정
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]); // 날짜별 필터링된 주문 목록
+  const [orders, setOrders] = useState<any[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [error, setError] = useState('');
-  const [selectedDate, setSelectedDate] = useState<string>(''); // 선택된 날짜
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [page, setPage] = useState(0); // 현재 페이지
+  const [pageSize] = useState(3);
+  const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수
   const router = useRouter();
 
   useEffect(() => {
-//     const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
-//     const accessToken = token ? token.split('=')[1] : null;
-//
-//     if (!accessToken) {
-//       setError('Access token is missing');
-//       return;
-//     }
-
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:8080/my/orders', {
+        const res = await fetch(`http://localhost:8080/my/orders?page=${page}&size=${pageSize}`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -31,8 +26,13 @@ export default function OrdersPage() {
         }
 
         const data = await res.json();
-        setOrders(data);
-        setFilteredOrders(data); // 전체 주문 목록을 필터링된 목록으로 초기화
+        if (!Array.isArray(data.content)) {
+          throw new Error('Invalid response format');
+        }
+
+        setOrders(data.content); // 데이터 목록
+        setTotalPages(data.totalPages); // 전체 페이지 수
+        setFilteredOrders(data.content); // 필터링된 주문 목록
       } catch (err) {
         console.error('Failed to load order list', err);
         setError('주문 목록을 불러오는 데 실패했습니다.');
@@ -40,21 +40,30 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, []); // 처음에만 실행되도록 빈 배열
+  }, [page, pageSize]);
 
-  // 날짜 변경 시 주문 목록을 필터링하는 함수
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = event.target.value;
     setSelectedDate(selectedDate);
 
     if (selectedDate) {
-      // 날짜별로 필터링
-      const filtered = orders.filter((order) => order.orderDate === selectedDate);
+      const filtered = orders.filter(order => {
+        const createDate = new Date(order.createDate);
+        if (isNaN(createDate.getTime())) {
+          console.error(`Invalid date format: ${order.createDate}`);
+          return false;
+        }
+        return createDate.toISOString().split('T')[0] === selectedDate;
+      });
       setFilteredOrders(filtered);
     } else {
-      // 날짜가 없으면 전체 주문 목록 표시
       setFilteredOrders(orders);
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 0 || newPage >= totalPages) return;
+    setPage(newPage);
   };
 
   return (
@@ -79,33 +88,53 @@ export default function OrdersPage() {
 
         <ul>
           {filteredOrders.length === 0 ? (
-              <p>No orders found for this date.</p>
+            <p className="text-gray-600">해당 날짜의 주문이 없습니다.</p>
           ) : (
-              filteredOrders.map((order) => (
-                  <li
-                      key={order.orderId}
-                      className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative"
-                  >
-                    <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div>
-                    <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
-                    <p className="text-xl font-semibold">Total Price: {order.totalPrice}원</p>
-                    <button
-                        className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
-                        onClick={() => {
-                          if (order.orderId) {
-                            router.push(`/my/orders/${order.orderId}/details`);
-                          } else {
-                            console.error('Order ID is missing.');
-                          }
-                        }}
-                    >
-                      <span role="img" aria-label="detail" className="text-xl">🔍</span>
-                      <span className="text-lg font-medium">상세 조회</span>
-                    </button>
-                  </li>
-              ))
+            filteredOrders.map((order) => (
+              <li
+                key={order.orderId}
+                className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative max-w-lg w-full mx-auto"
+              >
+                <div className="absolute top-2 left-2 text-sm text-gray-500">
+                  {order.createDate ? new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR') : '날짜 정보 없음'}
+                </div>
+                <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
+                <p className="text-xl font-semibold">Total Price: {order.totalPrice.toLocaleString()}원</p>
+                <button
+                  className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
+                  onClick={() => {
+                    if (order.orderId) {
+                      router.push(`/my/orders/${order.orderId}/details`);
+                    } else {
+                      console.error('Order ID is missing.');
+                    }
+                  }}
+                >
+                  <span role="img" aria-label="detail" className="text-xl">🔍</span>
+                  <span className="text-lg font-medium">상세 조회</span>
+                </button>
+              </li>
+            ))
           )}
         </ul>
+
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 0}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50"
+          >
+            이전
+          </button>
+          <span className="mx-4">페이지 {page + 1} / {totalPages}</span>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === totalPages - 1}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50"
+          >
+            다음
+          </button>
+        </div>
       </main>
     </div>
   );

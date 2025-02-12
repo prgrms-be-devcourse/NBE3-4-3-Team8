@@ -10,10 +10,11 @@ import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -30,10 +31,9 @@ public class OrderController {
 
     // 주문조회
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getOrders(@CookieValue(value = "accessToken", required = false) String token) {
-        Member member = authService.validateTokenAndGetMember(token);
-        List<OrderDTO> orders = orderService.getOrdersByMember(member);
-        return ResponseEntity.ok(orders);
+    public Page<OrderDTO> getOrdersByMember(@AuthenticationPrincipal SecurityUser securityUser, Pageable pageable) {
+        Member member = securityUser.getMember(); // 인증된 사용자의 Member 객체를 가져옴
+        return orderService.getOrdersByMember(member, pageable);
     }
 
     // 주문삭제
