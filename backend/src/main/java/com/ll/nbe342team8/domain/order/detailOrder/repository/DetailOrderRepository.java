@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
+import com.ll.nbe342team8.domain.member.member.entity.Member;
 
 @Repository
 public interface DetailOrderRepository extends JpaRepository<DetailOrder, Long> {
@@ -18,5 +19,6 @@ public interface DetailOrderRepository extends JpaRepository<DetailOrder, Long> 
 
 	void deleteByOrderId(Long orderId);
 
-	List<DetailOrder> findByOrderIdAndMemberId(Long orderId, Long memberId);
+//	List<DetailOrder> findByOrderIdAndMember(Long orderId, Member member);
+
 }

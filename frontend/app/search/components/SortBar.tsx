@@ -22,7 +22,7 @@ export const SortBar: React.FC<SortBarProps> = ({ currentSort, onSortChange }) =
                   key={option.value}
                   onClick={() => onSortChange(option.value)}
                   className={`
-              px-4 py-2 text-sm font-medium transition-colors 
+              px-4 py-2 text-sm font-medium transition-colors
               ${currentSort === option.value
                       ? "border-t border-l border-r border-blue-500 bg-white text-blue-500"
                       : "text-gray-500 hover:text-blue-500"}
