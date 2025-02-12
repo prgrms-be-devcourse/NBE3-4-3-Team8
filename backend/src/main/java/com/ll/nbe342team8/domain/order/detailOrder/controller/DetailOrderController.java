@@ -16,7 +16,7 @@ import java.util.List;
 public class DetailOrderController {
     private final DetailOrderService detailOrderService;
 
-    // 주문 상세 조회 - Member와 orderId를 기반으로 조회
+    // 주문 상세 조회 -
     @GetMapping("/{orderId}/details")
     public List<DetailOrderDto> getDetailOrdersByOrderIdAndMember(
             @PathVariable Long orderId,
