@@ -23,7 +23,6 @@ public class AdminDetailOrderService {
 
 	// 상세 주문 내역 조회
 	public Page<AdminDetailOrderDTO> getDetailsByOrderId(Long orderId, int page, int size, String sort) {
-
 		Sort sorting;
 
 		if ("book-title".equals(sort)) {

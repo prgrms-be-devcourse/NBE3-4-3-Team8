@@ -73,6 +73,7 @@ public class OrderService {
     public Order createOrder(Member member, OrderRequestDto orderRequestDTO) {
         Order order = createOrderInternal(member, orderRequestDTO);
         cartService.deleteProduct(member); // 주문 완료 후 장바구니 비우기
+
         return order;
     }
 
@@ -122,7 +123,7 @@ public class OrderService {
                 .mapToLong(cart -> (long) cart.getBook().getPriceStandard() * cart.getQuantity())
                 .sum();
     }
-    
+
     public PaymentResponseDto createPaymentInfo(Member member) {
         List<Cart> cartList = cartService.findCartByMember(member);
         List<CartResponseDto> cartResponseDtoList = cartList.stream()

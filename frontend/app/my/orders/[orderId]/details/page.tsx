@@ -1,79 +1,62 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Sidebar from '@/app/components/Sidebar';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 
-interface DetailOrderDto {
-  orderId: number;
-  bookId: number;
-  bookQuantity: number;
-  deliveryStatus: string; // DeliveryStatus를 문자열로 표시
+interface OrderDetail {
+    orderId: string;
+    bookId: string;
+    bookQuantity: number;
+    deliveryStatus: string;
 }
 
 export default function OrderDetailsPage() {
-  const [orderDetails, setOrderDetails] = useState<DetailOrderDto[]>([
-    { orderId: 1, bookId: 101, bookQuantity: 2, deliveryStatus: 'Pending' },
-    { orderId: 2, bookId: 102, bookQuantity: 1, deliveryStatus: 'Shipped' },
-  ]); // 임시 초기 데이터
-  const [error, setError] = useState('');
-  const router = useRouter();
+    const [detailOrders, setDetailOrders] = useState<OrderDetail[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const params = useParams();
+    const orderId = params.orderId as string;
 
-  const [orderId, setOrderId] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        const fetchOrderDetails = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/my/orders/${orderId}/details`, {
+                    credentials: 'include',
+                });
 
-  // router.query가 변경될 때마다 orderId 설정
-  useEffect(() => {
-    if (router.query?.orderId) {
-      // router.query가 정의되고 orderId가 있을 때만 처리
-      setOrderId(router.query.orderId as string);
-    }
-  }, [router.query]);
+                if (!response.ok) {
+                    throw new Error('주문 상세 정보를 불러오지 못했습니다');
+                }
 
-  useEffect(() => {
-    if (!orderId) return; // orderId가 없으면 API 호출하지 않음
+                const data: OrderDetail[] = await response.json();
+                setDetailOrders(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const oauthId = 'testOauthId'; // 예시 oauthId, 실제로는 로그인한 유저의 oauthId를 가져와야 함
+        fetchOrderDetails();
+    }, [orderId]);
 
-    fetch(`http://localhost:8080/my/orders/${orderId}/details?oauthId=${oauthId}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setOrderDetails(data); // 주문 상세 데이터 저장
-      })
-      .catch((err) => {
-        console.error('Failed to load order details', err);
-        setError('주문 상세 정보를 불러오는 데 실패했습니다.');
-      });
-  }, [orderId]); // orderId가 변경될 때마다 실행
+    if (loading) return <p className="text-center mt-8">로딩 중...</p>;
+    if (error) return <p className="text-center mt-8 text-red-500">{error}</p>;
+    if (detailOrders.length === 0) return <p className="text-center mt-8">이 주문에 대한 상세 정보가 없습니다.</p>;
 
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main className="ml-64 p-8 w-full">
-        <h1 className="text-2xl font-bold">주문 상세</h1>
-        {error && <p className="text-red-500">{error}</p>}
-        {orderDetails.length > 0 ? (
-          <div>
-            {orderDetails.map((detail) => (
-              <div
-                key={detail.orderId}
-                className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300" // OrdersPage와 동일한 스타일
-              >
-                <p className="text-xl font-semibold">Order ID: {detail.orderId}</p>
-                <p className="text-xl font-semibold">Book ID: {detail.bookId}</p>
-                <p className="text-xl font-semibold">Book Quantity: {detail.bookQuantity}</p>
-                <p className="text-xl font-semibold">Delivery Status: {detail.deliveryStatus}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </main>
-    </div>
-  );
+    return (
+        <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen bg-white">
+            <h2 className="text-2xl font-bold mb-6 text-center">주문 상세 정보</h2>
+            <div className="space-y-4">
+                {detailOrders.map((detail) => (
+                    <div key={`${detail.orderId}-${detail.bookId}`} className="bg-gray-50 p-4 rounded-lg shadow">
+                        <p><strong>주문 ID:</strong> {detail.orderId}</p>
+                        <p><strong>도서 ID:</strong> {detail.bookId}</p>
+                        <p><strong>수량:</strong> {detail.bookQuantity}</p>
+                        <p><strong>배송 상태:</strong> {detail.deliveryStatus}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }

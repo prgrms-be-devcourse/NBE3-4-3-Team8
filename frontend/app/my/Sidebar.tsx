@@ -1,19 +1,9 @@
-@controller
+'use client';
 
-void putData() {
-       // oauthid 로 member 호출
-       DetailOrder=new(, , , );
-       Order=new (, , , )
-       //서비스 호출해 order과 detailOrder 데이터 db에 등록
-}
-NEW
-[오후 4:26]
-"use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie"; //  쿠키에서 JWT 토큰 가져오기
-import { jwtDecode } from "jwt-decode"; //  올바른 방식
-
+import Cookies from "js-cookie"; // ✅ 쿠키에서 JWT 토큰 가져오기
+import { jwtDecode } from "jwt-decode"; // ✅ 올바른 방식으로 디폴트로 import
 
 interface SidebarItemProps {
   to: string;
@@ -21,7 +11,7 @@ interface SidebarItemProps {
   subLabel?: string;
 }
 
-//  JWT 토큰의 페이로드 타입 정의
+// ✅ JWT 토큰의 페이로드 타입 정의
 interface JwtPayload {
   name: string; // name 키 값
 }
@@ -31,11 +21,11 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     try {
-      const token = Cookies.get("token"); //  쿠키에서 JWT 토큰 가져오기
+      const token = Cookies.get("accessToken"); // ✅ 쿠키에서 JWT 토큰 가져오기 (토큰 이름이 accessToken일 수 있음)
       if (token) {
-        const decoded: JwtPayload = jwtDecode(token); //  JWT 디코딩
-        console.log("username: ",decoded.name);
-        setUsername(decoded.name); //  name 값 설정
+        const decoded: JwtPayload = jwtDecode(token); // ✅ JWT 디코딩
+        console.log("username: ", decoded.name);
+        setUsername(decoded.name); // ✅ name 값 설정
       }
     } catch (error) {
       console.error("토큰을 해독할 수 없습니다:", error);
@@ -44,10 +34,10 @@ const Sidebar: React.FC = () => {
   }, []);
 
   return (
-    <aside className="w-64 p-4 border-r min-h-screen bg-gray-100">
+    <aside className="fixed top-0 left-0 w-64 h-full bg-gray-800 text-white p-4">
       <div className="flex flex-col items-center mb-6">
         <div className="w-20 h-20 bg-gray-300 rounded-full mb-2"></div>
-        <p className="text-gray-700 font-semibold">{username || "유저 이름"}</p> {/*  JWT에서 가져온 유저 이름 표시 */}
+        <p className="text-gray-700 font-semibold">{username || "유저 이름"}</p> {/* ✅ JWT에서 가져온 유저 이름 표시 */}
       </div>
       <nav className="space-y-2">
         <SidebarItem to="/my/orders" label="쇼핑내역" subLabel="주문/배송목록" />

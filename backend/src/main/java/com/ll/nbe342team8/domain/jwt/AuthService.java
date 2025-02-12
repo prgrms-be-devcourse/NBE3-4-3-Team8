@@ -76,7 +76,7 @@ public class AuthService {
 
     }
 
-    //프론트에서 삭제하는 걸로 변경
+    // ✅ 로그아웃 - `Set-Cookie`로 `accessToken`, `refreshToken` 삭제
     public ResponseEntity<?> logout() {
         ResponseCookie deleteAccessToken = ResponseCookie.from("accessToken", "")
                 .path("/")

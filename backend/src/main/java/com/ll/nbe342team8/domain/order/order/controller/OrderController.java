@@ -13,11 +13,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @RequestMapping("/my/orders")
+@CrossOrigin(origins = "http://localhost:3000")
 public class OrderController {
     private final OrderService orderService;
     private final AuthService authService;
@@ -46,7 +47,7 @@ public class OrderController {
         return ResponseEntity.ok("주문 삭제 완료");
     }
 
-    //주문등록
+    // 주문등록
     @PostMapping("/create")
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
                                                         @AuthenticationPrincipal SecurityUser securityUser) {
@@ -59,10 +60,10 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
-    //주문등록
+    // 주문등록
     @PostMapping("/create/fast")
     public ResponseEntity<OrderResponseDto> createFastOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
-                                                        @AuthenticationPrincipal SecurityUser securityUser) {
+                                                            @AuthenticationPrincipal SecurityUser securityUser) {
 
         System.out.println("orderRequestDto = " + orderRequestDto);
 
@@ -82,4 +83,3 @@ public class OrderController {
         return ResponseEntity.ok(paymentResponseDto);
     }
 }
-

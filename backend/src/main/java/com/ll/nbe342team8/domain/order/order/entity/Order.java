@@ -22,7 +22,7 @@ import lombok.Setter;
 @Table(name = "orders")
 public class Order extends BaseTime {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
@@ -51,5 +51,12 @@ public class Order extends BaseTime {
 		ORDERED,
 		CANCELLED,
 		COMPLETE
+	}
+
+	public Order(Member member, OrderStatus orderStatus, long totalPrice) {
+		this.member = member;
+		this.orderStatus = orderStatus;
+		this.totalPrice = totalPrice;
+		this.detailOrders = new ArrayList<>();
 	}
 }
