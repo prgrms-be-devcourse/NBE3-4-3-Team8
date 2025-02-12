@@ -1,5 +1,7 @@
 package com.ll.nbe342team8.domain.order.order.service;
 
+import com.ll.nbe342team8.domain.book.book.entity.Book;
+import com.ll.nbe342team8.domain.book.book.service.BookService;
 import com.ll.nbe342team8.domain.cart.dto.CartResponseDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.service.CartService;
@@ -29,14 +31,20 @@ public class OrderService {
     private final DetailOrderRepository detailOrderRepository;
     private final MemberRepository memberRepository;
     private final CartService cartService;
+    private final BookService bookService;  // Book 정보를 가져오기 위한 서비스
 
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, DetailOrderRepository detailOrderRepository, MemberRepository memberRepository, CartService cartService) {
+    public OrderService(OrderRepository orderRepository,
+                        DetailOrderRepository detailOrderRepository,
+                        MemberRepository memberRepository,
+                        CartService cartService,
+                        BookService bookService) {
         this.orderRepository = orderRepository;
         this.detailOrderRepository = detailOrderRepository;
         this.memberRepository = memberRepository;
         this.cartService = cartService;
+        this.bookService = bookService;
     }
 
     @Transactional(readOnly = true)
@@ -57,11 +65,9 @@ public class OrderService {
     public void deleteOrder(Long orderId, Member member) {
         Order order = orderRepository.findByIdAndMember(orderId, member)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
-
         if (order.getOrderStatus() != OrderStatus.COMPLETE) {
             throw new IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.");
         }
-
         detailOrderRepository.deleteByOrderId(orderId);
         orderRepository.delete(order);
     }
@@ -102,7 +108,6 @@ public class OrderService {
     @Transactional
     public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO) {
         List<Cart> cartList = cartService.findCartByMember(member);
-
         Order order = Order.builder()
                 .member(member)
                 .orderStatus(OrderStatus.ORDERED)
@@ -113,7 +118,6 @@ public class OrderService {
                 .paymentMethod(orderRequestDTO.paymentMethod())
                 .totalPrice(calculateTotalPriceSales(cartList))
                 .build();
-
         orderRepository.save(order);
 
         List<DetailOrder> detailOrders = cartList.stream()
@@ -124,8 +128,36 @@ public class OrderService {
                         .bookQuantity(cart.getQuantity())
                         .build())
                 .collect(Collectors.toList());
-
         detailOrderRepository.saveAll(detailOrders);
+
+        cartService.deleteProduct(member); // 주문 완료 후 장바구니 비우기
+        return order;
+    }
+
+    @Transactional
+    public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO, Long bookId, int quantity) {
+        Book book = bookService.getBookById(bookId);
+        long totalPrice = (long) book.getPricesSales() * quantity;
+
+        Order order = Order.builder()
+                .member(member)
+                .orderStatus(OrderStatus.ORDERED)
+                .fullAddress(orderRequestDTO.fullAddress())
+                .postCode(orderRequestDTO.postCode())
+                .phone(orderRequestDTO.phone())
+                .recipient(orderRequestDTO.recipient())
+                .paymentMethod(orderRequestDTO.paymentMethod())
+                .totalPrice(totalPrice)
+                .build();
+        orderRepository.save(order);
+
+        DetailOrder detailOrder = DetailOrder.builder()
+                .order(order)
+                .deliveryStatus(DeliveryStatus.PENDING)
+                .book(book)
+                .bookQuantity(quantity)
+                .build();
+        detailOrderRepository.save(detailOrder);
 
         return order;
     }
@@ -147,10 +179,8 @@ public class OrderService {
         List<CartResponseDto> cartResponseDtoList = cartList.stream()
                 .map(CartResponseDto::from)
                 .collect(Collectors.toList());
-
         Long totalPriceSales = calculateTotalPriceSales(cartList);
         Long totalPriceStandard = calculateTotalPriceStandard(cartList);
-
         return new PaymentResponseDto(cartResponseDtoList, totalPriceStandard, totalPriceSales);
     }
 }

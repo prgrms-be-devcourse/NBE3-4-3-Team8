@@ -69,17 +69,18 @@ export default function OrdersPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="ml-64 p-8 w-full">
+      <main className="flex-1 p-6">
+
         <h1 className="text-2xl font-bold">나의 주문 내역</h1>
 
         <div className="my-4">
           <label htmlFor="dateFilter" className="mr-2">날짜별 조회:</label>
           <input
-            id="dateFilter"
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="border p-2 rounded"
+              id="dateFilter"
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="border p-2 rounded"
           />
         </div>
 

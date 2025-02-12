@@ -41,44 +41,38 @@ public class OrderController {
     public ResponseEntity<String> deleteOrder(@PathVariable Long orderId,
                                               @CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
-
         orderService.deleteOrder(orderId, member);
         return ResponseEntity.ok("주문 삭제 완료");
     }
 
-    // 주문등록
+    // 주문등록 (일반 주문: 장바구니 기반)
     @PostMapping("/create")
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
                                                         @AuthenticationPrincipal SecurityUser securityUser) {
-
         System.out.println("orderRequestDto = " + orderRequestDto);
-
         Member member = securityUser.getMember();
         Order order = orderService.createOrder(member, orderRequestDto);
-
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
-    // 주문등록
+    // 주문등록 (단일 상품 주문)
     @PostMapping("/create/fast")
-    public ResponseEntity<OrderResponseDto> createFastOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
-                                                            @AuthenticationPrincipal SecurityUser securityUser) {
+    public ResponseEntity<OrderResponseDto> createFastOrder(
+            @RequestBody @Valid OrderRequestDto orderRequestDto,
+            @RequestParam("bookId") Long bookId,
+            @RequestParam("quantity") int quantity,
+            @AuthenticationPrincipal SecurityUser securityUser) {
 
-        System.out.println("orderRequestDto = " + orderRequestDto);
-
+        System.out.println("orderRequestDto = " + orderRequestDto + ", bookId = " + bookId + ", quantity = " + quantity);
         Member member = securityUser.getMember();
-        Order order = orderService.createFastOrder(member, orderRequestDto);
-
+        Order order = orderService.createFastOrder(member, orderRequestDto, bookId, quantity);
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
     @GetMapping("/payment")
     public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser) {
-
         Member member = securityUser.getMember();
-
         PaymentResponseDto paymentResponseDto = orderService.createPaymentInfo(member);
-
         return ResponseEntity.ok(paymentResponseDto);
     }
 }
