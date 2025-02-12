@@ -12,10 +12,8 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    List<Order> findByOauthId(String oauthId);
+    List<Order> findByMember(Member member);
 
-    Optional<Order> findByIdAndOauthId(Long orderId, String oauthId);
-
-
+    Optional<Order> findByIdAndMember(Long orderId, Member member);
 }
 

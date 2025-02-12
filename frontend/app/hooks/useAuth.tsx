@@ -4,11 +4,12 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface User {
+  id: number;
   name: string;
+  email: string;
   phoneNumber: string;
   memberType: 'USER' | 'ADMIN';
   oauthId: string;
-  email: string;
   deliveryInformations: DeliveryInformation[];
 }
 

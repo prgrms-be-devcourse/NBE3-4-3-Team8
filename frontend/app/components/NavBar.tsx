@@ -103,6 +103,13 @@ export default function NavBar() {
                                 <button onClick={handleLogout} className="text-red-500">
                                     로그아웃
                                 </button>
+                                {/* 로그인 후 마이페이지 버튼 수정 */}
+                                <span
+                                    className="cursor-pointer hover:text-blue-500 transition-colors"
+                                    onClick={() => router.push("/my/orders")}
+                                >
+                                    마이페이지
+                                </span>
                             </>
                         ) : (
                             <KakaoLoginButton />

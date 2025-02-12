@@ -28,6 +28,7 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final CartService cartService;
 
+
     @Autowired
     public OrderService(OrderRepository orderRepository, DetailOrderRepository detailOrderRepository, MemberRepository memberRepository, CartService cartService) {
         this.orderRepository = orderRepository;
@@ -37,13 +38,9 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByOAuthId(String oAuthId) {
-        // 회원이 존재하는지 먼저 체크
-        Member member = memberRepository.findByoAuthId(oAuthId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
+    public List<OrderDTO> getOrdersByMember(Member member) {
         // 주문 조회
-        List<Order> orders = orderRepository.findByOauthId(oAuthId);
+        List<Order> orders = orderRepository.findByMember(member);
         if (orders.isEmpty()) {
             throw new IllegalArgumentException("주문이 존재하지 않습니다.");
         }
@@ -58,11 +55,8 @@ public class OrderService {
     }
 
     @Transactional
-    public void deleteOrder(Long orderId, String oauthId) {
-        Member member = memberRepository.findByoAuthId(oauthId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-        Order order = orderRepository.findByIdAndOauthId(orderId, oauthId)
+    public void deleteOrder(Long orderId, Member member) {
+        Order order = orderRepository.findByIdAndMember(orderId, member)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
 
         if (order.getOrderStatus() != OrderStatus.COMPLETE) {
@@ -93,7 +87,7 @@ public class OrderService {
         List<DetailOrder> detailOrders = cartList.stream()
                 .map(cart -> DetailOrder.builder()
                         .order(order)
-                        .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
+                        .deliveryStatus(DeliveryStatus.PENDING)
                         .book(cart.getBook())
                         .bookQuantity(cart.getQuantity())
                         .build())
@@ -126,7 +120,7 @@ public class OrderService {
         List<DetailOrder> detailOrders = cartList.stream()
                 .map(cart -> DetailOrder.builder()
                         .order(order)
-                        .deliveryStatus(DetailOrder.DeliveryStatus.PENDING)
+                        .deliveryStatus(DeliveryStatus.PENDING)
                         .book(cart.getBook())
                         .bookQuantity(cart.getQuantity())
                         .build())
@@ -148,7 +142,7 @@ public class OrderService {
                 .mapToLong(cart -> (long) cart.getBook().getPriceStandard() * cart.getQuantity())
                 .sum();
     }
-    
+
     public PaymentResponseDto createPaymentInfo(Member member) {
         List<Cart> cartList = cartService.findCartByMember(member);
         List<CartResponseDto> cartResponseDtoList = cartList.stream()
