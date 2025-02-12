@@ -1,5 +1,20 @@
 package com.ll.nbe342team8.domain.qna.answer.controller;
 
+import java.time.Duration;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
@@ -11,211 +26,155 @@ import com.ll.nbe342team8.domain.qna.answer.service.AnswerService;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.service.QuestionService;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/dashboard")
+@Tag(name = "Answer Controller", description = "관리자 전용 QnA 답변 API")
 public class AnswerController {
 
-    private final MemberService memberService;
-    private final QuestionService questionService;
-    private final AnswerService answerService;
+	private final MemberService memberService;
+	private final QuestionService questionService;
+	private final AnswerService answerService;
 
-    //qna 답변 경우 관리자만 작성 가능하다
+	@Operation(summary = "사용자가 작성한 QnA 질문에 대한 답변 조회")
+	@GetMapping("/question/{questionId}/answer")
+	public ResponseEntity<GetResAnswersDto> getAnswers(
+			@PathVariable Long questionId,
+			@AuthenticationPrincipal SecurityUser securityUser
+	) {
+		Member member = getAuthenticatedMember(securityUser);
+		Question question = getQuestionById(questionId);
 
-    @Operation(summary = "사용자가 작성한 qna 질문에 대한 답변 조회")
-    @GetMapping("/question/{questionId}/answer")
-    public ResponseEntity<?> getAnswers(@PathVariable Long questionId) {
+		// 질문 작성자 또는 관리자인지 확인
+		validateQuestionOwner(member, question);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		List<Answer> answers = answerService.findByQuestion(question);
+		return ResponseEntity.ok(new GetResAnswersDto(answers));
+	}
 
-        if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
-        }
+	@Operation(summary = "사용자가 작성한 QnA 질문의 상세 답변 조회 (관리자 전용)")
+	@GetMapping("/questions/{questionId}/answers/{answerId}")
+	public ResponseEntity<AnswerDto> getAnswer(
+			@PathVariable Long questionId,
+			@PathVariable Long answerId,
+			@AuthenticationPrincipal SecurityUser securityUser
+	) {
+		Member admin = getAuthenticatedMember(securityUser);
+		validateAdmin(admin);
 
-        String oauthId=securityUser.getMember().getOAuthId();
+		Question question = getQuestionById(questionId);
+		Answer answer = getAnswerById(answerId);
 
-        Member member = memberService.findByOauthId(oauthId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
+		return ResponseEntity.ok(new AnswerDto(answer));
+	}
 
-        Question question = questionService.findById(questionId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다."));
+	@Operation(summary = "질문에 답변 등록 (관리자 전용)")
+	@PostMapping("/questions/{questionId}/answers")
+	public ResponseEntity<Void> postAnswer(
+			@PathVariable Long questionId,
+			@RequestBody @Valid ReqAnswerDto reqAnswerDto,
+			@AuthenticationPrincipal SecurityUser securityUser
+	) {
+		Member admin = getAuthenticatedMember(securityUser);
+		validateAdmin(admin);
 
-        //프론트에서 보낸 질문id가 사용자가 작성한지 확인
-        validateQuestionOwner(member, question);
+		Question question = getQuestionById(questionId);
+		validateExistsDuplicateAnswerInShortTime(question, admin, reqAnswerDto.content(), Duration.ofSeconds(5));
 
-        //답변 데이터를 가져와 dto로 변환
-        List<Answer> answers =answerService.findByQuestion(question);
-        GetResAnswersDto getResAnswersDto=new GetResAnswersDto(answers);
+		answerService.createAnswer(question, admin, reqAnswerDto);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 
-        return ResponseEntity.ok(getResAnswersDto);
-    }
+	@Operation(summary = "질문에 대한 답변 수정 (관리자 전용)")
+	@PutMapping("/questions/{questionId}/answers/{answerId}")
+	public ResponseEntity<Void> modifyAnswer(
+			@PathVariable Long questionId,
+			@PathVariable Long answerId,
+			@RequestBody @Valid ReqAnswerDto reqAnswerDto,
+			@AuthenticationPrincipal SecurityUser securityUser
+	) {
+		Member admin = getAuthenticatedMember(securityUser);
+		validateAdmin(admin);
 
-    //관리자가 상세 답변 데이터 조회
-    @Operation(summary = "사용자가 작성한 qna 질문의 상세 답변 조회")
-    @GetMapping("/question/{questionId}/answer/{answerId}")
-    public ResponseEntity<?> getAnswer(@PathVariable Long questionId,
-                                       @PathVariable Long answerId) {
+		Question question = getQuestionById(questionId);
+		Answer answer = getAnswerById(answerId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		answerService.modifyAnswer(answer, reqAnswerDto);
+		return ResponseEntity.ok().build();
+	}
 
-        if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
-        }
+	@Operation(summary = "질문에 대한 답변 삭제 (관리자 전용)")
+	@DeleteMapping("/questions/{questionId}/answers/{answerId}")
+	public ResponseEntity<Void> deleteAnswer(
+			@PathVariable Long questionId,
+			@PathVariable Long answerId,
+			@AuthenticationPrincipal SecurityUser securityUser
+	) {
+		Member admin = getAuthenticatedMember(securityUser);
+		validateAdmin(admin);
 
-        String oauthId=securityUser.getMember().getOAuthId();
+		Question question = getQuestionById(questionId);
+		Answer answer = getAnswerById(answerId);
 
-        Member member = memberService.findByOauthId(oauthId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
+		answerService.deleteAnswer(answer);
+		return ResponseEntity.noContent().build();
+	}
 
-        Question question = questionService.findById(questionId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다."));
+	/**
+	 * 🔥 공통 메서드들 (중복 코드 제거)
+	 */
 
-        Answer answer=answerService.findById(answerId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "답변을 찾을 수 없습니다."));
+	// 로그인된 사용자 정보 가져오기
+	private Member getAuthenticatedMember(SecurityUser securityUser) {
+		if (securityUser == null) {
+			throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야 합니다.");
+		}
 
+		return memberService.findByOauthId(securityUser.getMember().getOAuthId())
+				.orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
+	}
 
-        //관리자 계정인 경우 누구던 답변 등록 가능, 아닌 경우 에러 발생
-        validateAdmin(member);
+	// 질문 ID로 질문 가져오기
+	private Question getQuestionById(Long questionId) {
+		return questionService.findById(questionId)
+				.orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다."));
+	}
 
-        //답변 데이터를 가져와 dto로 변환
-        AnswerDto answerDto=new AnswerDto(answer);
+	// 답변 ID로 답변 가져오기
+	private Answer getAnswerById(Long answerId) {
+		return answerService.findById(answerId)
+				.orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "답변을 찾을 수 없습니다."));
+	}
 
-        return ResponseEntity.ok(answerDto);
-    }
+	// 질문 작성자인지 확인
+	private void validateQuestionOwner(Member member, Question question) {
+		if (!(questionService.isQuestionOwner(member, question) || checkAdmin(member))) {
+			throw new ServiceException(HttpStatus.FORBIDDEN.value(), "권한이 없습니다.");
+		}
+	}
 
+	// 관리자 계정인지 확인
+	private void validateAdmin(Member member) {
+		if (!checkAdmin(member)) {
+			throw new ServiceException(HttpStatus.FORBIDDEN.value(), "권한이 없습니다.");
+		}
+	}
 
-    //관리자가 질문에 답변 등록
-    @Operation(summary = "사용자가 작성한 qna 질문에 답변 등록(관리자 전용)")
-    @PostMapping("/question/{questionId}/answer")
-    public ResponseEntity<?> postAnswer(@PathVariable Long questionId,
-                                        @RequestBody @Valid ReqAnswerDto reqAnswerDto ) {
+	// 짧은 시간 내 중복 답변 등록 방지
+	private void validateExistsDuplicateAnswerInShortTime(Question question, Member member, String content, Duration duration) {
+		if (answerService.existsDuplicateAnswerInShortTime(question, member, content, duration)) {
+			throw new ServiceException(HttpStatus.TOO_MANY_REQUESTS.value(), "너무 빠르게 동일한 답변을 등록할 수 없습니다.");
+		}
+	}
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
-        }
-
-        String oauthId=securityUser.getMember().getOAuthId();
-
-        Member admin = memberService.findByOauthId(oauthId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
-
-        Question question = questionService.findById(questionId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다."));
-
-
-        //관리자 계정인 경우 누구던 답변 등록 가능, 아닌 경우 에러 발생
-        validateAdmin(admin);
-        //짫은 시간 내 중복 등록 방지
-        validateExistsDuplicateAnswerInShortTime(question, admin, reqAnswerDto.content(), Duration.ofSeconds(5));
-
-        //답변 등록
-        answerService.createAnswer(question,admin,reqAnswerDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "답변 등록 성공."));
-    }
-
-    //관리자가 질문에 답변 수정
-    @Operation(summary = "사용자가 작성한 qna 질문에 답변 수정(관리자 전용)")
-    @PutMapping("/question/{questionId}/answer/{answerId}")
-    public ResponseEntity<?> modifyAnswer(@PathVariable Long questionId,
-                                          @PathVariable Long answerId,
-                                          @RequestBody @Valid ReqAnswerDto reqAnswerDto ) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
-        }
-
-        String oauthId=securityUser.getMember().getOAuthId();
-
-        Member admin = memberService.findByOauthId(oauthId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
-
-        Question question = questionService.findById(questionId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다."));
-
-        Answer answer=answerService.findById(answerId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "답변을 찾을 수 없습니다."));
-
-        //관리자 계정 확인
-        validateAdmin(admin);
-
-        //답변 수정
-        answerService.modifyAnswer(answer,reqAnswerDto);
-
-        return ResponseEntity.ok(Map.of("message", "답변 수정 성공."));
-    }
-
-    //관리자가 답변 삭제
-    @Operation(summary = "사용자가 작성한 qna 질문에 답변 삭제(관리자 전용)")
-    @DeleteMapping("/question/{questionId}/answer/{answerId}")
-    public ResponseEntity<?> deleteAnswer(@PathVariable Long questionId,
-                                          @PathVariable Long answerId) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
-        }
-
-        String oauthId=securityUser.getMember().getOAuthId();
-
-        Member admin = memberService.findByOauthId(oauthId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
-
-        Question question = questionService.findById(questionId)
-                .orElseThrow(() -> new ServiceException(404, "질문을 찾을 수 없습니다."));
-
-        Answer answer=answerService.findById(answerId)
-                .orElseThrow(() -> new ServiceException(404, "답변을 찾을 수 없습니다."));
-
-
-        validateAdmin(admin);
-
-        //답변 삭제
-        answerService.deleteAnswer(answer);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "답변 수정 성공."));
-    }
-
-    //사용자 권한 확인, 관리자 계정이여도 접근 가능
-    private void validateQuestionOwner(Member member, Question question) {
-        if (!(questionService.isQuestionOwner(member, question) || checkAdmin(member))) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "권한이 없습니다.");
-        }
-    }
-
-
-    // 관리자 계정 확인
-    private void validateAdmin(Member member) {
-        if(!checkAdmin(member)) {
-            throw new ServiceException(HttpStatus.FORBIDDEN.value(), "권한이 없습니다.");
-        }
-    }
-
-    private void validateExistsDuplicateAnswerInShortTime(Question question,Member member, String content, Duration duration) {
-        if (answerService.existsDuplicateAnswerInShortTime(question, member, content, duration)) {
-            throw new ServiceException(HttpStatus.TOO_MANY_REQUESTS.value(), "너무 빠르게 동일한 답변을 등록할 수 없습니다.");
-        }
-    }
-
-    private boolean checkAdmin(Member member) {
-        return member.getMemberType() == Member.MemberType.ADMIN;
-    }
+	// 관리자 여부 체크
+	private boolean checkAdmin(Member member) {
+		return member.getMemberType() == Member.MemberType.ADMIN;
+	}
 }
