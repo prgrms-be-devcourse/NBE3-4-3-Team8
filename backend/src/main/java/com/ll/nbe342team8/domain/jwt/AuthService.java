@@ -81,14 +81,12 @@ public class AuthService {
         ResponseCookie deleteAccessToken = ResponseCookie.from("accessToken", "")
                 .path("/")
                 .maxAge(0)
-                .httpOnly(true)
                 .secure(true)
                 .build();
 
         ResponseCookie deleteRefreshToken = ResponseCookie.from("refreshToken", "")
-                .path("/api/auth/refresh")
+                .path("/")
                 .maxAge(0)
-                .httpOnly(true)
                 .secure(true)
                 .build();
 
