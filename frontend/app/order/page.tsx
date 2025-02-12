@@ -1,3 +1,4 @@
+// app/order/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -5,6 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchPaymentInfo, createOrder, createFastOrder } from '@/utils/api';
 import Script from 'next/script';
+import { DeliveryInformationDto } from '@/app/my/types';
 
 interface OrderItemData {
   bookId: number;
@@ -26,24 +28,35 @@ export default function OrderPage() {
   const fastOrderParam = searchParams.get('fastOrder');
   const orderItemParam = searchParams.get('orderItem');
 
-  // 바로구매일 경우 URL에서 전달된 주문 항목 저장
   const [fastOrderItem, setFastOrderItem] = useState<OrderItemData | null>(null);
-  // 일반 주문 시 사용할 결제 정보 상태
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
   const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
   const [errorPaymentInfo, setErrorPaymentInfo] = useState<string | null>(null);
 
-  // 배송지 등록 폼 상태
+  // 배송지 입력 폼 상태
   const [postCode, setPostCode] = useState('');
   const [roadAddress, setRoadAddress] = useState('');
   const [detailAddress, setDetailAddress] = useState('');
   const [recipient, setRecipient] = useState('');
   const [phone, setPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('CARD'); // 예: CARD, TOSS 등
+  const [paymentMethod, setPaymentMethod] = useState('CARD');
+
+  // 마이페이지에서 저장한 기본 배송지가 있다면 읽어와서 초기값 설정
+  useEffect(() => {
+    const storedDelivery = localStorage.getItem('defaultDelivery');
+    if (storedDelivery) {
+      const defaultDelivery: DeliveryInformationDto = JSON.parse(storedDelivery);
+      setPostCode(defaultDelivery.postCode);
+      // 여기서는 예시로 addressName을 도로명주소로 사용합니다.
+      setRoadAddress(defaultDelivery.addressName);
+      setDetailAddress(defaultDelivery.detailAddress);
+      setRecipient(defaultDelivery.recipient);
+      setPhone(defaultDelivery.phone);
+    }
+  }, []);
 
   useEffect(() => {
     if (fastOrderParam === 'true' && orderItemParam) {
-      // 바로구매인 경우 URL의 orderItem 파라미터를 파싱하여 상태에 저장
       try {
         const parsedItem: OrderItemData = JSON.parse(decodeURIComponent(orderItemParam));
         setFastOrderItem(parsedItem);
@@ -54,7 +67,6 @@ export default function OrderPage() {
         setLoadingPaymentInfo(false);
       }
     } else {
-      // 일반 결제인 경우 백엔드에서 결제 정보를 불러옴
       const loadPaymentInfo = async () => {
         try {
           const data = await fetchPaymentInfo();
@@ -75,11 +87,12 @@ export default function OrderPage() {
   }
   if (errorPaymentInfo || (!fastOrderItem && !paymentInfo)) {
     return (
-        <div className="max-w-6xl mx-auto py-8 text-center text-red-500">{errorPaymentInfo}</div>
+        <div className="max-w-6xl mx-auto py-8 text-center text-red-500">
+          {errorPaymentInfo}
+        </div>
     );
   }
 
-  // 가격 및 주문 항목 계산
   let subtotal = 0;
   let discount = 0;
   let shippingFee = 0;
@@ -87,14 +100,12 @@ export default function OrderPage() {
   let orderItems: OrderItemData[] = [];
 
   if (fastOrderParam === 'true' && fastOrderItem) {
-    // 바로구매인 경우: 단일 도서 정보 사용
     subtotal = fastOrderItem.price * fastOrderItem.quantity;
-    discount = 0; // 직접구매는 할인 없이 진행할 수 있음
-    shippingFee = 0; // 배송비 계산은 별도 처리 가능
+    discount = 0;
+    shippingFee = 0;
     totalPrice = subtotal + shippingFee;
     orderItems = [fastOrderItem];
   } else if (paymentInfo) {
-    // 일반 주문인 경우: 백엔드에서 받아온 결제 정보 사용
     subtotal = paymentInfo.priceStandard;
     discount = paymentInfo.priceStandard - paymentInfo.pricesSales;
     shippingFee = 0;
@@ -102,13 +113,10 @@ export default function OrderPage() {
     orderItems = paymentInfo.cartList;
   }
 
-  // "결제하기" 버튼 클릭 시 주문 생성
   const handlePayment = async () => {
-    // fullAddress 생성 (도로명주소 + 상세주소)
     const fullAddress = roadAddress.trim() + ' ' + detailAddress.trim();
 
     try {
-      // OrderRequestDto 형식의 데이터 생성
       const orderData = {
         postCode,
         fullAddress,
@@ -117,14 +125,11 @@ export default function OrderPage() {
         paymentMethod,
       };
       if (fastOrderParam === 'true' && fastOrderItem) {
-        // 바로구매인 경우 createFastOrder API 호출: 추가 인자로 bookId와 quantity를 전달
         await createFastOrder(orderData, fastOrderItem.bookId, fastOrderItem.quantity);
       } else {
-        // 일반 주문인 경우 createOrder API 호출
         await createOrder(orderData);
       }
       alert('주문이 성공적으로 생성되었습니다!');
-      // 주문 생성 후 후속 처리(예: 장바구니 초기화) 후 메인 페이지 등으로 이동
       router.push('/');
     } catch (error) {
       console.error('주문 생성 중 오류:', error);
@@ -132,7 +137,6 @@ export default function OrderPage() {
     }
   };
 
-  // 다음 주소찾기 API 스크립트 로드
   const loadPostcodeScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
@@ -159,7 +163,6 @@ export default function OrderPage() {
   return (
       <div className="max-w-6xl mx-auto py-8">
         <h1 className="text-2xl font-bold mb-6">주문결제</h1>
-
         {orderItems.length === 0 ? (
             <div className="text-center py-10">주문할 상품이 없습니다.</div>
         ) : (
@@ -187,7 +190,6 @@ export default function OrderPage() {
                     </div>
                 ))}
               </div>
-
               {/* 오른쪽: 배송지 등록 폼 & 결제 요약 */}
               <div className="w-full md:w-96 space-y-6">
                 {/* 배송 정보 입력 폼 */}
@@ -237,7 +239,6 @@ export default function OrderPage() {
                         placeholder="상세주소"
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="block text-sm font-medium mb-1">수령인</label>
                     <input

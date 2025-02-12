@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ReviewList } from './ReviewList';
 import { ExchangeReturnInfo } from './ExchangeReturnInfo';
-
+import { BookDetails } from './BookDetails';
 interface BookTabsProps {
   bookId: number;
 }
@@ -45,7 +45,7 @@ export const BookTabs: React.FC<BookTabsProps> = ({ bookId }) => {
           교환/반품
         </button>
       </div>
-
+      {activeTab === 'info' && <BookDetails bookId={bookId} />}
       {activeTab === 'reviews' && <ReviewList bookId={bookId} />}
       {activeTab === 'exchange' && <ExchangeReturnInfo />}
     </div>

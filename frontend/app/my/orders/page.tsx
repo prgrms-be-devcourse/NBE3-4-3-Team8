@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '../Sidebar';
+import Sidebar from '@/app/components/my/Sidebar';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]); // orders 기본값을 빈 배열로 설정
@@ -60,17 +60,18 @@ export default function OrdersPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="ml-64 p-8 w-full">
+      <main className="flex-1 p-6">
+
         <h1 className="text-2xl font-bold">나의 주문 내역</h1>
 
         <div className="my-4">
           <label htmlFor="dateFilter" className="mr-2">날짜별 조회:</label>
           <input
-            id="dateFilter"
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="border p-2 rounded"
+              id="dateFilter"
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="border p-2 rounded"
           />
         </div>
 
@@ -78,31 +79,31 @@ export default function OrdersPage() {
 
         <ul>
           {filteredOrders.length === 0 ? (
-            <p>No orders found for this date.</p>
+              <p>No orders found for this date.</p>
           ) : (
-            filteredOrders.map((order) => (
-              <li
-                key={order.orderId}
-                className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative"
-              >
-                <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div>
-                <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
-                <p className="text-xl font-semibold">Total Price: {order.totalPrice}원</p>
-                <button
-                  className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
-                  onClick={() => {
-                    if (order.orderId) {
-                      router.push(`/my/orders/${order.orderId}/details`);
-                    } else {
-                      console.error('Order ID is missing.');
-                    }
-                  }}
-                >
-                  <span role="img" aria-label="detail" className="text-xl">🔍</span>
-                  <span className="text-lg font-medium">상세 조회</span>
-                </button>
-              </li>
-            ))
+              filteredOrders.map((order) => (
+                  <li
+                      key={order.orderId}
+                      className="border p-12 my-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative"
+                  >
+                    <div className="absolute top-2 left-2 text-sm text-gray-500">{order.orderDate}</div>
+                    <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
+                    <p className="text-xl font-semibold">Total Price: {order.totalPrice}원</p>
+                    <button
+                        className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
+                        onClick={() => {
+                          if (order.orderId) {
+                            router.push(`/my/orders/${order.orderId}/details`);
+                          } else {
+                            console.error('Order ID is missing.');
+                          }
+                        }}
+                    >
+                      <span role="img" aria-label="detail" className="text-xl">🔍</span>
+                      <span className="text-lg font-medium">상세 조회</span>
+                    </button>
+                  </li>
+              ))
           )}
         </ul>
       </main>
