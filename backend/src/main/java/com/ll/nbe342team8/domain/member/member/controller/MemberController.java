@@ -72,15 +72,7 @@ public class MemberController {
 
         return  ResponseEntity.ok(memberMyPageDto);
 
-        /*
-        @GetMapping("/my")
-        public ResponseEntity<?> getMyPage(@CookieValue(value = "accessToken", required = false) String token) {
-            Member memberId = authService.getMemberFromToken(token);
-            // 명시적으로 지연 로딩 데이터 초기화
 
-            ResMemberMyPageDto memberMyPageDto = new ResMemberMyPageDto(memberId);
-            return ResponseEntity.ok(memberMyPageDto);
-        }*/
 
     }
 

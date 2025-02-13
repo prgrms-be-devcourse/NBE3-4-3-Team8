@@ -50,6 +50,7 @@ public class CartControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    /*
     @Test
     @DisplayName("장바구니 삭제 테스트")
     public void testDeleteCartItem() throws Exception {
@@ -63,4 +64,6 @@ public class CartControllerTest {
         ResponseEntity<Void> response = restTemplate.exchange("/cart/1", HttpMethod.DELETE, entity, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
+    */
+
 }

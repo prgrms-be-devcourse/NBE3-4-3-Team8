@@ -69,13 +69,9 @@ public class Member extends BaseTime implements UserDetails {
 	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
 	private List<Question> questions;
 
-  private String profileImageUrl;
+  	private String profileImageUrl;
 
-  // Enum 사용자 역할
-  public enum MemberType {
-      USER,
-      ADMIN
-  }
+
   
  	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
 		this.name = dto.name();
