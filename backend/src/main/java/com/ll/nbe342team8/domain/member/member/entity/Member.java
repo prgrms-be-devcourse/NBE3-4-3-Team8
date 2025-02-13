@@ -54,12 +54,6 @@ public class Member extends BaseTime implements UserDetails {
 
 	private String username;
 
-	// Enum 사용자 역할
-	public enum MemberType {
-		USER,
-		ADMIN
-	}
-
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DeliveryInformation> deliveryInformations;
 

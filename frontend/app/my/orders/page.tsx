@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '../Sidebar'; //변경하니까 사이즈가 이상해ㅛ ㅠ추후수정
+import Sidebar from '@/app/components/my/Sidebar';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
