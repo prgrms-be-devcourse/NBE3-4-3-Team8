@@ -35,96 +35,90 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member extends BaseTime implements UserDetails {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    private Long id;
 
-	private String name; // 사용자 이름
+    private String name; // 사용자 이름
 
-	private String phoneNumber; // 전화번호
+    private String phoneNumber; // 전화번호
 
-	@Enumerated(EnumType.STRING)
-	private MemberType memberType; // 사용자 역할(사용자, 관리자)
+    @Enumerated(EnumType.STRING)
+    private MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-	private String oAuthId; // 필드 이름 변경
+    private String oAuthId; // 필드 이름 변경
 
-	private String email; // 사용자 이메일
+    private String email; // 사용자 이메일
 
-	private String password;
+    private String password;
 
-	private String username;
+    private String username;
 
-	// Enum 사용자 역할
-	public enum MemberType {
-		USER,
-		ADMIN
-	}
+    // Enum 사용자 역할
+    public enum MemberType {
+        USER,
+        ADMIN
+    }
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DeliveryInformation> deliveryInformations;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeliveryInformation> deliveryInformations;
 
-	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-	private List<Cart> carts;
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    private List<Cart> carts;
 
-	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-	private List<Question> questions;
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Question> questions;
 
-  private String profileImageUrl;
+    private String profileImageUrl;
 
-  // Enum 사용자 역할
-  public enum MemberType {
-      USER,
-      ADMIN
-  }
-  
- 	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
-		this.name = dto.name();
-		this.phoneNumber = dto.phoneNumber();
-	}
+    public void updateMemberInfo(PutReqMemberMyPageDto dto) {
+        this.name = dto.name();
+        this.phoneNumber = dto.phoneNumber();
+    }
 
-	public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
-		this.deliveryInformations.add(deliveryInformation);
-	}
+    public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
+        this.deliveryInformations.add(deliveryInformation);
+    }
 
-	public void convertFalseDeliveryInformationsIsDefaultAddress() {
-		deliveryInformations.forEach(info -> info.setIsDefaultAddress(false));
-	}
+    public void convertFalseDeliveryInformationsIsDefaultAddress() {
+        deliveryInformations.forEach(info -> info.setIsDefaultAddress(false));
+    }
 
-	public String getUsername() {
-		return oAuthId;
-	}
+    public String getUsername() {
+        return oAuthId;
+    }
 
-	public String getOAuthId() {
-		return oAuthId;
-	}
+    public String getOAuthId() {
+        return oAuthId;
+    }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if (this.memberType == MemberType.ADMIN) {
-			return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-		} else {
-			// 일반 사용자라면 필요에 따라 ROLE_USER 또는 빈 리스트를 반환할 수 있음.
-			return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-		}
-	}
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.memberType == MemberType.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            // 일반 사용자라면 필요에 따라 ROLE_USER 또는 빈 리스트를 반환할 수 있음.
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+    }
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
