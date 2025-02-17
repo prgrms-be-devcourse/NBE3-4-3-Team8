@@ -66,6 +66,10 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findByoAuthId(oAuthId);
     }
 
+    //테스트용 메서드
+    @Transactional
+    public void saveMember(Member member) { memberRepository.save(member);}
+
     @Override
     public UserDetails loadUserByUsername(String oAuthId) throws UsernameNotFoundException {
         Member member = findByOauthId(oAuthId)

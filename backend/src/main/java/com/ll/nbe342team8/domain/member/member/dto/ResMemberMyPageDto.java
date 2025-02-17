@@ -1,13 +1,8 @@
 package com.ll.nbe342team8.domain.member.member.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Comparator;
 import java.util.List;

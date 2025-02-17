@@ -14,5 +14,5 @@ import lombok.Setter;
 public record PutReqMemberMyPageDto(
         @NotBlank(message = "공백은 허용하지 않습니다.") String name,
         @NotNull String phoneNumber,
-        String profileImageUrl
+        @NotNull String profileImageUrl
 ) {}
