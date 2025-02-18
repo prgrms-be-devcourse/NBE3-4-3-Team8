@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.member.member.controller;
 
 import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto;
+import com.ll.nbe342team8.domain.book.review.dto.ReviewsResponseDto;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.domain.book.review.service.ReviewService;
 import com.ll.nbe342team8.domain.book.review.type.ReviewSortType;
@@ -19,6 +20,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -29,8 +32,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import java.util.Optional;
 
+@Slf4j
 @RequestMapping("/api/auth/me")
 @RestController
 @Tag(name = "Member", description = "Member API")
@@ -109,11 +112,12 @@ public class MemberController {
 
     @GetMapping("/my/reviews")
     @Operation(summary = "사용자 리뷰 조회")
-    public ResponseEntity<PageDto<ReviewResponseDto>> getMemberReviews(@RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<PageDto<ReviewsResponseDto>> getMemberReviews(@RequestParam(defaultValue = "0") int page) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
+            log.info("리뷰 조회 인증 실패!");
             throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
         }
 
@@ -122,7 +126,7 @@ public class MemberController {
         Member member = memberService.findByOauthId(oauthId)
                 .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
 
-        PageDto<ReviewResponseDto> reviews = reviewService.getMemberReviewPage(member,page);
+        PageDto<ReviewsResponseDto> reviews = reviewService.getMemberReviewPage(member,page);
 
         return ResponseEntity.ok(reviews);
     }

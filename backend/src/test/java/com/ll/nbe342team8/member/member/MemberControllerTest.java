@@ -1,6 +1,12 @@
 package com.ll.nbe342team8.member.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ll.nbe342team8.domain.book.book.entity.Book;
+import com.ll.nbe342team8.domain.book.book.service.BookService;
+import com.ll.nbe342team8.domain.book.category.entity.Category;
+import com.ll.nbe342team8.domain.book.category.service.CategoryService;
+import com.ll.nbe342team8.domain.book.review.entity.Review;
+import com.ll.nbe342team8.domain.book.review.service.ReviewService;
 import com.ll.nbe342team8.domain.member.deliveryInformation.dto.DeliveryInformationDto;
 import com.ll.nbe342team8.domain.member.deliveryInformation.repository.DeliveryInformationRepository;
 import com.ll.nbe342team8.domain.member.deliveryInformation.service.DeliveryInformationService;
@@ -44,10 +50,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -68,6 +76,15 @@ public class MemberControllerTest {
 
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    ReviewService reviewService;
+
+    @Autowired
+    CategoryService categoryService;
+
+    @Autowired
+    BookService bookService;
 
     @Autowired MemberRepository memberRepository;
 
@@ -125,7 +142,6 @@ public class MemberControllerTest {
         // ✅ 3. API 요청
         ResultActions resultActions = mockMvc.perform(
                         get("/api/auth/me/my")
-                                //.cookie(new Cookie("accessToken", testJwtToken))  // ✅ JWT 토큰 추가
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
                 )
@@ -160,7 +176,7 @@ public class MemberControllerTest {
     void putMyPageTest() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        PutReqMemberMyPageDto putReqMemberMyPageDto=new PutReqMemberMyPageDto("김철수","010-2222-1111","url");
+        PutReqMemberMyPageDto putReqMemberMyPageDto=new PutReqMemberMyPageDto("김철수","010-2222-1111");
 
         String requestBody =objectMapper.writeValueAsString(putReqMemberMyPageDto);
 
@@ -168,7 +184,7 @@ public class MemberControllerTest {
         // ✅ 3. API 요청
         ResultActions resultActions = mockMvc.perform(
                         put("/api/auth/me/my")
-                                //.cookie(new Cookie("accessToken", testJwtToken))  // ✅ JWT 토큰 추가
+
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .content(requestBody)
@@ -183,5 +199,71 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.phoneNumber").value("010-2222-1111"))
                 .andExpect(jsonPath("$.name").value("김철수"));
 
+    }
+
+    @Test
+    @DisplayName("사용자 작성 리뷰 불러오기1")
+    void getMyReviewsTest1() throws Exception {
+
+        Category category1 = Category.builder()
+                .categoryId(1)
+                .categoryName("경제/경영")
+                .mall("국내도서")
+                .depth1("경제/경영")
+                .depth2("재테크/금융")
+                .depth3("재테크")
+                .depth4("부자되는법")
+                .depth5(null)
+                .category("국내도서 > 경제/경영 > 재테크/금융 > 재테크 > 부자되는법")
+                .books(new ArrayList<>())
+                .build();
+
+        Book book1 = Book.builder()
+                .title("부자 되는 법")
+                .author("홍길동")
+                .isbn("978-89-1234-567-8")
+                .isbn13("9788912345678")
+                .pubDate(LocalDate.of(2023, 10, 15))
+                .priceStandard(25000)
+                .pricesSales(22000)
+                .stock(100)
+                .status(1)
+                .rating(4.5)
+                .toc("1장: 시작하기\n2장: 재테크 기본기\n3장: 투자 전략")
+                .coverImage("https://example.com/cover.jpg")
+                .description("이 책은 부자가 되는 법을 알려주는 최고의 가이드입니다.")
+                .descriptionImage("https://example.com/description.jpg")
+                .salesPoint(5000L)
+                .reviewCount(120L)
+                .publisher("성공출판사")
+                .categoryId(category1)
+                .review(new ArrayList<>())
+                .build();
+
+        categoryService.create(category1);
+        bookService.create(book1);
+
+        Review review1=Review.create(book1,mockMember,"리뷰 내용1",1.0);
+        Review review2=Review.create(book1,mockMember,"리뷰 내용2",2.0);
+        reviewService.create(review1,1.0);
+        reviewService.create(review2,2.0);
+        ResultActions resultActions = mockMvc.perform(
+                        get("/api/auth/me/my/reviews")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding(StandardCharsets.UTF_8)
+                )
+                .andDo(print());
+
+        // ✅ 4. 응답 검증
+        resultActions
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("getMemberReviews"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.items", hasSize(2)))
+                .andExpect(jsonPath("$.items[0].rating").value(2.0))
+                .andExpect(jsonPath("$.items[0].bookContent").value("리뷰 내용2"))
+                .andExpect(jsonPath("$.items[1].rating").value(1.0))
+                .andExpect(jsonPath("$.items[1].bookContent").value("리뷰 내용1"));;
     }
 }

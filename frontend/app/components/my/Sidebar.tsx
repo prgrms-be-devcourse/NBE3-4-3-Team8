@@ -29,8 +29,8 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <Link href="/mypage/library" className="block p-2 bg-white rounded shadow">
-              라이브러리
+            <Link href="/my/reviews" className="block p-2 bg-white rounded shadow">
+              리뷰내역
             </Link>
           </li>
           <li>
