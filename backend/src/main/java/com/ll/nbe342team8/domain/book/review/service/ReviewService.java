@@ -1,78 +1,81 @@
-package com.ll.nbe342team8.domain.book.review.service;
+package com.ll.nbe342team8.domain.book.review.service
 
-import com.ll.nbe342team8.domain.book.book.entity.Book;
-import com.ll.nbe342team8.domain.book.book.service.BookService;
-import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto;
-import com.ll.nbe342team8.domain.book.review.entity.Review;
-import com.ll.nbe342team8.domain.book.review.repository.ReviewRepository;
-import com.ll.nbe342team8.domain.book.review.type.ReviewSortType;
-import com.ll.nbe342team8.global.exceptions.ServiceException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.ll.nbe342team8.domain.book.book.service.BookService
+import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto
+import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto.Companion.from
+import com.ll.nbe342team8.domain.book.review.entity.Review
+import com.ll.nbe342team8.domain.book.review.repository.ReviewRepository
+import com.ll.nbe342team8.domain.book.review.type.ReviewSortType
+import com.ll.nbe342team8.global.exceptions.ServiceException
+import lombok.RequiredArgsConstructor
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import java.util.function.Supplier
 
 @Service
 @RequiredArgsConstructor
-public class ReviewService {
-    private final ReviewRepository reviewRepository;
-    private final BookService bookService;
+class ReviewService (
+    private val reviewRepository: ReviewRepository,
+    private val bookService: BookService
+){
 
-    public Page<Review> getAllReviews(int page, int pageSize, ReviewSortType reviewSortType) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(reviewSortType.getOrder());
+    fun getAllReviews(page: Int, pageSize: Int, reviewSortType: ReviewSortType): Page<Review> {
+        val sorts: MutableList<Sort.Order> = ArrayList<Sort.Order>()
+        sorts.add(reviewSortType.order)
 
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
-        return reviewRepository.findAll(pageable);
+        val pageable: Pageable = PageRequest.of(page, pageSize, Sort.by(sorts))
+        return reviewRepository.findAll(pageable)
     }
 
-    public Page<Review> getReviewsById(Long bookId, int page, int pageSize, ReviewSortType reviewSortType) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(reviewSortType.getOrder());
+    fun getReviewsById(bookId: Long, page: Int, pageSize: Int, reviewSortType: ReviewSortType): Page<Review> {
+        val sorts: MutableList<Sort.Order> = ArrayList<Sort.Order>()
+        sorts.add(reviewSortType.order)
 
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
-        return reviewRepository.findAllByBookId(bookId, pageable);
+        val pageable: Pageable = PageRequest.of(page, pageSize, Sort.by(sorts))
+        return reviewRepository.findAllByBookId(bookId, pageable)
     }
 
-    public Review getReviewById(Long reviewId) {
+    fun getReviewById(reviewId: Long): Review {
         return reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "id에 해당하는 리뷰가 없습니다."));
+            .orElseThrow<ServiceException?>(Supplier {
+                ServiceException(
+                    HttpStatus.NOT_FOUND.value(),
+                    "id에 해당하는 리뷰가 없습니다."
+                )
+            })
     }
 
-    public Review create(Review review, Double rating) {
-        bookService.createReview(review.getBook(), rating);
-        return reviewRepository.save(review);
+    fun create(review: Review, rating: Double?): Review {
+        bookService.createReview(review.book, rating)
+        return reviewRepository.save<Review>(review)
     }
 
-    public ReviewResponseDto updateReview(Long reviewId, String content, Double rating) {
+    fun updateReview(reviewId: Long, content: String, rating: Double): ReviewResponseDto {
+        val book = getReviewById(reviewId).book
+        val review = getReviewById(reviewId)
 
-        Book book = getReviewById(reviewId).getBook();
-        Review review = getReviewById(reviewId);
+        bookService.deleteReview(book, review.rating)
+        bookService.createReview(book, rating)
 
-        bookService.deleteReview(book, review.getRating());
-        bookService.createReview(book, rating);
+        review.update(content, rating)
+        val updatedReview = reviewRepository.save<Review>(review)
 
-        review.update(content, rating);
-        Review updatedReview = reviewRepository.save(review);
-
-        return ReviewResponseDto.from(updatedReview);
+        return from(updatedReview)
     }
 
-    public void deleteReview(Long reviewId){
-        Book book = getReviewById(reviewId).getBook();
-        Review review = getReviewById(reviewId);
+    fun deleteReview(reviewId: Long) {
+        val book = getReviewById(reviewId).book
+        val review = getReviewById(reviewId)
 
-        bookService.deleteReview(book, review.getRating());
-        reviewRepository.delete(review);
+        bookService.deleteReview(book, review.rating)
+        reviewRepository.delete(review)
     }
 
-    public long count() {
-        return reviewRepository.count();
+    fun count(): Long {
+        return reviewRepository.count()
     }
 }

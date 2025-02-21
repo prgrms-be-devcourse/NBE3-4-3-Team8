@@ -1,12 +1,11 @@
-package com.ll.nbe342team8.global.types;
+package com.ll.nbe342team8.global.types
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort
 
-public interface Sortable {
-    String getField();
-    Sort.Direction getDirection();
+interface Sortable {
+    val field: String
+    val direction: Sort.Direction
 
-    default Sort.Order getOrder() {
-        return new Sort.Order(getDirection(), getField());
-    }
+    val order: Sort.Order
+        get() = Sort.Order(this.direction, this.field)
 }
