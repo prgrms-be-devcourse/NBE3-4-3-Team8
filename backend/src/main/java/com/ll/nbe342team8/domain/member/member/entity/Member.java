@@ -64,7 +64,7 @@ public class Member extends BaseTime implements UserDetails {
     private List<DeliveryInformation> deliveryInformations;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    private List<Cart> carts;
+    public List<Cart> carts;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Question> questions;

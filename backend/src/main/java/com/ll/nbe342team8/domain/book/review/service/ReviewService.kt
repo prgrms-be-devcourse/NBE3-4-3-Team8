@@ -7,7 +7,6 @@ import com.ll.nbe342team8.domain.book.review.entity.Review
 import com.ll.nbe342team8.domain.book.review.repository.ReviewRepository
 import com.ll.nbe342team8.domain.book.review.type.ReviewSortType
 import com.ll.nbe342team8.global.exceptions.ServiceException
-import lombok.RequiredArgsConstructor
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service
 import java.util.function.Supplier
 
 @Service
-@RequiredArgsConstructor
 class ReviewService (
     private val reviewRepository: ReviewRepository,
     private val bookService: BookService

@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.8.0" // Kotlin 버전 확인
     kotlin("plugin.jpa") version "1.8.0" // Kotlin-JPA 플러그인 추가
+    kotlin("plugin.spring") version "1.8.0"
     id("org.springframework.boot") version "3.4.2" // Spring Boot 플러그인
     id("io.spring.dependency-management") version "1.1.7" // Spring Dependency Management 플러그인
 }
