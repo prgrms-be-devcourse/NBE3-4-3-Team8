@@ -37,7 +37,7 @@ import lombok.Setter;
 public class Member extends BaseTime implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    private Long id;
+    public Long id;
 
     private String name; // 사용자 이름
 
