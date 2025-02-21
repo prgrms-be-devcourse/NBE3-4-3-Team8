@@ -1,51 +1,74 @@
-package com.ll.nbe342team8.domain.book.review.entity;
+package com.ll.nbe342team8.domain.book.review.entity
 
-import com.ll.nbe342team8.domain.book.book.entity.Book;
-import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import com.ll.nbe342team8.domain.book.book.entity.Book
+import com.ll.nbe342team8.domain.member.member.entity.Member
+import com.ll.nbe342team8.global.jpa.entity.BaseTime
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
 
 @Entity
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Review extends BaseTime {
+class Review(
+
+    @field:NotNull
+    @ManyToOne(fetch = FetchType.EAGER) // EAGER로 변경
+    var book: Book,
+
+    @field:NotNull
+    @ManyToOne(fetch = FetchType.EAGER) // EAGER로 변경
+    var member: Member,
+
+    @field:NotNull
+    var content: String,
+
+    @field:NotNull
+    var rating: Double
+
+) : BaseTime() {
+
+    constructor() : this(
+        book = Book(), // 기본값 설정 (실제 서비스에서는 주의)
+        member = Member(),
+        content = "",
+        rating = 0.0
+    )
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null
+        private set
 
-    @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    Book book;
-
-    @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    Member member;
-
-    @NonNull
-    String content;
-
-    @NonNull
-    Double rating;
-
-    public Review(Book book, Member member, String content, Double rating) {
-        this.book = book;
-        this.member = member;
-        this.content = content;
-        this.rating = rating;
+    fun update(content: String, rating: Double) {
+        this.content = content
+        this.rating = rating
     }
 
-    public void update(String content, Double rating){
-        this.content = content;
-        this.rating = rating;
+    companion object {
+        @JvmStatic
+        fun create(book: Book, member: Member, content: String, rating: Double): Review {
+            return Review(book, member, content, rating)
+        }
+
+        @JvmStatic
+        fun builder(): Builder = Builder()
     }
 
-    // 정적 팩토리 메서드 - 컨트롤러나 서비스 단에서 빌더 패턴을 사용하지 않고 객체를 생성할 수 있도록 함.
-    public static Review create(Book book, Member member, String content, Double rating){
-        return new Review(book, member, content, rating);
+    class Builder {
+        private var book: Book? = null
+        private var member: Member? = null
+        private var content: String? = null
+        private var rating: Double? = null
+
+        fun book(book: Book) = apply { this.book = book }
+        fun member(member: Member) = apply { this.member = member }
+        fun content(content: String) = apply { this.content = content }
+        fun rating(rating: Double) = apply { this.rating = rating }
+
+        fun build(): Review {
+            val bookVal = book ?: throw IllegalArgumentException("book must not be null")
+            val memberVal = member ?: throw IllegalArgumentException("member must not be null")
+            val contentVal = content ?: throw IllegalArgumentException("content must not be null")
+            val ratingVal = rating ?: throw IllegalArgumentException("rating must not be null")
+            return Review(bookVal, memberVal, contentVal, ratingVal)
+        }
     }
 }
