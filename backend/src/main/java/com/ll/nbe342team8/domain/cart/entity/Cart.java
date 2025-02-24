@@ -25,12 +25,6 @@ open class Cart(
 
 ) : BaseTime() {
 
-    constructor(): this(
-        member = Member(),
-        book = Book(),
-        quantity = 99
-    )
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null

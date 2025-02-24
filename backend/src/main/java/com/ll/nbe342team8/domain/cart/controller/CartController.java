@@ -52,8 +52,7 @@ class CartController(
     @GetMapping
     fun getCart(@AuthenticationPrincipal securityUser: SecurityUser): List<CartResponseDto> {
         val member = securityUser.member
-        val carts = cartService.findCartByMember(member)
-        return carts.map { CartResponseDto.from(it) }
+        return cartService.findCartDtosByMember(member)
     }
 
     @PostMapping("/anonymous")

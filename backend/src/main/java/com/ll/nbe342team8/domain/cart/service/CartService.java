@@ -2,6 +2,7 @@ package com.ll.nbe342team8.domain.cart.service
 
 import com.ll.nbe342team8.domain.book.book.service.BookService
 import com.ll.nbe342team8.domain.cart.dto.CartRequestDto
+import com.ll.nbe342team8.domain.cart.dto.CartResponseDto
 import com.ll.nbe342team8.domain.cart.entity.Cart
 import com.ll.nbe342team8.domain.cart.repository.CartRepository
 import com.ll.nbe342team8.domain.member.member.entity.Member
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CartService(
     private val cartRepository: CartRepository,
-    private val bookService: BookService,
+    private val bookService: BookService
 ) {
 
     @Transactional
@@ -25,7 +26,6 @@ class CartService(
             val book = bookService.getBookById(item.bookId)
 
             val cart = cartRepository.findByMemberAndBook(member, book).orElse(null)
-
             if (cart != null) {
                 cart.updateCart(
                     if (item.isAddToCart) cart.quantity + item.quantity else item.quantity
@@ -59,8 +59,14 @@ class CartService(
         cartRepository.deleteByMember(member)
     }
 
+    @Transactional(readOnly = true)
     fun findCartByMember(member: Member): List<Cart> {
-        return cartRepository.findAllByMember(member)
+        return cartRepository.findAllByMemberFetchBook(member)
+    }
+    @Transactional(readOnly = true)
+    fun findCartDtosByMember(member: Member): List<CartResponseDto> {
+        val carts = cartRepository.findAllByMemberFetchBook(member)
+        return carts.map { CartResponseDto.from(it) }
     }
 
     fun getCartItems(@Valid cartRequestDto: CartRequestDto): List<Cart> {
