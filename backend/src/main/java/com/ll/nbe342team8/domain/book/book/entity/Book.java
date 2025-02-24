@@ -38,7 +38,7 @@ public class Book extends BaseTime {
 
 	@Column(length = 100)
 	@NotNull
-	private String title;      // 제목
+	public String title;      // 제목
 
 	@NotNull
 	private String author; // 저자
@@ -57,7 +57,7 @@ public class Book extends BaseTime {
 	private Integer priceStandard;         // 정가
 
 	@NotNull
-	private Integer pricesSales;         // 판매가
+	public Integer pricesSales;         // 판매가
 
 	@NotNull
 	private Integer stock;         // 재고
@@ -73,7 +73,7 @@ public class Book extends BaseTime {
 	@Column(columnDefinition = "TEXT")
 	private String toc;        // 목차
 
-	private String coverImage;            // 커버 이미지 URL
+	public String coverImage;            // 커버 이미지 URL
 
 	private String description;           // 상세페이지 글
 
