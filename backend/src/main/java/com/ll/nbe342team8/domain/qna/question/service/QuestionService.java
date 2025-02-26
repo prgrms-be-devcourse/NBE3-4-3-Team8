@@ -2,6 +2,7 @@ package com.ll.nbe342team8.domain.qna.question.service;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionDto;
+import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDto;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.repository.QuestionRepository;
@@ -26,26 +27,21 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public void createQuestion(Member member, ReqQuestionDto dto) {
+    public Question createQuestion(Member member, ReqQuestionDto dto) {
         //이스케이프 처리
-        String sanitizedTitle = Ut.XSSSanitizer.sanitize(dto.title());
-        String sanitizedContent = Ut.XSSSanitizer.sanitize(dto.content());
-        Question question = Question.builder()
-                .title(sanitizedTitle)
-                .content(sanitizedContent)
-                .member(member)
-                .build();
-
+        Question question = Question.create(dto,member);
         questionRepository.save(question);
+
+        return question;
     }
 
-    public PageDto<QuestionDto> getPage(Member member, int page) {
+    public PageDto<QuestionListDto> getPage(Member member, int page) {
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createDate").descending());
         Page<Question> paging = this.questionRepository.findByMember(pageable, member);
 
-        Page<QuestionDto> pagingOrderDto = paging.map(QuestionDto::new);
-        PageDto<QuestionDto> pageDto = new PageDto<>(pagingOrderDto);
+        Page<QuestionListDto> pagingOrderDto = paging.map(QuestionListDto::new);
+        PageDto<QuestionListDto> pageDto = new PageDto<>(pagingOrderDto);
         return pageDto;
 
     }
@@ -58,10 +54,11 @@ public class QuestionService {
 
     @Transactional
     public void modifyQuestion(Question question,ReqQuestionDto dto) {
-        //이스케이프 처리한 데이터를 question 개체에 갱신
+
         question.updateQuestionInfo(dto);
     }
 
+    @Transactional
     public Optional<Question> findById(Long id) {
 
         return questionRepository.findById(id);
@@ -75,9 +72,11 @@ public class QuestionService {
 
     //네트워크 지연, 스팸 봇, 답변 등록 버튼 연타로 생성되는 중복 답변 방지
     public boolean existsDuplicateQuestionInShortTime(Member member,String title, String content, Duration duration) {
-        String sanitizedContent = Ut.XSSSanitizer.sanitize(content);
-        String sanitizedTitle = Ut.XSSSanitizer.sanitize(title);
         LocalDateTime cutoffTime = LocalDateTime.now().minus(duration);
-        return questionRepository.existsByMemberAndTitleAndContentAndCreateDateAfter( member, sanitizedTitle, sanitizedContent, cutoffTime);
+        return questionRepository.existsByMemberAndTitleAndContentAndCreateDateAfter( member, title, content, cutoffTime);
+    }
+
+    public void flush() {
+        questionRepository.flush(); // em.flush(); 와 동일
     }
 }

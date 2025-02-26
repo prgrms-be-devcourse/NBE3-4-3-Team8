@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionDto;
+import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDto;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.service.QuestionService;
@@ -47,7 +48,7 @@ public class QuestionController {
         Member member = memberService.findByOauthId(oauthId)
                 .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
 
-        PageDto<QuestionDto> pageDto = new PageDto<>();
+        PageDto<QuestionListDto> pageDto = new PageDto<>();
 
         pageDto = questionService.getPage(member, page);
 
@@ -96,9 +97,12 @@ public class QuestionController {
                 .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
 
         validateExistsDuplicateQuestionInShortTime(member, reqQuestionDto.title(),reqQuestionDto.content(),Duration.ofSeconds(5));
-        questionService.createQuestion(member,reqQuestionDto);
+        Question question= questionService.createQuestion(member,reqQuestionDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "질문 등록 성공."));
+        QuestionDto questionDto=new QuestionDto(question);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(questionDto);
+
     }
 
     @Operation(summary = "사용자의 특정 qna 질문 수정")
@@ -124,7 +128,7 @@ public class QuestionController {
 
         questionService.modifyQuestion(question,reqQuestionDto);
 
-        return ResponseEntity.ok(Map.of("message", "질문 수정 성공."));
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "사용자의 특정 qna 질문 삭제")
@@ -150,7 +154,7 @@ public class QuestionController {
 
         questionService.deleteQuestion(question);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "질문 삭제 성공."));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 

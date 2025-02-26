@@ -1,10 +1,6 @@
 package com.ll.nbe342team8.domain.member.deliveryInformation.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 public record DeliveryInformationDto(
         Long id,

@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+
 }
 
 dependencies {
@@ -53,6 +54,17 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.4.0'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'  // ✅ OAUTH2 Resource Server 추가
+    implementation 'org.jsoup:jsoup:1.15.3'
+
+    implementation("org.apache.tika:tika-core:3.1.0")
+
+    implementation("com.twelvemonkeys.imageio:imageio-core:3.8.1")
+    implementation("com.twelvemonkeys.imageio:imageio-jpeg:3.8.1")
+    implementation("com.twelvemonkeys.imageio:imageio-webp:3.8.1")
+
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+
 }
 
 tasks.named('test') {

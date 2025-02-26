@@ -14,6 +14,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class Ut {
@@ -33,13 +35,10 @@ public class Ut {
         }
     }
 
-    public static class XSSSanitizer {
-        public static String sanitize(String input) {
-            return StringEscapeUtils.escapeHtml4(input);
-        }
-    }
 
     public static class file {
+
+
 
         public static void downloadByHttp(String url, String dirPath) {
             try {
@@ -121,6 +120,8 @@ public class Ut {
                     })
                     .orElse("");
         }
+
+
     }
 
     public class cmd {
@@ -162,6 +163,13 @@ public class Ut {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static class date {
+        public static String getCurrentDateFormatted(String pattern) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            return simpleDateFormat.format(new Date());
         }
     }
 }

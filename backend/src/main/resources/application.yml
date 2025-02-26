@@ -2,6 +2,10 @@ server:
   port: 8080
 
 spring:
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size : 10MB
 
   profiles:
     active: dev
@@ -75,3 +79,6 @@ custom:
     name: Book
   accessToken:
     expirationSeconds: "#{60 * 20}"
+  genFile:
+    dirPath: c:/temp/glog_dev
+
