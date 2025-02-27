@@ -3,6 +3,7 @@ package com.ll.nbe342team8.domain.qna.question.service;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionDto;
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDto;
+import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDtoProjection;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.repository.QuestionRepository;
@@ -38,7 +39,7 @@ public class QuestionService {
     public PageDto<QuestionListDto> getPage(Member member, int page) {
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createDate").descending());
-        Page<Question> paging = this.questionRepository.findByMember(pageable, member);
+        Page<QuestionListDtoProjection> paging = this.questionRepository.findByMember(pageable, member);
 
         Page<QuestionListDto> pagingOrderDto = paging.map(QuestionListDto::new);
         PageDto<QuestionListDto> pageDto = new PageDto<>(pagingOrderDto);

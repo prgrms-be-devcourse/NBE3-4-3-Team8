@@ -31,4 +31,16 @@ public record QuestionListDto(
                 question.getIsAnswer()
         );
     }
+
+    public QuestionListDto(QuestionListDtoProjection questionListDtoProjection) {
+
+        this(
+                questionListDtoProjection.getId(),
+                questionListDtoProjection.getCreateDate(),
+                questionListDtoProjection.getModifyDate(),
+                questionListDtoProjection.getTitle(),
+                questionListDtoProjection.getContent(),
+                questionListDtoProjection.getIsAnswer()
+        );
+    }
 }

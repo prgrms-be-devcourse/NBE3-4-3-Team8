@@ -23,7 +23,18 @@ import org.hibernate.annotations.BatchSize;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(indexes = {@Index(name = "idx_question_createDate", columnList = "createDate")})
+@Table(
+		name = "question",
+		indexes = {
+				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 추가
+		},
+		uniqueConstraints = {
+				@UniqueConstraint(
+						name = "unique_question",
+						columnNames = {"member_id", "title", "content", "create_date"} // 유니크 제약 조건 적용
+				)
+		} // 거의 같은 시간에 같은 질문이 2개 등록되는 경우 방지
+)
 public class Question extends BaseTime {
 
 	@Id
