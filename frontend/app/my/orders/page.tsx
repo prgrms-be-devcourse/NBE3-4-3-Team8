@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '../Sidebar'; //변경하니까 사이즈가 이상해ㅛ ㅠ추후수정
+import Sidebar from '@/app/components/my/Sidebar';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -14,6 +14,14 @@ export default function OrdersPage() {
   const router = useRouter();
 
   useEffect(() => {
+//     const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
+//     const accessToken = token ? token.split('=')[1] : null;
+//
+//     if (!accessToken) {
+//       setError('Access token is missing');
+//       return;
+//     }
+
     const fetchOrders = async () => {
       try {
         const res = await fetch(`http://localhost:8080/my/orders?page=${page}&size=${pageSize}`, {

@@ -1,5 +1,7 @@
 package com.ll.nbe342team8.domain.member.member.controller;
 
+import com.ll.nbe342team8.domain.book.review.dto.ReviewsResponseDto;
+import com.ll.nbe342team8.domain.book.review.service.ReviewService;
 import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.dto.MemberDto;
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
@@ -8,22 +10,20 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+import com.ll.nbe342team8.standard.PageDto.PageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
-import java.util.Optional;
 
+@Slf4j
 @RequestMapping("/api/auth/me")
 @RestController
 @Tag(name = "Member", description = "Member API")
@@ -32,6 +32,7 @@ public class MemberController {
 
     private final AuthService authService;
     private final MemberService memberService;
+    private final ReviewService reviewService;
 
     @GetMapping
     public ResponseEntity<?> getUserInfo() {
@@ -64,15 +65,7 @@ public class MemberController {
 
         return  ResponseEntity.ok(memberMyPageDto);
 
-        /*
-        @GetMapping("/my")
-        public ResponseEntity<?> getMyPage(@CookieValue(value = "accessToken", required = false) String token) {
-            Member memberId = authService.getMemberFromToken(token);
-            // 명시적으로 지연 로딩 데이터 초기화
 
-            ResMemberMyPageDto memberMyPageDto = new ResMemberMyPageDto(memberId);
-            return ResponseEntity.ok(memberMyPageDto);
-        }*/
 
     }
 
@@ -106,5 +99,28 @@ public class MemberController {
     public ResponseEntity<?> logout() {
         return authService.logout();
     }
+
+    @GetMapping("/my/reviews")
+    @Operation(summary = "사용자 리뷰 조회")
+    public ResponseEntity<PageDto<ReviewsResponseDto>> getMemberReviews(@RequestParam(defaultValue = "0") int page) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal()  instanceof SecurityUser securityUser)) {
+            log.info("리뷰 조회 인증 실패!");
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(),"로그인을 해야합니다.");
+        }
+
+        String oauthId=securityUser.getMember().getOAuthId();
+
+        Member member = memberService.findByOauthId(oauthId)
+                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
+
+        PageDto<ReviewsResponseDto> reviews = reviewService.getMemberReviewPage(member,page);
+
+        return ResponseEntity.ok(reviews);
+    }
+
+
 
 }

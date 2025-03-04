@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import jakarta.validation.constraints.NotNull;
 
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +18,8 @@ public record QuestionDto(
         String title,
         String content,
         Boolean isAnswer,
-        List<AnswerDto> answers
+        List<AnswerDto> answers,
+        List<QuestionGenFileDto> genFiles
 ) {
     public QuestionDto(Question question) {
 
@@ -32,7 +34,12 @@ public record QuestionDto(
                         ? question.getAnswers().stream()
                         .map(AnswerDto::new) // ✅ List<Answer> → List<AnswerDto> 변환
                         .collect(Collectors.toList())
-                        : List.of() // null 방지 (빈 리스트 반환)
+                        : List.of(), // null 방지 (빈 리스트 반환)
+                question.getGenFiles()!= null
+                        ? question.getGenFiles().stream()
+                        .map(QuestionGenFileDto::new) // ✅ List<Answer> → List<AnswerDto> 변환
+                        .collect(Collectors.toList())
+                        : List.of()
         );
     }
 }

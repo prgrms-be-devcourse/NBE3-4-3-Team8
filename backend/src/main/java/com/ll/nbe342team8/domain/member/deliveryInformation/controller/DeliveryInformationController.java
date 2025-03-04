@@ -83,7 +83,7 @@ public class DeliveryInformationController {
         validateDeliveryInformationOwner(member, deliveryInformation);
 
         //배송 정보 id로 배송 정보를 찾아 삭제
-        deliveryInformationService.deleteDeliveryInformation(deliveryInformation);
+        deliveryInformationService.deleteDeliveryInformation(deliveryInformation,member);
 
         // dto로 갱신된 memberId 데이터를 반환
         ResMemberMyPageDto resMemberMyPageDto=new ResMemberMyPageDto(member);
@@ -109,7 +109,7 @@ public class DeliveryInformationController {
 
         // 갱신할 배송 정보를 id로 탐색
         DeliveryInformation deliveryInformation = deliveryInformationService.findById(id)
-                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ServiceException(HttpStatus.NOT_FOUND.value(), "배송 정보를 찾을 수 없습니다."));
 
         validateDeliveryInformationOwner(member, deliveryInformation);
         //validateExistsDuplicateQuestionInShortTime 추가 필요(매개변수 너무 많은거 해결 필요)

@@ -3,17 +3,19 @@ package com.ll.nbe342team8.domain.book.review.service
 import com.ll.nbe342team8.domain.book.book.service.BookService
 import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto
 import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto.Companion.from
+import com.ll.nbe342team8.domain.book.review.dto.ReviewsResponseDto
 import com.ll.nbe342team8.domain.book.review.entity.Review
 import com.ll.nbe342team8.domain.book.review.repository.ReviewRepository
 import com.ll.nbe342team8.domain.book.review.type.ReviewSortType
+import com.ll.nbe342team8.domain.member.member.entity.Member
 import com.ll.nbe342team8.global.exceptions.ServiceException
+import com.ll.nbe342team8.standard.PageDto.PageDto
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.util.function.Supplier
 
 @Service
 class ReviewService (
@@ -22,7 +24,7 @@ class ReviewService (
 ){
 
     fun getAllReviews(page: Int, pageSize: Int, reviewSortType: ReviewSortType): Page<Review> {
-        val sorts: MutableList<Sort.Order> = ArrayList<Sort.Order>()
+        val sorts = ArrayList<Sort.Order>()
         sorts.add(reviewSortType.order)
 
         val pageable: Pageable = PageRequest.of(page, pageSize, Sort.by(sorts))
@@ -30,7 +32,7 @@ class ReviewService (
     }
 
     fun getReviewsById(bookId: Long, page: Int, pageSize: Int, reviewSortType: ReviewSortType): Page<Review> {
-        val sorts: MutableList<Sort.Order> = ArrayList<Sort.Order>()
+        val sorts = ArrayList<Sort.Order>()
         sorts.add(reviewSortType.order)
 
         val pageable: Pageable = PageRequest.of(page, pageSize, Sort.by(sorts))
@@ -39,17 +41,17 @@ class ReviewService (
 
     fun getReviewById(reviewId: Long): Review {
         return reviewRepository.findById(reviewId)
-            .orElseThrow<ServiceException?>(Supplier {
+            .orElseThrow {
                 ServiceException(
                     HttpStatus.NOT_FOUND.value(),
                     "id에 해당하는 리뷰가 없습니다."
                 )
-            })
+            }
     }
 
     fun create(review: Review, rating: Double?): Review {
         bookService.createReview(review.book, rating)
-        return reviewRepository.save<Review>(review)
+        return reviewRepository.save(review)
     }
 
     fun updateReview(reviewId: Long, content: String, rating: Double): ReviewResponseDto {
@@ -60,7 +62,7 @@ class ReviewService (
         bookService.createReview(book, rating)
 
         review.update(content, rating)
-        val updatedReview = reviewRepository.save<Review>(review)
+        val updatedReview = reviewRepository.save(review)
 
         return from(updatedReview)
     }
@@ -75,5 +77,13 @@ class ReviewService (
 
     fun count(): Long {
         return reviewRepository.count()
+    }
+
+    fun getMemberReviewPage(member: Member, page: Int): PageDto<ReviewsResponseDto> {
+        val pageable = PageRequest.of(page, 10, Sort.by("createDate").descending())
+        val paging = reviewRepository.findByMember(pageable, member)
+
+        val pagingOrderDto = paging?.map { ReviewsResponseDto.from(it) }
+        return PageDto(pagingOrderDto)
     }
 }

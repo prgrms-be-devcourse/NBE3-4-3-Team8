@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { GetMyPage } from "./api"; // API 함수 가져오기
-import { PageDto, QuestionDto } from "./types"; // DTO 타입 가져오기
+import { PageDto, QuestionListDto } from "./types"; // DTO 타입 가져오기
 import Sidebar from '@/app/components/my/Sidebar';
 import { useRouter } from 'next/navigation';
 
@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
     
     const router = useRouter();
-    const [pageData, setPageData] = useState<PageDto<QuestionDto> | null>(null);
+    const [pageData, setPageData] = useState<PageDto<QuestionListDto> | null>(null);
     const [currentPage, setCurrentPage] = useState(0); // 현재 페이지 번호
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export default function Home() {
           const response = await GetMyPage(currentPage);
           if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
   
-          const data: PageDto<QuestionDto> = await response.json();
+          const data: PageDto<QuestionListDto> = await response.json();
           setPageData(data);
         } catch (error) {
           setError(error instanceof Error ? error.message : "알 수 없는 오류 발생");

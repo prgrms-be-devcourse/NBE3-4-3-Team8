@@ -9,11 +9,12 @@ import com.ll.nbe342team8.domain.book.review.service.ReviewService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -22,31 +23,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+@Profile("dev")
 @Configuration
 @RequiredArgsConstructor
-public class BaseInitData implements EnvironmentAware {
+public class BaseInitData {
 
     private final BookService bookService;
     private final ReviewService reviewService;
     private final MemberService memberService;
     private final CategoryRepository categoryRepository;
 
-    private Environment environment;
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
+    @Autowired
+    @Lazy
+    private BaseInitData self;
 
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
-            makeSampleMembers();
-            makeSampleBooks();
-            // test 프로파일일 경우 리뷰 샘플 생성을 건너뜁니다.
-            if (!Arrays.asList(environment.getActiveProfiles()).contains("test")) {
-                makeSampleReviews();
-            }
+            self.makeSampleMembers();
+            self.makeSampleBooks();
+            self.makeSampleReviews();
         };
     }
 
@@ -57,7 +53,7 @@ public class BaseInitData implements EnvironmentAware {
         for (int i = 1; i <= 10; i++) {
             Member member = Member.builder()
                     .name("test" + i)
-                    .password("") // 비밀번호 암호화는 실제 환경에서 처리
+                    .password("")
                     .phoneNumber("01012345678")
                     .memberType(Member.MemberType.USER)
                     .build();
@@ -118,7 +114,8 @@ public class BaseInitData implements EnvironmentAware {
                     .priceStandard(10000 + i)
                     .pricesSales(9000)
                     .stock(100)
-                    .coverImage(coverUrls.get(i - 1))
+                    .coverImage(coverUrls.get(i-1))
+//                    .coverImage("img src")
                     .pubDate(date.plusDays(i))
                     .publisher("출판사")
                     .salesPoint(50L + i)
@@ -131,10 +128,11 @@ public class BaseInitData implements EnvironmentAware {
 
             bookService.create(book);
         }
+
     }
 
     @Transactional
-    // 리뷰 작성 시 Book 엔티티의 평점, 리뷰 수 갱신
+    // 리뷰 작성되면 Book에서 총 평점 계산
     public void makeSampleReviews() throws IOException {
         Random random = new Random();
 
