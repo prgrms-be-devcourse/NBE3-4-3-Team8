@@ -15,22 +15,23 @@ open class Cart(
 
     @field:ManyToOne(fetch = FetchType.LAZY)
     @field:JsonIgnore
-    var member: Member?,
+    open var member: Member?,
 
     @field:ManyToOne(fetch = FetchType.LAZY)
     @field:JsonIgnore
-    var book: Book,
+    open var book: Book,
 
-    var quantity: Int
+    open var quantity: Int
 
 ) : BaseTime() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
-        private set
+    @Column(name = "id")
+    open var id: Long? = null
+        protected set  // Changed from private to protected
 
-    fun updateCart(quantity: Int) {
+    open fun updateCart(quantity: Int) {
         this.quantity = quantity
     }
 

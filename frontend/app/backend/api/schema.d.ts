@@ -686,10 +686,10 @@ export interface components {
         };
         CartItemRequestDto: {
             /** Format: int64 */
-            bookId: number;
+            bookId?: number;
             /** Format: int32 */
             quantity?: number;
-            isAddToCart?: boolean;
+            addToCart?: boolean;
         };
         CartRequestDto: {
             cartItems: components["schemas"]["CartItemRequestDto"][];
@@ -844,11 +844,11 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            pageNumber?: number;
+            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
+            /** Format: int32 */
+            pageNumber?: number;
             unpaged?: boolean;
         };
         ReviewResponseDto: {
@@ -1116,7 +1116,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };
@@ -1138,7 +1138,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };
