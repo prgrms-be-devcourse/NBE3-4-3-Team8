@@ -49,7 +49,7 @@ class ReviewService (
             }
     }
 
-    fun create(review: Review, rating: Double?): Review {
+    fun create(review: Review, rating: Double): Review {
         bookService.createReview(review.book, rating)
         return reviewRepository.save(review)
     }
