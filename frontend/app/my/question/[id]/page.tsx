@@ -2,27 +2,10 @@
 
 import { useEffect, useState,use  } from 'react';
 import { useRouter, useParams, usePathname } from "next/navigation"; 
-import { QuestionDto } from "./types"; // ✅ 타입 정의 파일 import
+import { QuestionDto,QuestionGenFileDto } from "./types"; // ✅ 타입 정의 파일 import
+import { useFetchImages } from "./api";
+import { GetQuestion,DeleteQuestion } from "./api";
 
-async function apiRequest(url: string, method: string, body?: object): Promise<Response> {
-    return fetch(new URL(url, window.location.origin).toString(), {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: body ? JSON.stringify(body) : undefined,
-    });
-}
-
-export async function GetQuestion(id: number): Promise<Response> {
-    console.log(`my/question/{id} api.ts - GetQuestion (id: ${id})`);
-    return apiRequest(`/api/my/question/${id}`, "GET");
-}
-
-
-// 특정 배송지 삭제
-export async function DeleteQuestion(id: number): Promise<Response> {
-    console.log("my-page/api.ts - DeleteAddress");
-    return apiRequest(`/api/my/question/${id}`, "DELETE");
-}
 
 export default function Home()  {
     const params = useParams();
@@ -49,9 +32,15 @@ export default function Home()  {
                 const response = await GetQuestion(Number(id));
                 if (!response.ok) throw new Error("질문 데이터를 불러오는 데 실패했습니다.");
                 const data: QuestionDto = await response.json();
+                console.log("question data:")
+                console.log(data)
+
+                
                 if (isMounted) {
                     setQuestion(data);
                 }
+
+
             } catch (err) {
                 setError(err instanceof Error ? err.message : "알 수 없는 오류 발생");
             } finally {
@@ -66,7 +55,11 @@ export default function Home()  {
         return () => {
             isMounted = false;
         };
+
+       
     }, [id, pathname]); // ✅ `id` 값이 변경될 때 실행
+
+    const imageUrls = useFetchImages(question!);
   
     const handleModify = () => {
       if (!id || isNaN(Number(id))) {
@@ -84,6 +77,8 @@ export default function Home()  {
         id,
         title: question?.title || "",
         content: question?.content || "",
+        imageUrls: imageUrls || null,
+        
       }));
   
       router.push("/my/question/modifyForm");
@@ -125,7 +120,25 @@ export default function Home()  {
         뒤로가기
       </button>
 
+      
+
       <div className="p-6 border rounded-md shadow-md bg-white">
+      <div className="mt-6">
+          {imageUrls.length > 0 ? (
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                   {imageUrls.map((url, index) => (
+                       <img
+                           key={index}
+                           src={url}
+                           alt={`Image ${index}`}
+                           className="rounded-lg shadow-lg"
+                      />
+                   ))}
+               </div>
+           ) : (
+              <p className="text-gray-500 mt-2">등록된 이미지가 없습니다.</p>
+          )}
+      </div>
         <h1 className="text-2xl font-bold">{question.title}</h1>
         <p className="text-gray-700 mt-2">{question.content}</p>
         <p className="text-sm text-gray-500 mt-2">

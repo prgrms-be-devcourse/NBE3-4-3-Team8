@@ -36,21 +36,21 @@ public class DeliveryInformation extends BaseTime {
     private Member member;
 
     public DeliveryInformation(ReqDeliveryInformationDto dto, Member member) {
-        this.addressName = Ut.XSSSanitizer.sanitize(dto.addressName());
-        this.postCode = Ut.XSSSanitizer.sanitize(dto.postCode());
-        this.detailAddress = Ut.XSSSanitizer.sanitize(dto.detailAddress());
-        this.recipient = Ut.XSSSanitizer.sanitize(dto.recipient());
-        this.phone = Ut.XSSSanitizer.sanitize(dto.phone());
+        this.addressName = dto.addressName();
+        this.postCode = dto.postCode();
+        this.detailAddress = dto.detailAddress();
+        this.recipient = dto.recipient();
+        this.phone = dto.phone();
         this.isDefaultAddress=dto.isDefaultAddress();
         this.member=member;
     }
 
     public void updateDeliveryInfo(ReqDeliveryInformationDto dto) {
-        this.addressName = Ut.XSSSanitizer.sanitize(dto.addressName());
-        this.postCode = Ut.XSSSanitizer.sanitize(dto.postCode());
-        this.detailAddress = Ut.XSSSanitizer.sanitize(dto.detailAddress());
-        this.recipient = Ut.XSSSanitizer.sanitize(dto.recipient());
-        this.phone = Ut.XSSSanitizer.sanitize(dto.phone());
+        this.addressName = dto.addressName();
+        this.postCode = dto.postCode();
+        this.detailAddress = dto.detailAddress();
+        this.recipient = dto.recipient();
+        this.phone = dto.phone();
         this.isDefaultAddress=dto.isDefaultAddress();
 
     }

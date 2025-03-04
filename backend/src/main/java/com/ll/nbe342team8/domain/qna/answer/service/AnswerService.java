@@ -26,11 +26,8 @@ public class AnswerService {
     @Transactional
     public void createAnswer(Question question, Member member, ReqAnswerDto dto) {
 
-        //이스케이프 처리후 저장
-        String sanitizedContent = Ut.XSSSanitizer.sanitize(dto.content());
-
         Answer answer = Answer.builder()
-                .content(sanitizedContent)
+                .content(dto.content())
                 .member(member)
                 .question(question)
                 .build();
@@ -63,8 +60,8 @@ public class AnswerService {
 
     //네트워크 지연, 스팸 봇, 답변 등록 버튼 연타로 생성되는 중복 답변 방지
     public boolean existsDuplicateAnswerInShortTime(Question question, Member member, String content, Duration duration) {
-        String sanitizedContent = Ut.XSSSanitizer.sanitize(content);
+
         LocalDateTime cutoffTime = LocalDateTime.now().minus(duration);
-        return answerRepository.existsByQuestionAndMemberAndContentAndCreateDateAfter(question, member, sanitizedContent, cutoffTime);
+        return answerRepository.existsByQuestionAndMemberAndContentAndCreateDateAfter(question, member, content, cutoffTime);
     }
 }
