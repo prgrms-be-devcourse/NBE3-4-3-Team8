@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ExceutionTimeAspect {
 
+    /*
     @Around("execution(* com.ll.nbe342team8.domain..*.controller..*(..))")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
@@ -21,5 +22,7 @@ public class ExceutionTimeAspect {
 
         return proceed;
     }
+
+     */
 
 }
