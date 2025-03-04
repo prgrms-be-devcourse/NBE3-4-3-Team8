@@ -32,6 +32,7 @@ public class QuestionController {
     private final MemberService memberService;
     private final QuestionService questionService;
 
+
     @Operation(summary = "사용자가 작성한 qna 질문 목록 조회")
     @GetMapping("/my/question")
     public ResponseEntity<?> getQuesitons(@RequestParam(name = "page", defaultValue = "0") int page
@@ -54,6 +55,9 @@ public class QuestionController {
 
         return ResponseEntity.ok(pageDto);
     }
+
+
+
 
     @Operation(summary = "사용자의 특정 qna 질문 조회")
     @GetMapping("/my/question/{id}")
