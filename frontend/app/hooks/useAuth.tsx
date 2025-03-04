@@ -196,4 +196,5 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Context를 활용하는 커스텀 훅
 export const useAuth = () => useContext(AuthContext);

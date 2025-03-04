@@ -3,10 +3,15 @@ package com.ll.nbe342team8.domain.book.review.service;
 import com.ll.nbe342team8.domain.book.book.entity.Book;
 import com.ll.nbe342team8.domain.book.book.service.BookService;
 import com.ll.nbe342team8.domain.book.review.dto.ReviewResponseDto;
+import com.ll.nbe342team8.domain.book.review.dto.ReviewsResponseDto;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
 import com.ll.nbe342team8.domain.book.review.repository.ReviewRepository;
 import com.ll.nbe342team8.domain.book.review.type.ReviewSortType;
+import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.qna.question.dto.QuestionDto;
+import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+import com.ll.nbe342team8.standard.PageDto.PageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -74,5 +79,16 @@ public class ReviewService {
 
     public long count() {
         return reviewRepository.count();
+    }
+
+    public PageDto<ReviewsResponseDto> getMemberReviewPage(Member member, int page) {
+
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createDate").descending());
+        Page<Review> paging = this.reviewRepository.findByMember(pageable, member);
+
+        Page<ReviewsResponseDto> pagingOrderDto = paging.map(ReviewsResponseDto::from);
+        PageDto<ReviewsResponseDto> pageDto = new PageDto<>(pagingOrderDto);
+        return pageDto;
+
     }
 }

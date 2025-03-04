@@ -14,7 +14,7 @@ export default function ModifyQuestion() {
     const [id, setId] = useState<string | null>(null);
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-  
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
   
@@ -22,10 +22,11 @@ export default function ModifyQuestion() {
         // ✅ sessionStorage에서 데이터 불러오기
         const storedData = sessionStorage.getItem("modifyQuestion");
         if (storedData) {
-          const { id, title, content } = JSON.parse(storedData);
+          const { id, title, content,imageUrls } = JSON.parse(storedData);
           setId(id);
           setTitle(title);
           setContent(content);
+          setImageUrls(imageUrls);
         } else {
           console.error("수정할 데이터가 없습니다.");
           router.push("/my/question"); // 데이터 없을 경우 리스트 페이지로 이동
@@ -87,6 +88,23 @@ export default function ModifyQuestion() {
             <h1 className="text-2xl font-bold mb-4">질문 수정</h1>
   
             {message && <p className="mb-4 text-center text-red-500">{message}</p>}
+
+            <div className="mt-6">
+              {imageUrls.length > 0 ? (
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                   {imageUrls.map((url, index) => (
+                       <img
+                           key={index}
+                           src={url}
+                           alt={`Image ${index}`}
+                           className="rounded-lg shadow-lg"
+                      />
+                   ))}
+               </div>
+              ) : (
+              <p className="text-gray-500 mt-2">등록된 이미지가 없습니다.</p>
+             )}
+            </div>
   
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* 제목 입력 */}

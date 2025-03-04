@@ -31,10 +31,11 @@ public class DeliveryInformationService {
     }
 
     @Transactional
-    public void deleteDeliveryInformation(DeliveryInformation deliveryInformation) {
+    public void deleteDeliveryInformation(DeliveryInformation deliveryInformation,Member member) {
 
         //사용자개체의 배송 정보 리스트에서 id에 해당하는 deliveryInformation을 찾아 삭제
         //더티 체킹을 이용해 개체 갱신
+        member.getDeliveryInformations().remove(deliveryInformation);
         deliveryInformationRepository.delete(deliveryInformation);
     }
 

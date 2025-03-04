@@ -7,6 +7,8 @@ import { useAuth } from '@/app/hooks/useAuth';
 const Sidebar = () => {
   const { user, logout } = useAuth();
 
+
+  
   return (
     <aside className="w-64 p-4 bg-gray-100 min-h-screen">
       <div className="flex flex-col items-center mb-6">
@@ -27,8 +29,8 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <Link href="/mypage/library" className="block p-2 bg-white rounded shadow">
-              라이브러리
+            <Link href="/my/reviews" className="block p-2 bg-white rounded shadow">
+              리뷰내역
             </Link>
           </li>
           <li>

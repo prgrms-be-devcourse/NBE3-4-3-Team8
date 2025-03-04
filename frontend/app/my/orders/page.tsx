@@ -14,6 +14,14 @@ export default function OrdersPage() {
   const router = useRouter();
 
   useEffect(() => {
+//     const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
+//     const accessToken = token ? token.split('=')[1] : null;
+//
+//     if (!accessToken) {
+//       setError('Access token is missing');
+//       return;
+//     }
+
     const fetchOrders = async () => {
       try {
         const res = await fetch(`http://localhost:8080/my/orders?page=${page}&size=${pageSize}`, {
