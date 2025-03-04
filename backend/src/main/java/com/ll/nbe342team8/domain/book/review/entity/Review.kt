@@ -25,13 +25,6 @@ class Review(
 
 ) : BaseTime() {
 
-    constructor() : this(
-        book = Book(), // 기본값 설정 (실제 서비스에서는 주의)
-        member = Member(),
-        content = "",
-        rating = 0.0
-    )
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null

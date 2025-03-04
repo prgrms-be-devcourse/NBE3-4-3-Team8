@@ -1,104 +1,163 @@
-package com.ll.nbe342team8.domain.book.book.entity;
+package com.ll.nbe342team8.domain.book.book.entity
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.hibernate.annotations.Formula;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ll.nbe342team8.domain.book.category.entity.Category;
-import com.ll.nbe342team8.domain.book.review.entity.Review;
-import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.ll.nbe342team8.domain.book.category.entity.Category
+import com.ll.nbe342team8.domain.book.review.entity.Review
+import com.ll.nbe342team8.global.jpa.entity.BaseTime
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Formula
+import java.time.LocalDate
 
 @Entity
-@Getter
-@Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-public class Book extends BaseTime {
+open class Book(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    open var id: Long? = null,
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-	public Long id;
+    @Column(length = 100)
+    @NotNull
+    open var title: String = "",
 
-	@Column(length = 100)
-	@NotNull
-	public String title;      // 제목
+    @NotNull
+    open var author: String = "",
 
-	@NotNull
-	private String author; // 저자
+    open var publisher: String? = null,
 
-	private String publisher; // 출판사
+    open var isbn: String? = null,
 
-	private String isbn;       // ISBN
+    @NotNull
+    open var isbn13: String = "",
 
-	@NotNull
-	private String isbn13;     // ISBN13
+    @NotNull
+    open var pubDate: LocalDate = LocalDate.now(),
 
-	@NotNull
-	private LocalDate pubDate;      //출판일
+    @NotNull
+    open var priceStandard: Int = 0,
 
-	@NotNull
-	private Integer priceStandard;         // 정가
+    @NotNull
+    open var pricesSales: Int = 0,
 
-	@NotNull
-	public Integer pricesSales;         // 판매가
+    @NotNull
+    open var stock: Int = 0,
 
-	@NotNull
-	private Integer stock;         // 재고
+    @NotNull
+    open var status: Int = 0,
 
-	@NotNull
-	private Integer status;         // 판매 상태
+    open var rating: Double = 0.0,
 
-	private Double rating = 0.0;      // 평점
+    @Formula("CASE WHEN review_count = 0 THEN 0 ELSE rating / review_count END")
+    open var averageRating: Double? = null,
 
-	@Formula("CASE WHEN review_count = 0 THEN 0 ELSE rating / review_count END")
-	private Double averageRating;        //평균 평점
+    @Column(columnDefinition = "TEXT")
+    open var toc: String? = null,
 
-	@Column(columnDefinition = "TEXT")
-	private String toc;        // 목차
+    open var coverImage: String = "",
 
-	public String coverImage;            // 커버 이미지 URL
+    open var description: String? = null,
 
-	private String description;           // 상세페이지 글
+    open var descriptionImage: String? = null,
 
-	private String descriptionImage;
+    open var salesPoint: Long? = null,
 
-	private Long salesPoint;
+    open var reviewCount: Long = 0,
 
-	private Long reviewCount; // 리뷰 수
+    @JsonIgnore
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    open var categoryId: Category,
 
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	@NotNull
-	@JoinColumn(name = "category_id", referencedColumnName = "id") // 외래키
-	private Category categoryId; // 카테고리
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    open var review: MutableList<Review> = mutableListOf()
+) : BaseTime() {
 
-	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
-	private List<Review> review;
+    open fun createReview(rating: Double) {
+        this.reviewCount++
+        this.rating += rating
+    }
 
-	public void createReview(Double rating) {
-		this.reviewCount++;
-		this.rating += rating;
-	}
+    open fun deleteReview(rating: Double) {
+        this.reviewCount--
+        this.rating -= rating
+    }
 
-	public void deleteReview(Double rating) {
-		this.reviewCount--;
-		this.rating -= rating;
-	}
+    // 빌더 패턴을 위한 Builder 클래스
+    class Builder {
+        private var id: Long? = null
+        private var title: String = ""
+        private var author: String = ""
+        private var publisher: String? = null
+        private var isbn: String? = null
+        private var isbn13: String = ""
+        private var pubDate: LocalDate = LocalDate.now()
+        private var priceStandard: Int = 0
+        private var pricesSales: Int = 0
+        private var stock: Int = 0
+        private var status: Int = 0
+        private var rating: Double = 0.0
+        private var averageRating: Double? = null
+        private var toc: String? = null
+        private var coverImage: String = ""
+        private var description: String? = null
+        private var descriptionImage: String? = null
+        private var salesPoint: Long? = null
+        private var reviewCount: Long = 0
+        private var categoryId: Category = Category()
+        private var review: MutableList<Review> = mutableListOf()
+
+        fun id(id: Long?) = apply { this.id = id }
+        fun title(title: String) = apply { this.title = title }
+        fun author(author: String) = apply { this.author = author }
+        fun publisher(publisher: String?) = apply { this.publisher = publisher }
+        fun isbn(isbn: String?) = apply { this.isbn = isbn }
+        fun isbn13(isbn13: String) = apply { this.isbn13 = isbn13 }
+        fun pubDate(pubDate: LocalDate) = apply { this.pubDate = pubDate }
+        fun priceStandard(priceStandard: Int) = apply { this.priceStandard = priceStandard }
+        fun pricesSales(pricesSales: Int) = apply { this.pricesSales = pricesSales }
+        fun stock(stock: Int) = apply { this.stock = stock }
+        fun status(status: Int) = apply { this.status = status }
+        fun rating(rating: Double) = apply { this.rating = rating }
+        fun averageRating(averageRating: Double?) = apply { this.averageRating = averageRating }
+        fun toc(toc: String?) = apply { this.toc = toc }
+        fun coverImage(coverImage: String) = apply { this.coverImage = coverImage }
+        fun description(description: String?) = apply { this.description = description }
+        fun descriptionImage(descriptionImage: String?) = apply { this.descriptionImage = descriptionImage }
+        fun salesPoint(salesPoint: Long?) = apply { this.salesPoint = salesPoint }
+        fun reviewCount(reviewCount: Long) = apply { this.reviewCount = reviewCount }
+        fun categoryId(categoryId: Category) = apply { this.categoryId = categoryId }
+        fun review(review: MutableList<Review>) = apply { this.review = review }
+
+        fun build(): Book {
+            return Book(
+                id = id,
+                title = title,
+                author = author,
+                publisher = publisher,
+                isbn = isbn,
+                isbn13 = isbn13,
+                pubDate = pubDate,
+                priceStandard = priceStandard,
+                pricesSales = pricesSales,
+                stock = stock,
+                status = status,
+                rating = rating,
+                averageRating = averageRating,
+                toc = toc,
+                coverImage = coverImage,
+                description = description,
+                descriptionImage = descriptionImage,
+                salesPoint = salesPoint,
+                reviewCount = reviewCount,
+                categoryId = categoryId,
+                review = review
+            )
+        }
+    }
+
+    companion object {
+        fun builder(): Builder {
+            return Builder()
+        }
+    }
 }

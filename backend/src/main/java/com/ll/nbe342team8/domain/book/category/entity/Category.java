@@ -29,7 +29,7 @@ public class Category {
 
 	@NotNull
 	@Column(name = "category_id")
-	private Integer categoryId;
+	public Integer categoryId;
 
 	@NotNull
 	private String categoryName;
