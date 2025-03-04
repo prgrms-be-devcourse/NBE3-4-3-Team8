@@ -125,7 +125,7 @@ public class QuestionControllerTest {
         // ✅ 4. 응답 검증
         resultActions
                 .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("getQuesitons"))
+                .andExpect(handler().methodName("getQuestions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalItems").value(2))
                 .andExpect(jsonPath("$.items", hasSize(2)))

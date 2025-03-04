@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 @Entity
-@Getter
 @NoArgsConstructor
+@Getter
 @AllArgsConstructor
 @Builder
 @Table(
@@ -39,43 +39,51 @@ public class Question extends BaseTime {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-	private Long id;
+	public Long id;
 
 	@Column(nullable = true) // 질문 제목
-	private String title;
+	public String title;
 
 	@Column(nullable = true) // 질문 내용
-	private String content;
+	public String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false) // 회원이 반드시 존재해야 한다.
-	private Member member;
+	public Member member;
 
 	@BatchSize(size = 10)
 	@OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-	private List<Answer> answers;
+	public List<Answer> answers;
 
-	private Boolean isAnswer;
+	public Boolean isAnswer;
 
 	@OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	@Builder.Default
-	private List<QuestionGenFile> genFiles = new ArrayList<>();
+	public List<QuestionGenFile> genFiles = new ArrayList<>();
 
 
 	public void updateQuestionInfo(ReqQuestionDto dto) {
-      this.title= dto.title();
-      this.content=dto.content();
+      this.title= dto.getTitle();
+      this.content=dto.getContent();
   	}
 
   	public static Question create(ReqQuestionDto dto,Member member) {
 		Question question = Question.builder()
-				.title(dto.title())
-				.content(dto.content())
+				.title(dto.getTitle())
+				.content(dto.getContent())
 				.member(member)
 				.build();
 
 		return question;
   	}
+
+
+	public Boolean getIsAnswer() {
+		if(this.isAnswer ==null) {this.isAnswer= false;}
+		return  this.isAnswer;
+	}
+
+
 
 	public void addAnswer(Answer answer) {
 		this.answers.add(answer);
