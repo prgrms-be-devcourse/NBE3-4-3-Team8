@@ -54,6 +54,8 @@ public class AdminQuestionControllerTest {
     @Autowired
     private AnswerRepository answerRepository;
 
+    private Long questionId;
+
     @BeforeEach
     void setup() {
         admin = new Member();
@@ -85,9 +87,10 @@ public class AdminQuestionControllerTest {
                 .member(regular)
                 .build();
 
-        questionRepository.save(question1);
+        question1 = questionRepository.save(question1);
         questionRepository.save(question2);
 
+        this.questionId = question1.getId();
         Answer answer = Answer.builder()
                 .content("Answer 1")
                 .question(question1)
@@ -149,6 +152,29 @@ public class AdminQuestionControllerTest {
                 .andExpect(jsonPath("$.items[0].hasAnswer").value(true));
     }
 
+    @Test
+    @DisplayName("관리자 - 특정 질문 상세 조회")
+    void getQuestionDetailTest() throws Exception{
+
+        ResultActions resultActions = mockMvc.perform(
+                        get("/admin/dashboard/questions/{id}", questionId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding(StandardCharsets.UTF_8)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(AdminQuestionController.class))
+                .andExpect(handler().methodName("getAdminQuestion"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(questionId))
+                .andExpect(jsonPath("$.title").value("Question 1"))
+                .andExpect(jsonPath("$.content").value("Content 1"))
+                .andExpect(jsonPath("$.memberEmail").value("user@example.com"))
+                .andExpect(jsonPath("$.hasAnswer").value(true))
+                .andExpect(jsonPath("$.answer").exists())
+                .andExpect(jsonPath("$.answer.content").value("Answer 1"));
+    }
 }
 
 
