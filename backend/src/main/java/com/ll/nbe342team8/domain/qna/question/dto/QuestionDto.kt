@@ -2,11 +2,10 @@ package com.ll.nbe342team8.domain.qna.question.dto
 
 import com.ll.nbe342team8.domain.qna.answer.dto.AnswerDto
 import com.ll.nbe342team8.domain.qna.question.entity.Question
-import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
 data class QuestionDto(
-    val id: @NotNull Long?,
+    val id:  Long,
     val createDate: LocalDateTime,
     val modifyDate: LocalDateTime,
     val title: String,

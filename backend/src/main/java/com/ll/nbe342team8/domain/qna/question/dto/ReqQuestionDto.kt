@@ -9,11 +9,11 @@ import org.jsoup.safety.Safelist
 
 data class ReqQuestionDto @JsonCreator constructor(
     @field:NotBlank
-    val title: String?,
+    val title: String,
     @field:NotNull
-    val content: String?
+    val content: String
 ) {
-    val cleanTitle: String? = title?.let { Jsoup.clean(it, Safelist.basic()) }
-    val cleanContent: String? = content?.let { Jsoup.clean(it, Safelist.basic()) }
+    val cleanTitle: String? = title.let { Jsoup.clean(it, Safelist.basic()) }
+    val cleanContent: String? = content.let { Jsoup.clean(it, Safelist.basic()) }
 }
 

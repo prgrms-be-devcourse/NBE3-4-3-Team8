@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
 
+
 @Tag(name = "QuestionController", description = " qna 질문 컨트롤러")
 @RequiredArgsConstructor
 @RestController
@@ -28,6 +29,9 @@ class QuestionController(
     private val questionService: QuestionService
 )  {
 
+    /*
+    //20 ~30ms 데이터 100개 이하일때
+    // 30 ~ 50ms 데이터 10000개 일때
     @Operation(summary = "사용자가 작성한 qna 질문 목록 조회")
     @GetMapping("/my/question")
     fun getQuestions(@RequestParam(name = "page", defaultValue = "0") page: Int): ResponseEntity<PageDto<QuestionListDto>> {
@@ -41,10 +45,46 @@ class QuestionController(
         val pageDto = questionService.getPage(member, page)
         return ResponseEntity.ok(pageDto)
     }
+    */
+
+
+    //33ms , 62ms 데이터 100개 이하일때
+    //20 ~30ms 데이터 10000개 일때
+    //조회 데이터가 적을땐 효율이 좋지않음
+    @Operation(summary = "사용자가 작성한 QnA 질문 목록 조회")
+    @GetMapping("/my/question")
+    fun getKeySetQuestions(
+        @RequestParam(name = "page", required = false) page: Int?,
+        @RequestParam(name = "lastQuestionId", required = false) lastQuestionId: Long?,
+        @RequestParam(name = "firstQuestionId", required = false) firstQuestionId: Long?
+    ): ResponseEntity<PageDto<QuestionListDto>> {
+
+        val authentication = SecurityContextHolder.getContext().authentication
+        val securityUser = authentication?.principal as? SecurityUser
+            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야 합니다.")
+
+        val member = memberService.findByOauthId(securityUser.member.oAuthId)
+            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+
+        // 현재 페이지의 바로 다음 페이지로 이동할 경우 keyset 방식을 이용해 이동합니다
+        // 그외 임의 페이지로 점프하는 경우 원래 대로 offset을 이용해 이동합니다.
+        val pageDto = when {
+            lastQuestionId != null || firstQuestionId != null ->
+                questionService.getNextOrBeforePage(member, lastQuestionId, firstQuestionId)
+            page != null ->
+                questionService.getPage(member, page)
+            else -> throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다.")
+        }
+
+        return ResponseEntity.ok(pageDto)
+    }
+
+
+
 
     @Operation(summary = "사용자의 특정 qna 질문 조회")
     @GetMapping("/my/question/{id}")
-    fun getQuestion(@PathVariable(name = "id") id: Long): ResponseEntity<*> {
+    fun getQuestion(@PathVariable id: Long): ResponseEntity<*> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -85,7 +125,7 @@ class QuestionController(
     @Operation(summary = "사용자의 특정 qna 질문 수정")
     @PutMapping("/my/question/{id}")
     fun putQuestion(
-        @PathVariable(name = "id") id: Long,
+        @PathVariable id: Long,
         @RequestBody reqQuestionDto: @Valid ReqQuestionDto
     ): ResponseEntity<*> {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -108,7 +148,7 @@ class QuestionController(
     @Operation(summary = "사용자의 특정 qna 질문 삭제")
     @DeleteMapping("/my/question/{id}")
     fun deleteQuestion(
-        @PathVariable(name = "id") id: Long
+        @PathVariable id: Long
     ): ResponseEntity<*> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser

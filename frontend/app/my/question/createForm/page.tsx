@@ -32,30 +32,28 @@ export default function Home() {
         setLoading(true);
         setMessage(null);
 
-        if (!file || !typeCode) {
-          setMessage('파일과 타입 코드를 모두 입력해주세요.');
-          return;
-        }
-    
         try {
-          const response= await PostQuestion(formData);
+          const response = await PostQuestion(formData);
           if (!response.ok) throw new Error("서버 요청 실패!");
-          
+    
           const data: QuestionDto = await response.json();
-          const questionId =data.id;
+          const questionId = data.id;
 
-          const fileFormData = new FormData();
-          fileFormData.append('file', file);
-    
-          const Fileresponse = await fetch(`http://localhost:8080/my/question/genFile/${questionId}/${typeCode}`, {
-            method: 'POST',
-            body: fileFormData,
-            credentials: 'include', // 쿠키를 포함시키기 위해
-          });
-    
-          if (!response.ok) {
-            throw new Error('파일 업로드에 실패했습니다.');
-          }
+          // 파일이 선택된 경우에만 파일 업로드 API 호출
+          if (file) {
+            const fileFormData = new FormData();
+            fileFormData.append('file', file);
+
+            const fileResponse = await fetch(`http://localhost:8080/my/question/genFile/${questionId}/${typeCode}`, {
+              method: 'POST',
+              body: fileFormData,
+              credentials: 'include',
+            });
+
+            if (!fileResponse.ok) {
+              throw new Error('파일 업로드에 실패했습니다.');
+            }
+          } 
           setMessage("질문이 성공적으로 등록되었습니다!");
           setFormData({ title: "", content: "" }); // 입력 필드 초기화
 
@@ -87,7 +85,7 @@ export default function Home() {
 
             <div>
               <label htmlFor="file">파일:</label>
-              <input type="file" id="file" onChange={handleFileChange} required />
+              <input type="file" id="file" onChange={handleFileChange} />
             </div>
             {/*
             <div>

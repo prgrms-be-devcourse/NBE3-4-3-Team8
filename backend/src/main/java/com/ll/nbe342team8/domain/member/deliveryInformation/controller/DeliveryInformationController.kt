@@ -56,7 +56,7 @@ class DeliveryInformationController(
     @Operation(summary = "배송 정보 삭제 (한개)")
     @DeleteMapping("/my/deliveryInformation/{id}")
     fun deleteDeliveryInformation(
-        @PathVariable(name = "id") id: Long
+        @PathVariable id: Long
     ): ResponseEntity<*> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
@@ -83,7 +83,7 @@ class DeliveryInformationController(
     @Operation(summary = "배송 정보 갱신 (한개)")
     @PutMapping("/my/deliveryInformation/{id}")
     fun putDeliveryInformation(
-        @PathVariable(name = "id") id: Long,
+        @PathVariable id: Long,
         @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto
     ): ResponseEntity<*> {
         val authentication = SecurityContextHolder.getContext().authentication

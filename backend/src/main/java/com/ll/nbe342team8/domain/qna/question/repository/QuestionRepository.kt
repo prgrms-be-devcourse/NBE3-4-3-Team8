@@ -6,6 +6,8 @@ import com.ll.nbe342team8.domain.qna.question.entity.Question
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -29,4 +31,24 @@ interface QuestionRepository : JpaRepository<Question, Long> {
     fun existsByMemberAndTitleAndContentAndCreateDateAfter(
         member: Member, title: String, content: String, cutoffTime: LocalDateTime
     ): Boolean
+
+
+    // 다음 페이지 조회 (현재 페이지 마지막 ID보다 작은 데이터)
+    @Query("SELECT q FROM Question q WHERE q.member = :member AND q.id < :lastQuestionId ORDER BY q.createDate DESC")
+    fun findByMemberWithKeysetNext(
+        @Param("member") member: Member,
+        @Param("lastQuestionId") lastQuestionId: Long,
+        pageable: Pageable
+    ): List<QuestionListDtoProjection>
+
+    // 이전 페이지 조회 (현재 페이지 첫 번째 ID보다 큰 데이터)
+    @Query("SELECT q FROM Question q WHERE q.member = :member AND q.id > :firstQuestionId ORDER BY q.createDate ASC")
+    fun findByMemberWithKeysetPrev(
+        @Param("member") member: Member,
+        @Param("firstQuestionId") firstQuestionId: Long,
+        pageable: Pageable
+    ): List<QuestionListDtoProjection>
+
+
+
 }
