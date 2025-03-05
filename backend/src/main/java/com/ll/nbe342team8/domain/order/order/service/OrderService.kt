@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+
 @Service
 class OrderService(
     private val orderRepository: OrderRepository,
@@ -36,9 +37,10 @@ class OrderService(
         if (ordersPage.isEmpty) {
             throw IllegalArgumentException("주문이 존재하지 않습니다.")
         }
+
         return ordersPage.map { order ->
             OrderDTO(
-                order.id,
+                order.id ?: 0L,
                 order.orderStatus.name,
                 order.totalPrice,
                 order.createDate
@@ -61,27 +63,26 @@ class OrderService(
     fun createOrder(member: Member, orderRequestDTO: OrderRequestDto): Order {
         val cartList = cartService.findCartByMember(member)
 
-        // Order 객체 생성 (builder 제거)
         val order = Order(
             member = member,
             orderStatus = OrderStatus.ORDERED,
-            fullAddress = orderRequestDTO.fullAddress,
-            postCode = orderRequestDTO.postCode,
-            phone = orderRequestDTO.phone,
-            recipient = orderRequestDTO.recipient,
-            paymentMethod = orderRequestDTO.paymentMethod,
+            fullAddress = orderRequestDTO.fullAddress(),
+            postCode = orderRequestDTO.postCode(),
+            phone = orderRequestDTO.phone(),
+            recipient = orderRequestDTO.recipient(),
+            paymentMethod = orderRequestDTO.paymentMethod(),
             totalPrice = calculateTotalPriceSales(cartList)
         )
 
         orderRepository.save(order)
 
-        // DetailOrder 객체 생성 (builder 제거)
         val detailOrders = cartList.map { cart ->
             DetailOrder(
                 order = order,
                 deliveryStatus = DeliveryStatus.PENDING,
                 book = cart.book,
-                bookQuantity = cart.quantity
+                bookQuantity = cart.quantity,
+                member = member
             )
         }
 
@@ -95,66 +96,56 @@ class OrderService(
     @Transactional
     fun createFastOrder(member: Member, orderRequestDTO: OrderRequestDto): Order {
         val cartList = cartService.findCartByMember(member)
-
-        // Order 객체 생성 (builder 제거)
         val order = Order(
             member = member,
             orderStatus = OrderStatus.ORDERED,
-            fullAddress = orderRequestDTO.fullAddress,
-            postCode = orderRequestDTO.postCode,
-            phone = orderRequestDTO.phone,
-            recipient = orderRequestDTO.recipient,
-            paymentMethod = orderRequestDTO.paymentMethod,
+            fullAddress = orderRequestDTO.fullAddress(),
+            postCode = orderRequestDTO.postCode(),
+            phone = orderRequestDTO.phone(),
+            recipient = orderRequestDTO.recipient(),
+            paymentMethod = orderRequestDTO.paymentMethod(),
             totalPrice = calculateTotalPriceSales(cartList)
         )
-
         orderRepository.save(order)
 
-        // DetailOrder 객체 생성 (builder 제거)
         val detailOrders = cartList.map { cart ->
             DetailOrder(
                 order = order,
                 deliveryStatus = DeliveryStatus.PENDING,
                 book = cart.book,
-                bookQuantity = cart.quantity
+                bookQuantity = cart.quantity,
+                member = member
             )
         }
-
         detailOrderRepository.saveAll(detailOrders)
 
-        cartService.deleteProduct(member) // 주문 완료 후 장바구니 비우기
+        cartService.deleteProduct(member) // 장바구니 비우기
         return order
     }
 
     @Transactional
-    fun createFastOrder(
-        member: Member,
-        orderRequestDTO: OrderRequestDto,
-        bookId: Long,
-        quantity: Int
-    ): Order {
+    fun createFastOrder(member: Member, orderRequestDTO: OrderRequestDto, bookId: Long, quantity: Int): Order {
         val book = bookService.getBookById(bookId)
-        val totalPrice = (book.pricesSales * quantity).toLong()
+        val totalPrice = book.pricesSales * quantity.toLong()
 
-        // Order 객체 생성 (builder 제거)
         val order = Order(
             member = member,
             orderStatus = OrderStatus.ORDERED,
-            fullAddress = orderRequestDTO.fullAddress,
-            postCode = orderRequestDTO.postCode,
-            phone = orderRequestDTO.phone,
-            recipient = orderRequestDTO.recipient,
-            paymentMethod = orderRequestDTO.paymentMethod,
+            fullAddress = orderRequestDTO.fullAddress(),
+            postCode = orderRequestDTO.postCode(),
+            phone = orderRequestDTO.phone(),
+            recipient = orderRequestDTO.recipient(),
+            paymentMethod = orderRequestDTO.paymentMethod(),
             totalPrice = totalPrice
         )
         orderRepository.save(order)
 
-        // DetailOrder 객체 생성 (builder 제거)
         val detailOrder = DetailOrder(
             order = order,
             deliveryStatus = DeliveryStatus.PENDING,
             book = book,
-            bookQuantity = quantity
+            bookQuantity = quantity,
+            member = member
         )
         detailOrderRepository.save(detailOrder)
 

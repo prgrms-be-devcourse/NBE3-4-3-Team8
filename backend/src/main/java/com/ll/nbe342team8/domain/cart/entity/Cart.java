@@ -24,17 +24,17 @@ public class Cart extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    private Long id;
+    public Long id;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    public Member member;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private Book book;
+    public Book book;
 
-    private int quantity;
+    public int quantity;
 
     public void updateCart(int quantity) {
         this.quantity = quantity;

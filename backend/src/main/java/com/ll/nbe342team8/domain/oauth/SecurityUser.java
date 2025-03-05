@@ -13,7 +13,7 @@ public class SecurityUser extends User implements OAuth2User {
     private final long id;
     private final String nickname;
     private final String email;
-    private final Member member;
+    public final Member member;
 
     public SecurityUser(Member member) {
         super(

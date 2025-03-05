@@ -51,9 +51,9 @@ class OrderController(
         @RequestParam("quantity") quantity: Int,
         @AuthenticationPrincipal securityUser: SecurityUser
     ): ResponseEntity<OrderResponseDto> {
-        println("orderRequestDto = $orderRequestDto, bookId = $bookId, quantity = $quantity")
-        val member: Member = securityUser.member
-        val order: Order = orderService.createFastOrder(member, orderRequestDto, bookId, quantity)
+
+        val member = securityUser.member // SecurityUser에서 member 가져오기
+        val order = orderService.createFastOrder(member, orderRequestDto, bookId, quantity)
         return ResponseEntity.ok(OrderResponseDto.from(order))
     }
 

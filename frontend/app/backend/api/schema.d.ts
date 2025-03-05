@@ -32,10 +32,27 @@ export interface paths {
         /** 사용자의 특정 qna 질문 조회 */
         get: operations["getQuestion"];
         /** 사용자의 특정 qna 질문 수정 */
-        put: operations["modifyQuesiton"];
+        put: operations["putQuestion"];
         post?: never;
         /** 사용자의 특정 qna 질문 삭제 */
-        delete: operations["removeQuesiton"];
+        delete: operations["deleteQuestion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/question/genFile/{questionId}/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 수정 */
+        put: operations["putNewFile"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -144,7 +161,24 @@ export interface paths {
         get: operations["getQuesitons"];
         put?: never;
         /** 사용자가 qna 질문 등록 */
-        post: operations["postQuesiton"];
+        post: operations["postQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/question/genFile/{questionId}/{typeCode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 등록 */
+        post: operations["makeNewFile"];
         delete?: never;
         options?: never;
         head?: never;
@@ -397,6 +431,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my/question/genFile/download/{questionId}/{fileName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 이미지 전송 */
+        get: operations["download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/my/orders": {
         parameters: {
             query?: never;
@@ -437,22 +488,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["payment"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/event/banners": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getBannerImages"];
         put?: never;
         post?: never;
         delete?: never;
@@ -520,6 +555,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getUserInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me/my/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 사용자 리뷰 조회 */
+        get: operations["getMemberReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -634,7 +686,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/my/orders/{orderId}": {
+    "/my/question/genFile/{questionId}/{fileNo}/{typeCode}": {
         parameters: {
             query?: never;
             header?: never;
@@ -644,7 +696,8 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["deleteOrder"];
+        /** 삭제 */
+        delete: operations["deleteNewFile"];
         options?: never;
         head?: never;
         patch?: never;
@@ -660,7 +713,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["deleteQuestion"];
+        delete: operations["deleteQuestion_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -697,7 +750,6 @@ export interface components {
         PutReqMemberMyPageDto: {
             name: string;
             phoneNumber: string;
-            profileImageUrl?: string;
         };
         ReqAnswerDto: {
             content: string;
@@ -833,23 +885,23 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         PageableObject: {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            unpaged?: boolean;
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
-            unpaged?: boolean;
         };
         ReviewResponseDto: {
             /** Format: int64 */
@@ -868,8 +920,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
         };
         Pageable: {
             /** Format: int32 */
@@ -898,11 +950,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         DetailOrderDto: {
@@ -966,12 +1018,37 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
+        };
+        PageDtoReviewsResponseDto: {
+            /** Format: int32 */
+            currentPageNumber: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int64 */
+            totalPages: number;
+            /** Format: int64 */
+            totalItems: number;
+            items: components["schemas"]["ReviewsResponseDto"][];
+        };
+        ReviewsResponseDto: {
+            /** Format: int64 */
+            bookId?: number;
+            bookTitle?: string;
+            bookContent?: string;
+            /** Format: int64 */
+            reviewId?: number;
+            /** Format: double */
+            rating?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
         };
         AdminOrderDTO: {
             /** Format: int64 */
@@ -994,11 +1071,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
@@ -1012,11 +1089,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         AdminQuestionDto: {
@@ -1080,11 +1157,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
     };
@@ -1165,7 +1242,7 @@ export interface operations {
             };
         };
     };
-    modifyQuesiton: {
+    putQuestion: {
         parameters: {
             query?: never;
             header?: never;
@@ -1191,7 +1268,7 @@ export interface operations {
             };
         };
     };
-    removeQuesiton: {
+    deleteQuestion: {
         parameters: {
             query?: never;
             header?: never;
@@ -1201,6 +1278,36 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    putNewFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             /** @description OK */
             200: {
@@ -1506,7 +1613,7 @@ export interface operations {
             };
         };
     };
-    postQuesiton: {
+    postQuestion: {
         parameters: {
             query?: never;
             header?: never;
@@ -1516,6 +1623,33 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ReqQuestionDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    makeNewFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                typeCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": string;
             };
         };
         responses: {
@@ -1913,6 +2047,29 @@ export interface operations {
             };
         };
     };
+    download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                fileName: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
+                };
+            };
+        };
+    };
     getOrdersByMember: {
         parameters: {
             query: {
@@ -1973,26 +2130,6 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["PaymentResponseDto"];
-                };
-            };
-        };
-    };
-    getBannerImages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": string[];
                 };
             };
         };
@@ -2085,6 +2222,28 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getMemberReviews: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["PageDtoReviewsResponseDto"];
                 };
             };
         };
@@ -2231,16 +2390,16 @@ export interface operations {
             };
         };
     };
-    deleteOrder: {
+    deleteNewFile: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                orderId: number;
+                questionId: number;
+                fileNo: number;
+                typeCode: string;
             };
-            cookie?: {
-                accessToken?: string;
-            };
+            cookie?: never;
         };
         requestBody?: never;
         responses: {
@@ -2250,12 +2409,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": string;
+                    "application/json;charset=UTF-8": Record<string, never>;
                 };
             };
         };
     };
-    deleteQuestion: {
+    deleteQuestion_1: {
         parameters: {
             query?: never;
             header?: never;
