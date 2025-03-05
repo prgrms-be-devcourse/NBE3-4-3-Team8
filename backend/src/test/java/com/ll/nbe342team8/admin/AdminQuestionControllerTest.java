@@ -29,9 +29,11 @@ import java.nio.charset.StandardCharsets;
 import static org.hamcrest.Matchers.hasSize;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
@@ -198,6 +200,26 @@ public class AdminQuestionControllerTest {
                 .andExpect(jsonPath("$.currentPageNumber").value(1))
                 .andExpect(jsonPath("$.pageSize").value(1))
                 .andExpect(jsonPath("$.items", hasSize(1)));
+    }
+
+    @Test
+    @DisplayName("관리자 - 질문 삭제")
+    void admindeletequesetion() throws Exception{
+        ResultActions resultActions = mockMvc.perform(
+                        delete("/admin/dashboard/questions/{questionid}", questionId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding(StandardCharsets.UTF_8)
+                )
+                .andDo(print());
+        resultActions
+                .andExpect(handler().handlerType(AdminQuestionController.class))
+                .andExpect(handler().methodName("deleteQuestion"))
+                .andExpect(status().isOk());
+
+        assertFalse(questionRepository.findById(questionId).isPresent(),
+                "질문이 삭제되어 존재하면 오류입니다.");
+        List<Answer> answers = answerRepository.findByQuestionId(questionId);
+        assertTrue(answers.isEmpty(), "질문에 달린 답변 또한 같이 삭제되었어야한다.");
     }
 }
 
