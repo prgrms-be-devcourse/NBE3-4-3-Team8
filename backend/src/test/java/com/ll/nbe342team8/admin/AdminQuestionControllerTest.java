@@ -217,9 +217,9 @@ public class AdminQuestionControllerTest {
                 .andExpect(status().isOk());
 
         assertFalse(questionRepository.findById(questionId).isPresent(),
-                "질문이 삭제되어 존재하면 오류입니다.");
+                "질문이 삭제되어 존재하면 오류");
         List<Answer> answers = answerRepository.findByQuestionId(questionId);
-        assertTrue(answers.isEmpty(), "질문에 달린 답변 또한 같이 삭제되었어야한다.");
+        assertTrue(answers.isEmpty(), "질문에 달린 답변 또한 같이 삭제되었어야 함.");
     }
 }
 
