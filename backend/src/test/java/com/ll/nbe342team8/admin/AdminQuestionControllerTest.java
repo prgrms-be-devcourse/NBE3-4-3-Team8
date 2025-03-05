@@ -175,6 +175,30 @@ public class AdminQuestionControllerTest {
                 .andExpect(jsonPath("$.answer").exists())
                 .andExpect(jsonPath("$.answer.content").value("Answer 1"));
     }
+
+    @Test
+    @DisplayName("관리자 - 페이지네이션")
+    void paginationTest() throws Exception{
+
+        ResultActions resultActions = mockMvc.perform(
+                get("/admin/dashboard/questions")
+                        .param("page", "0")
+                        .param("size", "1")
+                        .param("sort", "createDate,desc")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+        ).andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(AdminQuestionController.class))
+                .andExpect(handler().methodName("getAdminQuestions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.currentPageNumber").value(1))
+                .andExpect(jsonPath("$.pageSize").value(1))
+                .andExpect(jsonPath("$.items", hasSize(1)));
+    }
 }
 
 
