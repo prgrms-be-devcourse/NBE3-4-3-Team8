@@ -51,6 +51,8 @@ class QuestionController(
     //33ms , 62ms 데이터 100개 이하일때
     //20 ~30ms 데이터 10000개 일때
     //조회 데이터가 적을땐 효율이 좋지않음
+    //CREATE INDEX idx_question_member_create_date_id ON question (member_id, createDate DESC, id DESC);
+    //복합 인덱스 추가로 개선 가능
     @Operation(summary = "사용자가 작성한 QnA 질문 목록 조회")
     @GetMapping("/my/question")
     fun getKeySetQuestions(

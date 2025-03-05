@@ -26,7 +26,7 @@ import org.hibernate.annotations.BatchSize;
 @Table(
 		name = "question",
 		indexes = {
-				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 추가
+				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 나중에 내림차순 인덱스 mysql에 직접 설정
 		},
 		uniqueConstraints = {
 				@UniqueConstraint(
@@ -72,6 +72,7 @@ public class Question extends BaseTime {
 				.title(dto.getTitle())
 				.content(dto.getContent())
 				.member(member)
+				.isAnswer(false)
 				.build();
 
 		return question;
