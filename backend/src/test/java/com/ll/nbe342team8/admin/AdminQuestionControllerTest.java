@@ -5,6 +5,7 @@ import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
+import com.ll.nbe342team8.domain.qna.answer.repository.AnswerRepository;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.repository.QuestionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,9 @@ public class AdminQuestionControllerTest {
     @Autowired
     QuestionRepository questionRepository;
 
+    @Autowired
+    private AnswerRepository answerRepository;
+
     @BeforeEach
     void setup() {
         admin = new Member();
@@ -66,6 +70,9 @@ public class AdminQuestionControllerTest {
         regular.setName("User");
         regular.setMemberType(Member.MemberType.USER);
 
+        memberService.saveMember(admin);
+        memberService.saveMember(regular);
+
         Question question1 = Question.builder()
                 .title("Question 1")
                 .content("Content 1")
@@ -78,16 +85,16 @@ public class AdminQuestionControllerTest {
                 .member(regular)
                 .build();
 
+        questionRepository.save(question1);
+        questionRepository.save(question2);
+
         Answer answer = Answer.builder()
                 .content("Answer 1")
                 .question(question1)
                 .member(admin)
                 .build();
 
-        memberService.saveMember(admin);
-        memberService.saveMember(regular);
-        questionRepository.save(question1);
-        questionRepository.save(question2);
+        answerRepository.save(answer);
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -120,6 +127,28 @@ public class AdminQuestionControllerTest {
                 .andExpect(jsonPath("$.items[0].hasAnswer").value(false));
         
     }
+
+    @Test
+    @DisplayName("관리자- 답변 있는 질문 불러오기")
+    void getQuestionswithAnswerTest() throws Exception{
+
+        ResultActions resultActions = mockMvc.perform(
+                get("/admin/dashboard/questions")
+                        .param("hasAnswer", "true")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+        ).andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(AdminQuestionController.class))
+                .andExpect(handler().methodName("getAdminQuestions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.items[0].title").value("Question 1"))
+                .andExpect(jsonPath("$.items[0].hasAnswer").value(true));
+    }
+
 }
 
 
