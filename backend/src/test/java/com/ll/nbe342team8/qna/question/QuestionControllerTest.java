@@ -110,6 +110,7 @@ public class QuestionControllerTest {
 
     }
 
+    /*
     @Test
     @DisplayName("사용자 질문 불러오기1")
     void getMyQuestions1() throws Exception {
@@ -125,7 +126,34 @@ public class QuestionControllerTest {
         // ✅ 4. 응답 검증
         resultActions
                 .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("getQuesitons"))
+                .andExpect(handler().methodName("getQuestions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.items", hasSize(2)))
+                .andExpect(jsonPath("$.items[0].title").value("제목2"))
+                .andExpect(jsonPath("$.items[0].content").value("내용2"))
+                .andExpect(jsonPath("$.items[1].title").value("제목1"))
+                .andExpect(jsonPath("$.items[1].content").value("내용1"));
+    }
+
+     */
+
+    @Test
+    @DisplayName("keyset을 적용한 사용자 질문 불러오기")
+    void getMyKeysetQuestions2() throws Exception {
+
+        // ✅ 3. API 요청
+        ResultActions resultActions = mockMvc.perform(
+                        get("/my/question?page=0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding(StandardCharsets.UTF_8)
+                )
+                .andDo(print());
+
+        // ✅ 4. 응답 검증
+        resultActions
+                .andExpect(handler().handlerType(QuestionController.class))
+                .andExpect(handler().methodName("getKeySetQuestions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalItems").value(2))
                 .andExpect(jsonPath("$.items", hasSize(2)))

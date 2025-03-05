@@ -53,5 +53,53 @@ public class QuestionGenFile extends BaseTime {
         return Objects.hash(super.hashCode(), typeCode, fileNo);
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public String getFileDateDir() {
+        return fileDateDir;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public String getFileExt() {
+        return fileExt;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public int getFileSize() {
+        return fileSize;
+    }
+
+    public String getFileExtTypeCode() {
+        return fileExtTypeCode;
+    }
+
+    public String getFileExtType2Code() {
+        return fileExtType2Code;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public int getFileNo() {
+        return fileNo;
+    }
+
 
 }

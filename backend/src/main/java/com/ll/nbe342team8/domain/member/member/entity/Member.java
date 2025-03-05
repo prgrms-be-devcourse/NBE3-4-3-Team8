@@ -37,33 +37,33 @@ import lombok.Setter;
 public class Member extends BaseTime implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-	private Long id;
+	public Long id;
 
-	private String name; // 사용자 이름
+	public String name; // 사용자 이름
 
-	private String phoneNumber; // 전화번호
+	public String phoneNumber; // 전화번호
 
 	@Enumerated(EnumType.STRING)
-	private MemberType memberType; // 사용자 역할(사용자, 관리자)
+	public MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-	private String oAuthId; // 필드 이름 변경
+	public String oAuthId; // 필드 이름 변경
 
-	private String email; // 사용자 이메일
+	public String email; // 사용자 이메일
 
-	private String password;
+	public String password;
 
-	private String username;
+	public String username;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DeliveryInformation> deliveryInformations;
+	public List<DeliveryInformation> deliveryInformations;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-	private List<Cart> carts;
+	public List<Cart> carts;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-	private List<Question> questions;
+	public List<Question> questions;
 
-  private String profileImageUrl;
+  	public String profileImageUrl;
 
   // Enum 사용자 역할
   public enum MemberType {
@@ -72,8 +72,8 @@ public class Member extends BaseTime implements UserDetails {
   }
   
  	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
-		this.name = dto.name();
-		this.phoneNumber = dto.phoneNumber();
+		this.name = dto.getName();
+		this.phoneNumber = dto.getPhoneNumber();
 	}
 
 	public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
@@ -120,5 +120,25 @@ public class Member extends BaseTime implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	private Member(String oAuthId, String email, String name, String phoneNumber, MemberType memberType, String password) {
+		this.oAuthId = oAuthId;
+		this.email = email;
+		this.name = name;
+		this.phoneNumber = phoneNumber;
+		this.memberType = memberType;
+		this.password = password;
+	}
+
+	public static Member of(String oAuthId, String email, PutReqMemberMyPageDto dto) {
+		return new Member(
+				oAuthId,
+				email,
+				dto.getName(),
+				dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "", // 전화번호가 없으면 빈 문자열 저장
+				MemberType.USER,
+				""
+		);
 	}
 }
