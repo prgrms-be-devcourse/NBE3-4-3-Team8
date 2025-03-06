@@ -1,15 +1,13 @@
 package com.ll.nbe342team8.global.baseInit.data;
 
-import java.util.UUID;
-
+import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
-
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor

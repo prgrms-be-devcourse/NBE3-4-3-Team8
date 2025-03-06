@@ -5,7 +5,10 @@ import com.ll.nbe342team8.domain.member.member.entity.Member
 import com.ll.nbe342team8.domain.order.order.entity.Order
 import com.ll.nbe342team8.global.jpa.entity.BaseTime
 import jakarta.persistence.*
-import lombok.*
+import lombok.AllArgsConstructor
+import lombok.Builder
+import lombok.Getter
+import lombok.NoArgsConstructor
 
 @Entity
 @Getter
@@ -20,10 +23,10 @@ class DetailOrder(
     @ManyToOne(fetch = FetchType.LAZY)
     val order: Order,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER) //나중에 다시 변경
     val book: Book,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER) //나중에 다시 변경
     val member: Member,
 
     val bookQuantity: Int,

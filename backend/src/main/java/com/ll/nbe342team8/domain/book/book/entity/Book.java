@@ -1,29 +1,18 @@
 package com.ll.nbe342team8.domain.book.book.entity;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.hibernate.annotations.Formula;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ll.nbe342team8.domain.book.category.entity.Category;
 import com.ll.nbe342team8.domain.book.review.entity.Review;
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Formula;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -91,6 +80,9 @@ public class Book extends BaseTime {
 
 	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
 	public List<Review> review;
+
+	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+	public List<DetailOrder> detailOrders = new ArrayList<>();  // 기본값 설정
 
 	public void createReview(Double rating) {
 		this.reviewCount++;
