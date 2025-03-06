@@ -86,7 +86,7 @@ class QuestionController(
 
     @Operation(summary = "사용자의 특정 qna 질문 조회")
     @GetMapping("/my/question/{id}")
-    fun getQuestion(@PathVariable id: Long): ResponseEntity<*> {
+    fun getQuestion(@PathVariable id: Long): ResponseEntity<QuestionDto> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -104,11 +104,12 @@ class QuestionController(
         return ResponseEntity.ok(questionDto)
     }
 
+
     @Operation(summary = "사용자가 qna 질문 등록")
     @PostMapping("/my/question")
     fun postQuestion(
         @RequestBody reqQuestionDto: @Valid ReqQuestionDto
-    ): ResponseEntity<*> {
+    ): ResponseEntity<QuestionDto> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -116,7 +117,7 @@ class QuestionController(
         val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
             .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
 
-        validateExistsDuplicateQuestionInShortTime( member,reqQuestionDto?.title ?: "",reqQuestionDto?.content ?: "", Duration.ofSeconds(5))
+        validateExistsDuplicateQuestionInShortTime( member,reqQuestionDto.title ?: "",reqQuestionDto.content ?: "", Duration.ofSeconds(5))
         val question = questionService.createQuestion(member, reqQuestionDto)
 
         val questionDto = QuestionDto(question)
@@ -129,7 +130,7 @@ class QuestionController(
     fun putQuestion(
         @PathVariable id: Long,
         @RequestBody reqQuestionDto: @Valid ReqQuestionDto
-    ): ResponseEntity<*> {
+    ): ResponseEntity<Void> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -144,14 +145,14 @@ class QuestionController(
 
         questionService.modifyQuestion(question, reqQuestionDto)
 
-        return ResponseEntity.ok().build<Any>()
+        return ResponseEntity.ok().build()
     }
 
     @Operation(summary = "사용자의 특정 qna 질문 삭제")
     @DeleteMapping("/my/question/{id}")
     fun deleteQuestion(
         @PathVariable id: Long
-    ): ResponseEntity<*> {
+    ): ResponseEntity<Void> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -166,7 +167,7 @@ class QuestionController(
 
         questionService.deleteQuestion(question)
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build<Any>()
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
 

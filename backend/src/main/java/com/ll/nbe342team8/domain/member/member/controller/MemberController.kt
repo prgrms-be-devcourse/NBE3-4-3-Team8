@@ -41,14 +41,14 @@ class MemberController (
         return if (securityUser != null) {
             ResponseEntity.ok(MemberDto(securityUser.member))
         } else {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build<Any>()
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build<Void>()
         }
     }
 
 
     @GetMapping("/my")
     @Operation(summary = "사용자 정보 조회")
-    fun getMyPage(): ResponseEntity<*>
+    fun getMyPage(): ResponseEntity<ResMemberMyPageDto>
     //마이페이지 데이터를 불러온다. 마이페이지는 resMemberMyPageDto 데이터를 이용해 마이페이지를 구성한다.
     {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -69,7 +69,7 @@ class MemberController (
     @PutMapping("/my")
     fun putMyPage(
         @RequestBody putReqMemberMyPageDto: @Valid PutReqMemberMyPageDto
-    ): ResponseEntity<*> {
+    ): ResponseEntity<ResMemberMyPageDto> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")

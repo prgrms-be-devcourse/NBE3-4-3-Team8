@@ -31,7 +31,7 @@ class DeliveryInformationController(
     @PostMapping("/my/deliveryInformation")
     fun postDeliveryInformation(
         @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto
-    ): ResponseEntity<*> {
+    ): ResponseEntity<ResMemberMyPageDto> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -57,7 +57,7 @@ class DeliveryInformationController(
     @DeleteMapping("/my/deliveryInformation/{id}")
     fun deleteDeliveryInformation(
         @PathVariable id: Long
-    ): ResponseEntity<*> {
+    ): ResponseEntity<ResMemberMyPageDto> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
@@ -85,7 +85,7 @@ class DeliveryInformationController(
     fun putDeliveryInformation(
         @PathVariable id: Long,
         @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto
-    ): ResponseEntity<*> {
+    ): ResponseEntity<ResMemberMyPageDto> {
         val authentication = SecurityContextHolder.getContext().authentication
         val securityUser = authentication?.principal as? SecurityUser
             ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
