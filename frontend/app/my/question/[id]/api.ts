@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { QuestionDto, QuestionGenFileDto } from "./types";
+import { QuestionDto, QuestionGenFileDto, ImageUrlDto } from "./types";
 
 const API_BASE_URL = "http://localhost:8080"; // API 주소 변경 필요
 
-export function useFetchImages(question: QuestionDto) {
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
+export function useFetchImages(question: QuestionDto | null) : ImageUrlDto[] {
+    const [imageUrlDtos, setImageUrlDtos] = useState<ImageUrlDto[]>([]);
     console.log("questionFile:")
     console.log(question)
     useEffect(() => {
@@ -12,11 +12,11 @@ export function useFetchImages(question: QuestionDto) {
       if (!question || !question.genFiles) return;
       
       const fetchImages = async () => {
-        const urls = await Promise.all(
+        const dtos = await Promise.all(
           question.genFiles.map(async (file: QuestionGenFileDto) => {
-            console.log(`fetch: ${API_BASE_URL}/my/question/genFile/download/${question.id}/${file.fileName}`)
+            console.log(`fetch: ${API_BASE_URL}/my/question/genFile/download/${question.id}/${file.fileNo}`)
             const response = await fetch(
-              `${API_BASE_URL}/my/question/genFile/download/${question.id}/${file.fileName}`, {
+              `${API_BASE_URL}/my/question/genFile/download/${question.id}/${file.fileNo}`, {
                 method: 'GET',
                 credentials: 'include',
               }
@@ -25,23 +25,29 @@ export function useFetchImages(question: QuestionDto) {
             
   
             if (!response.ok) {
-              console.error(`Failed to load image: ${file.fileName}`);
+              console.error(`Failed to load image: ${file.fileNo}`);
               return null;
             }
   
             const blob = await response.blob();
-            return URL.createObjectURL(blob);
+            const imageUrl = URL.createObjectURL(blob);
+
+            return {
+              imageUrl,
+              typeCode: file.typeCode,
+              fileNo: file.fileNo
+            };
           })
         );
   
-        setImageUrls(urls.filter(Boolean) as string[]);
+        setImageUrlDtos(dtos.filter(Boolean) as ImageUrlDto[]);
       };
   
       fetchImages();
     }, [question]);
     console.log("urls");
-    console.log(imageUrls);
-    return imageUrls;
+    console.log(imageUrlDtos);
+    return imageUrlDtos;
   }
 
   async function apiRequest(url: string, method: string, body?: object): Promise<Response> {

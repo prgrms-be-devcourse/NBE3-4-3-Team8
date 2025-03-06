@@ -1,11 +1,23 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.0'
+    id 'org.jetbrains.kotlin.plugin.jpa' version "1.9.22" // 최신 버전
 }
 
 group = 'com.ll'
 version = '0.0.1-SNAPSHOT'
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "21"
+    }
+}
+
 
 java {
     toolchain {
@@ -63,6 +75,8 @@ dependencies {
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.8.1")
 
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
 
 
 }

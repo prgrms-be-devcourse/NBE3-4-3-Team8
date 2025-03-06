@@ -86,11 +86,6 @@ public class MemberControllerTest {
     @Autowired
     BookService bookService;
 
-    @Autowired MemberRepository memberRepository;
-
-    @Autowired
-    DeliveryInformationRepository deliveryInformationRepository;
-
     @BeforeEach
     void setup() {
         // ✅ Mock Member 생성
@@ -98,6 +93,7 @@ public class MemberControllerTest {
         mockMember.setOAuthId("31313");
         mockMember.setPhoneNumber("010-1111-2222");
         mockMember.setName("테스트 유저");
+        mockMember.setEmail("rddds112@naver.com");
 
         DeliveryInformation deliveryInformation1=DeliveryInformation.builder()
                 .phone("010-1234-5678")
