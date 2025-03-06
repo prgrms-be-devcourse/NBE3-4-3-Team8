@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { fetchPaymentInfo, createOrder, createFastOrder } from '@/utils/api';
+import { fetchPaymentInfo, fetchFastOrderInfo, fetchSinglePaymentInfo } from '@/utils/api';
 import Script from 'next/script';
 import { DeliveryInformationDto } from '@/app/my/types';
 import DeliveryInformation from '@/app/components/order/DeliveryInformation';
@@ -23,11 +23,20 @@ interface PaymentInfo {
   orderId: string; // 백엔드에서 생성한 주문 ID
 }
 
+interface FastOrderInfo {
+  bookInfo: OrderItemData;
+  priceStandard: number; // 원래 가격
+  pricesSales: number; // 할인 적용된 가격
+  orderId: string; // 백엔드에서 생성한 주문 ID
+}
+
 export default function OrderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fastOrderParam = searchParams.get('fastOrder');
   const orderItemParam = searchParams.get('orderItem');
+  const bookIdParam = searchParams.get('bookId');
+  const quantityParam = searchParams.get('quantity');
 
   const [fastOrderItem, setFastOrderItem] = useState<OrderItemData | null>(null);
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
@@ -45,7 +54,6 @@ export default function OrderPage() {
   // 결제 관련 상태
   const [tossPaymentsLoaded, setTossPaymentsLoaded] = useState(false);
   const [tossWidgets, setTossWidgets] = useState<any>(null);
-  const [applyCoupon, setApplyCoupon] = useState(false);
 
   // 결제 정보 계산
   const [subtotal, setSubtotal] = useState(0);
@@ -53,6 +61,7 @@ export default function OrderPage() {
   const [shippingFee, setShippingFee] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItemData[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState('CARD');
 
   // Toss Payments 설정
   const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
@@ -104,23 +113,6 @@ export default function OrderPage() {
     initTossPayments();
   }, [tossPaymentsLoaded, totalPrice, clientKey, customerKey]);
 
-  // 쿠폰 적용 시 결제 금액 업데이트
-  useEffect(() => {
-    if (!tossWidgets) return;
-
-    const updateAmount = async () => {
-      const couponDiscount = applyCoupon ? 5000 : 0;
-      const newTotalPrice = Math.max(0, totalPrice - couponDiscount);
-
-      await tossWidgets.setAmount({
-        currency: 'KRW',
-        value: newTotalPrice,
-      });
-    };
-
-    updateAmount();
-  }, [applyCoupon, tossWidgets, totalPrice]);
-
   // 마이페이지에서 저장한 기본 배송지가 있다면 읽어와서 초기값 설정
   useEffect(() => {
     const storedDelivery = localStorage.getItem('defaultDelivery');
@@ -134,36 +126,70 @@ export default function OrderPage() {
     }
   }, []);
 
-  // 주문 정보 로드
+  // 주문 정보 로드 - 일반 결제와 빠른 주문 모두 처리
   useEffect(() => {
-    if (fastOrderParam === 'true' && orderItemParam) {
+    const loadOrderInfo = async () => {
       try {
-        const parsedItem: OrderItemData = JSON.parse(decodeURIComponent(orderItemParam));
-        setFastOrderItem(parsedItem);
+        setLoadingPaymentInfo(true);
 
-        // 결제 정보 계산
-        const itemSubtotal = parsedItem.price * parsedItem.quantity;
-        const itemShippingFee = 0; // 배송비 정책에 따라 조정
+        // 빠른 주문인 경우
+        if (fastOrderParam === 'true') {
+          let bookId: number;
+          let quantity: number;
 
-        setSubtotal(itemSubtotal);
-        setDiscount(0);
-        setShippingFee(itemShippingFee);
-        setTotalPrice(itemSubtotal + itemShippingFee);
-        setOrderItems([parsedItem]);
+          // orderItemParam이 있는 경우 (BookInfo.tsx에서 넘어온 경우)
+          if (orderItemParam) {
+            try {
+              // JSON 파싱하여 bookId와 quantity 추출
+              const decodedOrderItem = JSON.parse(
+                decodeURIComponent(orderItemParam),
+              ) as OrderItemData;
+              bookId = decodedOrderItem.bookId;
+              quantity = decodedOrderItem.quantity;
+            } catch (error) {
+              console.error('주문 정보 파싱 실패:', error);
+              setErrorPaymentInfo('주문 정보를 불러오는 데 실패했습니다.');
+              setLoadingPaymentInfo(false);
+              return;
+            }
+          }
+          // bookId와 quantity 파라미터가 직접 제공된 경우
+          else if (bookIdParam && quantityParam) {
+            bookId = parseInt(bookIdParam);
+            quantity = parseInt(quantityParam);
+          } else {
+            setErrorPaymentInfo('주문 정보가 올바르지 않습니다.');
+            setLoadingPaymentInfo(false);
+            return;
+          }
 
-        // 빠른 주문의 경우에도 백엔드에서 주문 ID를 받아오는 API 호출이 필요합니다.
-        // 이 부분은 백엔드 API에 맞게 구현해야 합니다.
-        // 예시: const response = await fetchFastOrderId(parsedItem);
-        // setOrderId(response.orderId);
-      } catch (error) {
-        console.error('orderItem 파싱 오류:', error);
-        setErrorPaymentInfo('주문 정보를 불러오는 데 실패했습니다.');
-      } finally {
-        setLoadingPaymentInfo(false);
-      }
-    } else {
-      const loadPaymentInfo = async () => {
-        try {
+          // 백엔드에서 빠른 주문 정보 가져오기
+          console.log('Fetching single payment info for bookId:', bookId, 'quantity:', quantity);
+          const data = await fetchSinglePaymentInfo(bookId, quantity);
+          console.log('Received book info:', data);
+
+          if (!data || !data.cartList || data.cartList.length === 0) {
+            throw new Error('서버에서 유효한 도서 정보를 반환하지 않았습니다.');
+          }
+
+          setFastOrderItem(data.cartList[0]);
+
+          // 결제 정보 계산
+          const itemSubtotal = data.priceStandard;
+          const itemDiscount = data.priceStandard - data.pricesSales;
+          const itemShippingFee = 0; // 배송비 정책에 따라 조정
+
+          setSubtotal(itemSubtotal);
+          setDiscount(itemDiscount);
+          setShippingFee(itemShippingFee);
+          setTotalPrice(data.pricesSales + itemShippingFee);
+          setOrderItems(data.cartList);
+
+          // 백엔드에서 생성한 주문 ID 저장
+          setOrderId(data.orderId);
+        }
+        // 일반 결제인 경우 (장바구니)
+        else {
           const data = await fetchPaymentInfo();
           setPaymentInfo(data);
 
@@ -180,16 +206,17 @@ export default function OrderPage() {
           setShippingFee(cartShippingFee);
           setTotalPrice(data.pricesSales + cartShippingFee);
           setOrderItems(data.cartList);
-        } catch (error) {
-          console.error('결제 정보 불러오기 실패:', error);
-          setErrorPaymentInfo('결제 정보를 불러오는 데 실패했습니다.');
-        } finally {
-          setLoadingPaymentInfo(false);
         }
-      };
-      loadPaymentInfo();
-    }
-  }, [fastOrderParam, orderItemParam]);
+      } catch (error) {
+        console.error('결제 정보 불러오기 실패:', error);
+        setErrorPaymentInfo('결제 정보를 불러오는 데 실패했습니다.');
+      } finally {
+        setLoadingPaymentInfo(false);
+      }
+    };
+
+    loadOrderInfo();
+  }, [fastOrderParam, orderItemParam, bookIdParam, quantityParam]);
 
   // 주소 검색 스크립트 로드
   const loadPostcodeScript = () => {
@@ -251,15 +278,6 @@ export default function OrderPage() {
         customerName: recipient,
         customerMobilePhone: phone,
       });
-
-      // 결제 성공 후 redirect되므로 이 코드는 실행되지 않을 수 있습니다.
-      const orderData = {
-        postCode,
-        fullAddress,
-        recipient,
-        phone,
-        orderId,
-      };
       // 주문 생성 로직은 successUrl 페이지에서 처리
     } catch (error) {
       console.error('결제 처리 중 오류:', error);

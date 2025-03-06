@@ -73,4 +73,14 @@ public class OrderController {
         System.out.println("paymentResponseDto = " + paymentResponseDto);
         return ResponseEntity.ok(paymentResponseDto);
     }
+
+    @GetMapping("/payment/single")
+    public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser,
+                                                      @RequestParam("bookId") Long bookId,
+                                                      @RequestParam("quantity") int quantity) {
+        Member member = securityUser.getMember();
+        PaymentResponseDto paymentResponseDto = orderService.createSinglePaymentInfo(member, bookId, quantity);
+        System.out.println("paymentResponseDto = " + paymentResponseDto);
+        return ResponseEntity.ok(paymentResponseDto);
+    }
 }

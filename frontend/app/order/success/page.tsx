@@ -70,7 +70,7 @@ const OrderSuccessPage = () => {
       {/* 버튼 그룹 */}
       <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
         <Link
-          href="/mypage/orders"
+          href="/my/orders"
           className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg text-center transition-all hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5"
         >
           주문 내역 확인

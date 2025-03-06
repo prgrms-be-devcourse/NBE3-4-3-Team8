@@ -98,35 +98,6 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO) {
-        List<Cart> cartList = cartService.findCartByMember(member);
-        Order order = Order.builder()
-                .member(member)
-                .orderStatus(OrderStatus.ORDERED)
-                .fullAddress(orderRequestDTO.fullAddress())
-                .postCode(orderRequestDTO.postCode())
-                .phone(orderRequestDTO.phone())
-                .recipient(orderRequestDTO.recipient())
-                .paymentMethod(orderRequestDTO.paymentMethod())
-                .totalPrice(calculateTotalPriceSales(cartList))
-                .build();
-        orderRepository.save(order);
-
-        List<DetailOrder> detailOrders = cartList.stream()
-                .map(cart -> DetailOrder.builder()
-                        .order(order)
-                        .deliveryStatus(DeliveryStatus.PENDING)
-                        .book(cart.getBook())
-                        .bookQuantity(cart.getQuantity())
-                        .build())
-                .collect(Collectors.toList());
-        detailOrderRepository.saveAll(detailOrders);
-
-        cartService.deleteProduct(member); // 주문 완료 후 장바구니 비우기
-        return order;
-    }
-
-    @Transactional
     public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO, Long bookId, int quantity) {
         Book book = bookService.getBookById(bookId);
         long totalPrice = (long) book.getPricesSales() * quantity;
@@ -178,6 +149,17 @@ public class OrderService {
         String orderId = generateOrderId();
 
         return new PaymentResponseDto(cartResponseDtoList, totalPriceStandard, totalPriceSales, orderId);
+    }
+
+    public PaymentResponseDto createSinglePaymentInfo(Member member, Long bookId, int quantity) {
+        Book book = bookService.getBookById(bookId);
+        // 주문 ID 생성
+        String orderId = generateOrderId();
+
+        return new PaymentResponseDto(List.of(CartResponseDto.from(new Cart(member, book, quantity))),
+                (long) book.getPriceStandard() * quantity,
+                (long) book.getPricesSales() * quantity,
+                orderId);
     }
 
     // 주문 ID 생성 메서드
