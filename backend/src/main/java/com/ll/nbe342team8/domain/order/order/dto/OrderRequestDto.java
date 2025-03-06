@@ -10,5 +10,10 @@ public record OrderRequestDto(
         @Pattern(regexp = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$", message = "10 ~ 11 자리의 숫자만 입력 가능합니다.")
         String phone,         // 전화번호
         String paymentMethod  // 결제수단
+
+        // paymentKey
+        // orderId
+        // approvedAt
+        // totalPrice (토스 response에서 totalAmount)
 ) {
 }

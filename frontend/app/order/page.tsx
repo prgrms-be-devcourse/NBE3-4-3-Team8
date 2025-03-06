@@ -1,4 +1,3 @@
-// app/order/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchPaymentInfo, createOrder, createFastOrder } from '@/utils/api';
 import Script from 'next/script';
 import { DeliveryInformationDto } from '@/app/my/types';
+import DeliveryInformation from '@/app/components/order/DeliveryInformation';
 
 interface OrderItemData {
   bookId: number;
@@ -20,6 +20,7 @@ interface PaymentInfo {
   cartList: OrderItemData[];
   priceStandard: number; // 원래 가격 합계
   pricesSales: number; // 할인 적용된 가격 합계
+  orderId: string; // 백엔드에서 생성한 주문 ID
 }
 
 export default function OrderPage() {
@@ -32,6 +33,7 @@ export default function OrderPage() {
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
   const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
   const [errorPaymentInfo, setErrorPaymentInfo] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string>(''); // 백엔드에서 받은 주문 ID 저장
 
   // 배송지 입력 폼 상태
   const [postCode, setPostCode] = useState('');
@@ -39,7 +41,85 @@ export default function OrderPage() {
   const [detailAddress, setDetailAddress] = useState('');
   const [recipient, setRecipient] = useState('');
   const [phone, setPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('CARD');
+
+  // 결제 관련 상태
+  const [tossPaymentsLoaded, setTossPaymentsLoaded] = useState(false);
+  const [tossWidgets, setTossWidgets] = useState<any>(null);
+  const [applyCoupon, setApplyCoupon] = useState(false);
+
+  // 결제 정보 계산
+  const [subtotal, setSubtotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [orderItems, setOrderItems] = useState<OrderItemData[]>([]);
+
+  // Toss Payments 설정
+  const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
+  const customerKey = 'YSZV58QAF8mLlddWuQEMN';
+
+  // Toss Payments 스크립트 로드 확인
+  const handleTossPaymentsLoad = () => {
+    setTossPaymentsLoaded(true);
+  };
+
+  // 결제 위젯 초기화
+  useEffect(() => {
+    if (!tossPaymentsLoaded || !totalPrice) return;
+
+    const initTossPayments = async () => {
+      try {
+        // @ts-ignore - TossPayments는 외부 스크립트에서 로드됨
+        const tossPayments = TossPayments(clientKey);
+
+        // 회원 결제 위젯 초기화
+        const widgets = tossPayments.widgets({
+          customerKey,
+        });
+
+        // 결제 금액 설정
+        await widgets.setAmount({
+          currency: 'KRW',
+          value: totalPrice,
+        });
+
+        // 결제 UI 및 이용약관 UI 렌더링
+        await Promise.all([
+          widgets.renderPaymentMethods({
+            selector: '#payment-method',
+            variantKey: 'DEFAULT',
+          }),
+          widgets.renderAgreement({
+            selector: '#agreement',
+            variantKey: 'AGREEMENT',
+          }),
+        ]);
+
+        setTossWidgets(widgets);
+      } catch (error) {
+        console.error('Toss Payments 초기화 오류:', error);
+      }
+    };
+
+    initTossPayments();
+  }, [tossPaymentsLoaded, totalPrice, clientKey, customerKey]);
+
+  // 쿠폰 적용 시 결제 금액 업데이트
+  useEffect(() => {
+    if (!tossWidgets) return;
+
+    const updateAmount = async () => {
+      const couponDiscount = applyCoupon ? 5000 : 0;
+      const newTotalPrice = Math.max(0, totalPrice - couponDiscount);
+
+      await tossWidgets.setAmount({
+        currency: 'KRW',
+        value: newTotalPrice,
+      });
+    };
+
+    updateAmount();
+  }, [applyCoupon, tossWidgets, totalPrice]);
 
   // 마이페이지에서 저장한 기본 배송지가 있다면 읽어와서 초기값 설정
   useEffect(() => {
@@ -47,7 +127,6 @@ export default function OrderPage() {
     if (storedDelivery) {
       const defaultDelivery: DeliveryInformationDto = JSON.parse(storedDelivery);
       setPostCode(defaultDelivery.postCode);
-      // 여기서는 예시로 addressName을 도로명주소로 사용합니다.
       setRoadAddress(defaultDelivery.addressName);
       setDetailAddress(defaultDelivery.detailAddress);
       setRecipient(defaultDelivery.recipient);
@@ -55,11 +134,27 @@ export default function OrderPage() {
     }
   }, []);
 
+  // 주문 정보 로드
   useEffect(() => {
     if (fastOrderParam === 'true' && orderItemParam) {
       try {
         const parsedItem: OrderItemData = JSON.parse(decodeURIComponent(orderItemParam));
         setFastOrderItem(parsedItem);
+
+        // 결제 정보 계산
+        const itemSubtotal = parsedItem.price * parsedItem.quantity;
+        const itemShippingFee = 0; // 배송비 정책에 따라 조정
+
+        setSubtotal(itemSubtotal);
+        setDiscount(0);
+        setShippingFee(itemShippingFee);
+        setTotalPrice(itemSubtotal + itemShippingFee);
+        setOrderItems([parsedItem]);
+
+        // 빠른 주문의 경우에도 백엔드에서 주문 ID를 받아오는 API 호출이 필요합니다.
+        // 이 부분은 백엔드 API에 맞게 구현해야 합니다.
+        // 예시: const response = await fetchFastOrderId(parsedItem);
+        // setOrderId(response.orderId);
       } catch (error) {
         console.error('orderItem 파싱 오류:', error);
         setErrorPaymentInfo('주문 정보를 불러오는 데 실패했습니다.');
@@ -71,6 +166,20 @@ export default function OrderPage() {
         try {
           const data = await fetchPaymentInfo();
           setPaymentInfo(data);
+
+          // 백엔드에서 생성한 주문 ID 저장
+          setOrderId(data.orderId);
+
+          // 결제 정보 계산
+          const cartSubtotal = data.priceStandard;
+          const cartDiscount = data.priceStandard - data.pricesSales;
+          const cartShippingFee = 0; // 배송비 정책에 따라 조정
+
+          setSubtotal(cartSubtotal);
+          setDiscount(cartDiscount);
+          setShippingFee(cartShippingFee);
+          setTotalPrice(data.pricesSales + cartShippingFee);
+          setOrderItems(data.cartList);
         } catch (error) {
           console.error('결제 정보 불러오기 실패:', error);
           setErrorPaymentInfo('결제 정보를 불러오는 데 실패했습니다.');
@@ -82,61 +191,7 @@ export default function OrderPage() {
     }
   }, [fastOrderParam, orderItemParam]);
 
-  if (loadingPaymentInfo) {
-    return <div className="max-w-6xl mx-auto py-8">결제 정보를 불러오는 중...</div>;
-  }
-  if (errorPaymentInfo || (!fastOrderItem && !paymentInfo)) {
-    return (
-        <div className="max-w-6xl mx-auto py-8 text-center text-red-500">
-          {errorPaymentInfo}
-        </div>
-    );
-  }
-
-  let subtotal = 0;
-  let discount = 0;
-  let shippingFee = 0;
-  let totalPrice = 0;
-  let orderItems: OrderItemData[] = [];
-
-  if (fastOrderParam === 'true' && fastOrderItem) {
-    subtotal = fastOrderItem.price * fastOrderItem.quantity;
-    discount = 0;
-    shippingFee = 0;
-    totalPrice = subtotal + shippingFee;
-    orderItems = [fastOrderItem];
-  } else if (paymentInfo) {
-    subtotal = paymentInfo.priceStandard;
-    discount = paymentInfo.priceStandard - paymentInfo.pricesSales;
-    shippingFee = 0;
-    totalPrice = paymentInfo.pricesSales + shippingFee;
-    orderItems = paymentInfo.cartList;
-  }
-
-  const handlePayment = async () => {
-    const fullAddress = roadAddress.trim() + ' ' + detailAddress.trim();
-
-    try {
-      const orderData = {
-        postCode,
-        fullAddress,
-        recipient,
-        phone,
-        paymentMethod,
-      };
-      if (fastOrderParam === 'true' && fastOrderItem) {
-        await createFastOrder(orderData, fastOrderItem.bookId, fastOrderItem.quantity);
-      } else {
-        await createOrder(orderData);
-      }
-      alert('주문이 성공적으로 생성되었습니다!');
-      router.push('/');
-    } catch (error) {
-      console.error('주문 생성 중 오류:', error);
-      alert('주문 생성 중 오류가 발생했습니다.');
-    }
-  };
-
+  // 주소 검색 스크립트 로드
   const loadPostcodeScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
@@ -146,6 +201,7 @@ export default function OrderPage() {
     });
   };
 
+  // 주소 검색 처리 (DeliveryInformation 컴포넌트에 전달)
   const handleAddressSearch = async () => {
     if (!(window as any).daum || !(window as any).daum.Postcode) {
       await loadPostcodeScript();
@@ -160,163 +216,164 @@ export default function OrderPage() {
     }).open();
   };
 
+  // 결제 처리
+  const handlePayment = async () => {
+    if (!tossWidgets) {
+      alert('결제 시스템을 초기화하는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    if (!postCode || !roadAddress || !recipient || !phone) {
+      alert('배송 정보를 모두 입력해주세요.');
+      return;
+    }
+
+    if (!orderId) {
+      alert('주문 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    const fullAddress = roadAddress.trim() + ' ' + detailAddress.trim();
+
+    try {
+      // 백엔드에서 받은 주문 ID 사용
+      const orderName =
+        orderItems.length > 1
+          ? `${orderItems[0].title} 외 ${orderItems.length - 1}건`
+          : orderItems[0].title;
+
+      await tossWidgets.requestPayment({
+        orderId: orderId, // 백엔드에서 받은 주문 ID 사용
+        orderName: orderName,
+        successUrl: `http://localhost:8080/order/success`,
+        failUrl: `${window.location.origin}/order/fail`,
+        customerEmail: '', // 필요시 추가
+        customerName: recipient,
+        customerMobilePhone: phone,
+      });
+
+      // 결제 성공 후 redirect되므로 이 코드는 실행되지 않을 수 있습니다.
+      const orderData = {
+        postCode,
+        fullAddress,
+        recipient,
+        phone,
+        orderId,
+      };
+      // 주문 생성 로직은 successUrl 페이지에서 처리
+    } catch (error) {
+      console.error('결제 처리 중 오류:', error);
+      alert('결제 처리 중 오류가 발생했습니다.');
+    }
+  };
+
+  if (loadingPaymentInfo) {
+    return <div className="max-w-6xl mx-auto py-8">결제 정보를 불러오는 중...</div>;
+  }
+
+  if (errorPaymentInfo || (!fastOrderItem && !paymentInfo)) {
+    return (
+      <div className="max-w-6xl mx-auto py-8 text-center text-red-500">{errorPaymentInfo}</div>
+    );
+  }
+
   return (
-      <div className="max-w-6xl mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-6">주문결제</h1>
-        {orderItems.length === 0 ? (
-            <div className="text-center py-10">주문할 상품이 없습니다.</div>
-        ) : (
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* 왼쪽: 주문 상품 목록 */}
-              <div className="flex-1 space-y-6">
-                {orderItems.map((item) => (
-                    <div
-                        key={item.bookId}
-                        className="flex items-center gap-6 p-6 border border-gray-200 rounded-lg"
-                    >
-                      <div className="w-32 h-32 bg-gray-100 relative flex-shrink-0">
-                        <Image
-                            src={item.coverImage}
-                            alt={item.title}
-                            fill
-                            className="rounded-lg object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-medium">{item.title}</h3>
-                        <p className="text-gray-500">가격: {item.price.toLocaleString()}원</p>
-                        <p className="text-gray-500">수량: {item.quantity}</p>
+    <div className="max-w-6xl mx-auto py-8">
+      {/* Toss Payments 스크립트 로드 */}
+      <Script src="https://js.tosspayments.com/v2/standard" onLoad={handleTossPaymentsLoad} />
+
+      <h1 className="text-2xl font-bold mb-6">주문결제</h1>
+      {orderItems.length === 0 ? (
+        <div className="text-center py-10">주문할 상품이 없습니다.</div>
+      ) : (
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* 왼쪽: 배송지 등록 폼 및 결제 수단 */}
+          <div className="w-full md:flex-1 space-y-6">
+            {/* 배송정보 컴포넌트 사용 */}
+            <DeliveryInformation
+              postCode={postCode}
+              roadAddress={roadAddress}
+              detailAddress={detailAddress}
+              recipient={recipient}
+              phone={phone}
+              onSearchAddress={handleAddressSearch}
+              setPostCode={setPostCode}
+              setRoadAddress={setRoadAddress}
+              setDetailAddress={setDetailAddress}
+              setRecipient={setRecipient}
+              setPhone={setPhone}
+            />
+            {/* 결제 위젯 */}
+            <div className="border border-gray-200 rounded p-4">
+              <h2 className="text-lg font-bold mb-4">결제 수단</h2>
+              <div id="payment-method"></div>
+              <div id="agreement" className="mt-4"></div>
+            </div>
+          </div>
+
+          {/* 오른쪽: 주문 상품 목록 및 결제 금액 정보 */}
+          <div className="w-full md:w-96 space-y-6">
+            {/* 주문 상품 목록 */}
+            <div className="border border-gray-200 rounded p-4">
+              <h2 className="text-lg font-bold mb-4">주문 상품</h2>
+              <div className="space-y-4">
+                {orderItems.map((item, index) => (
+                  <div key={index} className="flex gap-4 border-b pb-4 last:border-b-0 last:pb-0">
+                    <div className="w-16 h-20 relative flex-shrink-0">
+                      <Image
+                        src={item.coverImage || '/images/book-placeholder.png'}
+                        alt={item.title}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="rounded"
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-medium">{item.title}</h3>
+                      <div className="text-sm text-gray-500">
+                        {item.quantity}권 | {item.price.toLocaleString()}원
                       </div>
                     </div>
+                  </div>
                 ))}
               </div>
-              {/* 오른쪽: 배송지 등록 폼 & 결제 요약 */}
-              <div className="w-full md:w-96 space-y-6">
-                {/* 배송 정보 입력 폼 */}
-                <div className="border border-gray-200 rounded p-4">
-                  <h2 className="text-lg font-bold mb-4">배송 정보</h2>
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">주소</label>
-                    <div className="flex gap-2">
-                      <input
-                          type="text"
-                          value={postCode}
-                          onChange={(e) => setPostCode(e.target.value)}
-                          className="border p-2 flex-grow"
-                          placeholder="우편번호"
-                          readOnly
-                          disabled
-                          required
-                      />
-                      <button
-                          type="button"
-                          onClick={handleAddressSearch}
-                          className="bg-blue-500 text-white px-4 py-2 rounded"
-                      >
-                        주소찾기
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <input
-                        type="text"
-                        value={roadAddress}
-                        onChange={(e) => setRoadAddress(e.target.value)}
-                        className="border p-2 w-full"
-                        placeholder="도로명주소"
-                        readOnly
-                        disabled
-                        required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <input
-                        type="text"
-                        id="detailAddress"
-                        value={detailAddress}
-                        onChange={(e) => setDetailAddress(e.target.value)}
-                        className="border p-2 w-full"
-                        placeholder="상세주소"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">수령인</label>
-                    <input
-                        type="text"
-                        value={recipient}
-                        onChange={(e) => setRecipient(e.target.value)}
-                        className="border p-2 w-full"
-                        placeholder="예) 홍길동"
-                        required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">전화번호</label>
-                    <input
-                        type="text"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="border p-2 w-full"
-                        placeholder="예) 010-1234-5678"
-                        required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">결제수단</label>
-                    <div className="flex gap-4 mt-1">
-                      <label className="flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="CARD"
-                            checked={paymentMethod === 'CARD'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        />
-                        신용카드
-                      </label>
-                      <label className="flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="TOSS"
-                            checked={paymentMethod === 'TOSS'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        />
-                        토스
-                      </label>
-                    </div>
-                  </div>
+            </div>
+
+            {/* 결제 금액 정보 */}
+            <div className="border border-gray-200 rounded p-4">
+              <h2 className="text-lg font-bold mb-4">결제 금액</h2>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>상품 금액</span>
+                  <span>{subtotal.toLocaleString()}원</span>
                 </div>
-                {/* 결제 요약 */}
-                <div className="border border-gray-200 rounded p-4">
-                  <h2 className="text-lg font-medium mb-4">결제 요약</h2>
-                  <div className="flex justify-between mb-2">
-                    <span>상품 금액</span>
-                    <span>{subtotal.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span>할인</span>
-                    <span>-{discount.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span>배송비</span>
-                    <span>{shippingFee.toLocaleString()}원</span>
-                  </div>
-                  <hr className="my-3" />
-                  <div className="flex justify-between mb-4 font-bold text-lg">
-                    <span>총 결제 금액</span>
-                    <span className="text-red-600">{totalPrice.toLocaleString()}원</span>
-                  </div>
-                  <button
-                      onClick={handlePayment}
-                      className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
-                  >
-                    결제하기
-                  </button>
+                <div className="flex justify-between text-red-500">
+                  <span>할인 금액</span>
+                  <span>-{discount.toLocaleString()}원</span>
                 </div>
+                <div className="flex justify-between">
+                  <span>배송비</span>
+                  <span>{shippingFee.toLocaleString()}원</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200 mt-2">
+                  <span className="font-bold">최종 결제 금액</span>
+                  <span className="font-bold text-lg">{totalPrice.toLocaleString()}원</span>
+                </div>
+                {/* 결제하기 버튼 */}
+                <button
+                  onClick={handlePayment}
+                  className="button w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
+                  id="payment-button"
+                  style={{ marginTop: '30px' }}
+                  disabled={!tossWidgets}
+                >
+                  결제하기
+                </button>
               </div>
             </div>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

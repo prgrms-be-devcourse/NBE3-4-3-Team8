@@ -82,3 +82,8 @@ custom:
   genFile:
     dirPath: c:/temp/glog_dev
 
+payment:
+  toss:
+    secret-key: ${PAYMENT_KEY}
+    base-url: https://api.tosspayments.com/v1/payments
+    confirm-url: https://api.tosspayments.com/v1/payments/confirm

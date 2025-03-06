@@ -60,7 +60,7 @@ public class SecurityConfig {
 						// 그 외 관리자 페이지는 관리자 권한이 있는 사용자에게만 허용
 						.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
 						.requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/api/auth/me", "/api/auth/me/**").permitAll()
-						.requestMatchers("/my/orders").permitAll()
+						.requestMatchers("/my/orders", "/order/**", "/api/payments/**").permitAll()
 						.requestMatchers("/books/**", "/event/**", "/images/**", "/cart/**").permitAll() // 카트, 메인페이지 추가
 						.requestMatchers(HttpMethod.GET, "/reviews/**", "/cart").permitAll()
 						.anyRequest().authenticated()

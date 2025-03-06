@@ -16,36 +16,28 @@ import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final DetailOrderRepository detailOrderRepository;
     private final MemberRepository memberRepository;
     private final CartService cartService;
     private final BookService bookService;  // Book 정보를 가져오기 위한 서비스
-
-
-    @Autowired
-    public OrderService(OrderRepository orderRepository,
-                        DetailOrderRepository detailOrderRepository,
-                        MemberRepository memberRepository,
-                        CartService cartService,
-                        BookService bookService) {
-        this.orderRepository = orderRepository;
-        this.detailOrderRepository = detailOrderRepository;
-        this.memberRepository = memberRepository;
-        this.cartService = cartService;
-        this.bookService = bookService;
-    }
+    private final Random random = new Random();
 
     @Transactional(readOnly = true)
     public Page<OrderDTO> getOrdersByMember(Member member, Pageable pageable) {
@@ -181,6 +173,18 @@ public class OrderService {
                 .collect(Collectors.toList());
         Long totalPriceSales = calculateTotalPriceSales(cartList);
         Long totalPriceStandard = calculateTotalPriceStandard(cartList);
-        return new PaymentResponseDto(cartResponseDtoList, totalPriceStandard, totalPriceSales);
+
+        // 주문 ID 생성
+        String orderId = generateOrderId();
+
+        return new PaymentResponseDto(cartResponseDtoList, totalPriceStandard, totalPriceSales, orderId);
+    }
+
+    // 주문 ID 생성 메서드
+    private String generateOrderId() {
+        LocalDateTime now = LocalDateTime.now();
+        String timestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        int randomNum = random.nextInt(1000);
+        return String.format("ORDER_%s_%03d", timestamp, randomNum);
     }
 }

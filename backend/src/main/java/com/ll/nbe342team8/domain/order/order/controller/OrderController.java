@@ -10,6 +10,7 @@ import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +21,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/my/orders")
 @CrossOrigin(origins = "http://localhost:3000")
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
     private final AuthService authService;
-
-    public OrderController(OrderService orderService, AuthService authService) {
-        this.orderService = orderService;
-        this.authService = authService;
-    }
 
     // 주문조회
     @GetMapping
@@ -73,6 +70,7 @@ public class OrderController {
     public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser) {
         Member member = securityUser.getMember();
         PaymentResponseDto paymentResponseDto = orderService.createPaymentInfo(member);
+        System.out.println("paymentResponseDto = " + paymentResponseDto);
         return ResponseEntity.ok(paymentResponseDto);
     }
 }
