@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -41,7 +42,8 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity(prePostEnabled = true) // @PreAuthorize 사용
+@EnableMethodSecurity(prePostEnabled = true)
+@Slf4j // 롬복의 @Slf4j 사용
 public class SecurityConfig {
 	private final JwtService jwtService;
 	private final MemberService memberService;
@@ -50,26 +52,28 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		log.info("=== SecurityConfig.filterChain 시작 ===");
+
 		http
 				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-						// 관리자 로그인 페이지는 모든 사용자에게 허용
-						.requestMatchers("/admin/login").permitAll()
-						// 그 외 관리자 페이지는 관리자 권한이 있는 사용자에게만 허용
-						.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-						.requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/api/auth/me/**").permitAll()
-						.requestMatchers("/my/orders/create/**", "/order/**", "/api/payments/**").permitAll()
-						.requestMatchers("/books/**", "/event/**", "/images/**", "/cart/**").permitAll() // 카트, 메인페이지 추가
-						.requestMatchers(HttpMethod.GET, "/reviews/**", "/cart").permitAll()
-						.anyRequest().authenticated()
-				)
+				.authorizeHttpRequests(auth -> {
+					log.info("=== SecurityConfig.filterChain: authorizeHttpRequests 설정 중 ===");
+					auth
+							.requestMatchers("/admin/login").permitAll()
+							.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+							.requestMatchers("/api/public/**", "/oauth2/**", "/api/auth/**", "/refresh", "/api/auth/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/api/auth/me/**").permitAll()
+							.requestMatchers("/my/orders/create/**", "/order/**", "/api/payments/**").permitAll()
+							.requestMatchers("/books/**", "/event/**", "/images/**", "/cart/**").permitAll()
+							.requestMatchers(HttpMethod.GET, "/reviews/**", "/cart").permitAll()
+							.anyRequest().authenticated();
+				})
 				.addFilterBefore(new JwtAuthenticationFilter(jwtService, memberService),
 						UsernamePasswordAuthenticationFilter.class)
 				.headers((headers) -> headers
-						.addHeaderWriter(new XFrameOptionsHeaderWriter(
-								XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+						.frameOptions(frameOptions -> frameOptions.sameOrigin())
+				)
 				.oauth2Login(oauth2 -> oauth2
 						.authorizationEndpoint(authorization -> authorization
 								.baseUri("/oauth2/authorization")
@@ -85,11 +89,14 @@ public class SecurityConfig {
 				)
 				.exceptionHandling(exception -> exception
 						.authenticationEntryPoint((request, response, authException) -> {
+							log.error("=== 인증 실패 또는 비인증 상태로 접근: {}, 이유: {} ===", request.getRequestURI(), authException.getMessage());
 							response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 							response.setContentType("application/json;charset=UTF-8");
 							response.getWriter().write("인증이 필요합니다.");
 						})
 				);
+
+		log.info("=== SecurityConfig.filterChain 끝 ===");
 		return http.build();
 	}
 

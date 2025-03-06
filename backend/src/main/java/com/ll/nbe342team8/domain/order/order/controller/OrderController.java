@@ -9,8 +9,10 @@ import com.ll.nbe342team8.domain.order.order.dto.OrderResponseDto;
 import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequestMapping("/my/orders")
 @CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
     private final OrderService orderService;
     private final AuthService authService;
@@ -42,12 +45,23 @@ public class OrderController {
         return ResponseEntity.ok("주문 삭제 완료");
     }
 
-    // 주문등록 (일반 주문: 장바구니 기반)
     @PostMapping("/create")
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
-                                                        @AuthenticationPrincipal SecurityUser securityUser) {
-        System.out.println("orderRequestDto = " + orderRequestDto);
+    public ResponseEntity<OrderResponseDto> createOrder(
+            @RequestBody @Valid OrderRequestDto orderRequestDto,
+            @AuthenticationPrincipal SecurityUser securityUser
+    ) {
+        log.info("[OrderController] createOrder 호출됨");
+        log.info("[OrderController] orderRequestDto = {}", orderRequestDto);
+
+        if (securityUser == null) {
+            log.warn("[OrderController] securityUser가 null입니다. 인증 정보가 없습니다.");
+            // 여기서 401을 직접 리턴해볼 수도 있음
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).build();
+        }
+
         Member member = securityUser.getMember();
+        log.info("[OrderController] 인증된 사용자: {} (ID: {})", member.getEmail(), member.getId());
+
         Order order = orderService.createOrder(member, orderRequestDto);
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
