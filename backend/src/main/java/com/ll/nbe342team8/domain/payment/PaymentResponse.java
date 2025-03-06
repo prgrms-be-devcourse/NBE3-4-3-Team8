@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ public class PaymentResponse {
     private String currency;
     private String method;
     private String status;
-    private OffsetDateTime requestedAt;
-    private OffsetDateTime approvedAt;
+    private String requestedAt;
+    private String approvedAt;
     private Boolean useEscrow;
     private Boolean cultureExpense;
     private String type;
