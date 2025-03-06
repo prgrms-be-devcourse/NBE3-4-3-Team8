@@ -62,6 +62,13 @@ class QuestionService(
 
     @Transactional
     fun deleteQuestion(question: Question) {
+
+        // 사진 저장 디렉토리 내부 사진 데이터 삭제
+        val genFilesToDelete = question.genFiles.toList()
+        for(genFile in genFilesToDelete) {
+            question.deleteGenFile(genFile.typeCode, genFile.fileNo)
+        }
+
         questionRepository.delete(question)
     }
 

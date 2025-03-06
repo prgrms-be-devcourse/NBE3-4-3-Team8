@@ -19,10 +19,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 public class FileUploadUtil {
@@ -249,5 +246,14 @@ public class FileUploadUtil {
         multipartFile.transferTo(new File(filePath));
 
         return filePath;
+    }
+
+    // ✅ 허용된 파일 확장자 및 MIME 타입 검증
+    public static boolean isAllowedFileType(String filename, String contentType) {
+        String[] allowedExtensions = { "jpg", "jpeg", "png", "gif", "pdf", "txt", "docx" };
+        String[] allowedMimeTypes = { "image/jpeg", "image/png", "image/gif", "application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
+
+        String fileExtension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        return Arrays.asList(allowedExtensions).contains(fileExtension) && Arrays.asList(allowedMimeTypes).contains(contentType);
     }
 }

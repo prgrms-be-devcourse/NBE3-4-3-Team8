@@ -4,11 +4,11 @@ import com.ll.nbe342team8.domain.member.member.entity.Member
 import com.ll.nbe342team8.domain.member.member.service.MemberService
 import com.ll.nbe342team8.domain.oauth.SecurityUser
 import com.ll.nbe342team8.domain.qna.question.entity.Question
-import com.ll.nbe342team8.domain.qna.question.entity.QuestionGenFile
 import com.ll.nbe342team8.domain.qna.question.service.QuestionService
 import com.ll.nbe342team8.global.config.AppConfig
 import com.ll.nbe342team8.global.exceptions.ServiceException
 import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil
+import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil.isAllowedFileType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.FileInputStream
-import java.io.FileNotFoundException
+
 
 @Controller
 @RequestMapping("/my/question/genFile")
@@ -85,6 +85,9 @@ class QuestionGenFileController (
         val question = questionService.findById(questionId)
             .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다.") }
 
+        // 파일 검사 과정 필요
+
+
         checkActorCanMakeNewGenFile(member, question)
 
         val filePath = FileUploadUtil.toFile(file, AppConfig.getTempDirPath())
@@ -127,5 +130,14 @@ class QuestionGenFileController (
         if (question.genFiles.size >= 5) {
             throw ServiceException(HttpStatus.CONFLICT.value(), "질문 하나에 이미지는 5개까지 설정할수있습니다.")
         }
+    }
+
+    fun checkFileDanger(file : MultipartFile) {
+        if (file.size > 10 * 1024 * 1024) { throw ServiceException(HttpStatus.BAD_REQUEST.value(), "파일 크기가 너무 큽니다.") }
+        val originalFilename = file.originalFilename
+        if (originalFilename == null || !FileUploadUtil.isAllowedFileType(originalFilename, file.contentType)) {
+            throw ServiceException(HttpStatus.BAD_REQUEST.value(), "허용되지 않은 파일 형식입니다.")
+        }
+
     }
 }
