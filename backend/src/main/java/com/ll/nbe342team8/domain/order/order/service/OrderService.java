@@ -36,7 +36,7 @@ public class OrderService {
     private final DetailOrderRepository detailOrderRepository;
     private final MemberRepository memberRepository;
     private final CartService cartService;
-    private final BookService bookService;  // Book 정보를 가져오기 위한 서비스
+    private final BookService bookService;
     private final Random random = new Random();
 
     @Transactional(readOnly = true)
@@ -57,9 +57,11 @@ public class OrderService {
     public void deleteOrder(Long orderId, Member member) {
         Order order = orderRepository.findByIdAndMember(orderId, member)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
+
         if (order.getOrderStatus() != OrderStatus.COMPLETE) {
             throw new IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.");
         }
+
         detailOrderRepository.deleteByOrderId(orderId);
         orderRepository.delete(order);
     }
@@ -68,30 +70,14 @@ public class OrderService {
     public Order createOrder(Member member, OrderRequestDto orderRequestDTO) {
         List<Cart> cartList = cartService.findCartByMember(member);
 
-        Order order = Order.builder()
-                .member(member)
-                .orderStatus(OrderStatus.ORDERED)
-                .fullAddress(orderRequestDTO.fullAddress())
-                .postCode(orderRequestDTO.postCode())
-                .phone(orderRequestDTO.phone())
-                .recipient(orderRequestDTO.recipient())
-                .paymentMethod(orderRequestDTO.paymentMethod())
-                .totalPrice(calculateTotalPriceSales(cartList))
-                .build();
-
+        Order order = buildOrder(member, orderRequestDTO, calculateTotalPriceSales(cartList));
         orderRepository.save(order);
 
         List<DetailOrder> detailOrders = cartList.stream()
-                .map(cart -> DetailOrder.builder()
-                        .order(order)
-                        .deliveryStatus(DeliveryStatus.PENDING)
-                        .book(cart.getBook())
-                        .bookQuantity(cart.getQuantity())
-                        .build())
+                .map(cart -> buildDetailOrder(order, cart.getBook(), cart.getQuantity()))
                 .collect(Collectors.toList());
 
         detailOrderRepository.saveAll(detailOrders);
-
         cartService.deleteProduct(member); // 주문 완료 후 장바구니 비우기
 
         return order;
@@ -102,27 +88,35 @@ public class OrderService {
         Book book = bookService.getBookById(bookId);
         long totalPrice = (long) book.getPricesSales() * quantity;
 
-        Order order = Order.builder()
-                .member(member)
-                .orderStatus(OrderStatus.ORDERED)
-                .fullAddress(orderRequestDTO.fullAddress())
-                .postCode(orderRequestDTO.postCode())
-                .phone(orderRequestDTO.phone())
-                .recipient(orderRequestDTO.recipient())
-                .paymentMethod(orderRequestDTO.paymentMethod())
-                .totalPrice(totalPrice)
-                .build();
+        Order order = buildOrder(member, orderRequestDTO, totalPrice);
         orderRepository.save(order);
 
-        DetailOrder detailOrder = DetailOrder.builder()
+        DetailOrder detailOrder = buildDetailOrder(order, book, quantity);
+        detailOrderRepository.save(detailOrder);
+
+        return order;
+    }
+
+    private Order buildOrder(Member member, OrderRequestDto dto, Long totalPrice) {
+        return Order.builder()
+                .member(member)
+                .orderStatus(OrderStatus.ORDERED)
+                .fullAddress(dto.fullAddress())
+                .postCode(dto.postCode())
+                .phone(dto.phone())
+                .recipient(dto.recipient())
+                .paymentMethod(dto.paymentMethod())
+                .totalPrice(totalPrice)
+                .build();
+    }
+
+    private DetailOrder buildDetailOrder(Order order, Book book, int quantity) {
+        return DetailOrder.builder()
                 .order(order)
                 .deliveryStatus(DeliveryStatus.PENDING)
                 .book(book)
                 .bookQuantity(quantity)
                 .build();
-        detailOrderRepository.save(detailOrder);
-
-        return order;
     }
 
     private Long calculateTotalPriceSales(List<Cart> cartList) {
@@ -142,27 +136,25 @@ public class OrderService {
         List<CartResponseDto> cartResponseDtoList = cartList.stream()
                 .map(CartResponseDto::from)
                 .collect(Collectors.toList());
-        Long totalPriceSales = calculateTotalPriceSales(cartList);
-        Long totalPriceStandard = calculateTotalPriceStandard(cartList);
 
-        // 주문 ID 생성
-        String orderId = generateOrderId();
-
-        return new PaymentResponseDto(cartResponseDtoList, totalPriceStandard, totalPriceSales, orderId);
+        return new PaymentResponseDto(
+                cartResponseDtoList,
+                calculateTotalPriceStandard(cartList),
+                calculateTotalPriceSales(cartList),
+                generateOrderId());
     }
 
     public PaymentResponseDto createSinglePaymentInfo(Member member, Long bookId, int quantity) {
         Book book = bookService.getBookById(bookId);
-        // 주문 ID 생성
-        String orderId = generateOrderId();
+        Cart tempCart = new Cart(member, book, quantity);
 
-        return new PaymentResponseDto(List.of(CartResponseDto.from(new Cart(member, book, quantity))),
+        return new PaymentResponseDto(
+                List.of(CartResponseDto.from(tempCart)),
                 (long) book.getPriceStandard() * quantity,
                 (long) book.getPricesSales() * quantity,
-                orderId);
+                generateOrderId());
     }
 
-    // 주문 ID 생성 메서드
     private String generateOrderId() {
         LocalDateTime now = LocalDateTime.now();
         String timestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
