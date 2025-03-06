@@ -57,13 +57,7 @@ public class DeliveryInformationControllerTest {
     private Member mockMember;
 
     @Autowired
-    DeliveryInformationService deliveryInformationService;
-
-    @Autowired
     MemberService memberService;
-
-    @Autowired
-    DeliveryInformationRepository deliveryInformationRepository;
 
     @BeforeEach
     void setup() {

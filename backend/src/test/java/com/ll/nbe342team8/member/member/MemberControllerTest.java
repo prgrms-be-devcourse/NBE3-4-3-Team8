@@ -86,11 +86,6 @@ public class MemberControllerTest {
     @Autowired
     BookService bookService;
 
-    @Autowired MemberRepository memberRepository;
-
-    @Autowired
-    DeliveryInformationRepository deliveryInformationRepository;
-
     @BeforeEach
     void setup() {
         // ✅ Mock Member 생성

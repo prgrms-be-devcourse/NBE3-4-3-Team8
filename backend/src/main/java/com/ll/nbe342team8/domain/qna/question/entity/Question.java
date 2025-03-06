@@ -26,7 +26,7 @@ import org.hibernate.annotations.BatchSize;
 @Table(
 		name = "question",
 		indexes = {
-				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 추가
+				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 나중에 내림차순 인덱스 mysql에 직접 설정
 		},
 		uniqueConstraints = {
 				@UniqueConstraint(
@@ -72,6 +72,7 @@ public class Question extends BaseTime {
 				.title(dto.getTitle())
 				.content(dto.getContent())
 				.member(member)
+				.isAnswer(false)
 				.build();
 
 		return question;
@@ -149,9 +150,10 @@ public class Question extends BaseTime {
 	public Optional<QuestionGenFile> getGenFileByTypeCodeAndFileNo(String typeCode, int fileNo) {
 		return genFiles.stream()
 				.filter(genFile -> genFile.getTypeCode().equals(typeCode))
-				.filter(genFile -> genFile.getFileNo() == fileNo)
+				.filter(genFile -> genFile.getFileNo()==fileNo)
 				.findFirst();
 	}
+
 
 	public void deleteGenFile(String typeCode, int fileNo) {
 		getGenFileByTypeCodeAndFileNo(typeCode, fileNo)
@@ -162,55 +164,6 @@ public class Question extends BaseTime {
 				});
 	}
 
-	public void modifyGenFile(String typeCode, int fileNo, String filePath) {
-		getGenFileByTypeCodeAndFileNo(
-				typeCode,
-				fileNo
-		)
-				.ifPresent(genFile -> {
-					FileUploadUtil.rm(genFile.getFilePath());
-					String originalFileName = FileUploadUtil.getOriginalFileName(filePath);
-					String fileExt = FileUploadUtil.getFileExt(filePath);
-					String fileExtTypeCode = FileUploadUtil.getFileExtTypeCodeFromFileExt(fileExt);
-					String fileExtType2Code = FileUploadUtil.getFileExtType2CodeFromFileExt(fileExt);
-					Map<String, Object> metadata = FileUploadUtil.getMetadata(filePath);
-					String metadataStr = metadata
-							.entrySet()
-							.stream()
-							.map(entry -> entry.getKey() + "-" + entry.getValue())
-							.collect(Collectors.joining(";"));
-					String fileName = UUID.randomUUID() + "." + fileExt;
-					int fileSize = FileUploadUtil.getFileSize(filePath);
-					genFile.setOriginalFileName(originalFileName);
-					genFile.setMetadata(metadataStr);
-					genFile.setFileDateDir(Ut.date.getCurrentDateFormatted("yyyy_MM_dd"));
-					genFile.setFileExt(fileExt);
-					genFile.setFileExtTypeCode(fileExtTypeCode);
-					genFile.setFileExtType2Code(fileExtType2Code);
-					genFile.setFileName(fileName);
-					genFile.setFileSize(fileSize);
-					FileUploadUtil.mv(filePath, genFile.getFilePath());
-				});
-	}
-
-    public void putGenFile(String typeCode, int fileNo, String filePath) {
-        Optional<QuestionGenFile> opQuestionGenFile = getGenFileByTypeCodeAndFileNo(
-                typeCode,
-                fileNo
-        );
-
-        if (opQuestionGenFile.isPresent()) {
-            modifyGenFile(typeCode, fileNo, filePath);
-        } else {
-            addGenFile(typeCode, fileNo, filePath);
-        }
-    }
-
-	public Optional<QuestionGenFile> getGenFileById(Long id) {
-		return genFiles.stream()
-				.filter(genFile -> genFile.getId().equals(id))
-				.findFirst();
-	}
 
 
 

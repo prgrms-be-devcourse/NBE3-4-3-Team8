@@ -1,32 +1,33 @@
-package com.ll.nbe342team8.qna.question;
+package com.ll.nbe342team8.qna.answer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ll.nbe342team8.domain.member.deliveryInformation.controller.DeliveryInformationController;
-import com.ll.nbe342team8.domain.member.deliveryInformation.dto.ReqDeliveryInformationDto;
-import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation;
-import com.ll.nbe342team8.domain.member.deliveryInformation.repository.DeliveryInformationRepository;
-import com.ll.nbe342team8.domain.member.deliveryInformation.service.DeliveryInformationService;
-import com.ll.nbe342team8.domain.member.member.controller.MemberController;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
+import com.ll.nbe342team8.domain.qna.answer.controller.AnswerController;
+import com.ll.nbe342team8.domain.qna.answer.dto.AnswerDto;
+import com.ll.nbe342team8.domain.qna.answer.dto.GetResAnswersDto;
 import com.ll.nbe342team8.domain.qna.answer.dto.ReqAnswerDto;
+import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
 import com.ll.nbe342team8.domain.qna.answer.service.AnswerService;
 import com.ll.nbe342team8.domain.qna.question.controller.QuestionController;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.domain.qna.question.repository.QuestionRepository;
-import org.junit.jupiter.api.AfterEach;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,26 +35,25 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest
-public class QuestionControllerTest {
+public class AnswerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,6 +64,9 @@ public class QuestionControllerTest {
     MemberService memberService;
 
     @Autowired
+    AnswerService answerService;
+
+    @Autowired
     QuestionRepository questionRepository;
 
     @BeforeEach
@@ -72,18 +75,21 @@ public class QuestionControllerTest {
         mockMember = new Member();
         mockMember.setOAuthId("31313");
         mockMember.setPhoneNumber("010-1111-2222");
-        mockMember.setName("테스트 유저");
+        mockMember.setName("관리자 테스트 유저");
+        mockMember.setMemberType(Member.MemberType.ADMIN);
 
         Question question1 = Question.builder()
-                                .title("제목1")
-                                .content("내용1")
-                                .member(mockMember)
-                                .build();
+                .title("제목1")
+                .content("내용1")
+                .member(mockMember)
+                .answers(new ArrayList<>())
+                .build();
 
         Question question2 = Question.builder()
                 .title("제목2")
                 .content("내용2")
                 .member(mockMember)
+                .answers(new ArrayList<>())
                 .build();
 
         //Mock Security Context (인증된 사용자 정보 설정)
@@ -95,107 +101,105 @@ public class QuestionControllerTest {
             questionRepository.save(question);
         }
 
+        ReqAnswerDto reqAnswerDto1=new ReqAnswerDto("answer1");
+
+
+        answerService.createAnswer(question1,mockMember,reqAnswerDto1);
+
+
         // Security Context에 인증 정보 추가
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 new SecurityUser(mockMember), // ✅ SecurityUser를 사용해서 인증
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                List.of(new SimpleGrantedAuthority("RULE_ADMIN"))
         );
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-
-
     }
 
-    /*
-    @Test
-    @DisplayName("사용자 질문 불러오기1")
-    void getMyQuestions1() throws Exception {
 
-        // ✅ 3. API 요청
+    @Test
+    @DisplayName("관리자 답변 불러오기1")
+    void getAnswers1() throws Exception {
+        Question question1=mockMember.getQuestions().getFirst();
+        Question question2=mockMember.getQuestions().get(1);
+        Answer answer1 =question1.getAnswers().getFirst();
+
         ResultActions resultActions = mockMvc.perform(
-                        get("/my/question")
+                        get("/admin/dashboard/questions/{questionId}/answers",question1.id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding(StandardCharsets.UTF_8)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(AnswerController.class))
+                .andExpect(handler().methodName("getAnswers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.answers", hasSize(1)))
+                .andExpect(jsonPath("$.answers[0].content").value(answer1.content));
+
+        resultActions = mockMvc.perform(
+                        get("/admin/dashboard/questions/{questionId}/answers",question2.id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
                 )
                 .andDo(print());
 
-        // ✅ 4. 응답 검증
         resultActions
-                .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("getQuestions"))
+                .andExpect(handler().handlerType(AnswerController.class))
+                .andExpect(handler().methodName("getAnswers"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalItems").value(2))
-                .andExpect(jsonPath("$.items", hasSize(2)))
-                .andExpect(jsonPath("$.items[0].title").value("제목2"))
-                .andExpect(jsonPath("$.items[0].content").value("내용2"))
-                .andExpect(jsonPath("$.items[1].title").value("제목1"))
-                .andExpect(jsonPath("$.items[1].content").value("내용1"));
+                .andExpect(jsonPath("$.answers", hasSize(0)));
+
+
+
+
     }
 
-     */
-
     @Test
-    @DisplayName("keyset을 적용한 사용자 질문 불러오기")
-    void getMyKeysetQuestions2() throws Exception {
+    @DisplayName("관리자 답변 상세 내역 불러오기1")
+    void getAnswer1() throws Exception {
+        Question question=mockMember.getQuestions().getFirst();
+        Answer answer =question.getAnswers().getFirst();
 
-        // ✅ 3. API 요청
+
         ResultActions resultActions = mockMvc.perform(
-                        get("/my/question?page=0")
+                        get("/admin/dashboard/questions/{questionId}/answers/{answerId}",question.id,answer.id)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
                 )
                 .andDo(print());
 
-        // ✅ 4. 응답 검증
         resultActions
-                .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("getKeySetQuestions"))
+                .andExpect(handler().handlerType(AnswerController.class))
+                .andExpect(handler().methodName("getAnswer"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalItems").value(2))
-                .andExpect(jsonPath("$.items", hasSize(2)))
-                .andExpect(jsonPath("$.items[0].title").value("제목2"))
-                .andExpect(jsonPath("$.items[0].content").value("내용2"))
-                .andExpect(jsonPath("$.items[1].title").value("제목1"))
-                .andExpect(jsonPath("$.items[1].content").value("내용1"));
-    }
+                .andExpect(jsonPath("$.content").value(answer.content));
 
-    @Test
-    @DisplayName("사용자 상세 질문 불러오기1")
-    void getMyQuestion1() throws Exception {
 
-        Long id=1L;
-        ResultActions resultActions = mockMvc.perform(
-                        get("/my/question/{id}",id)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding(StandardCharsets.UTF_8)
-                )
-                .andDo(print());
 
-        // ✅ 4. 응답 검증
-        resultActions
-                .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("getQuestion"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("제목1"))
-                .andExpect(jsonPath("$.content").value("내용1"));
+
 
     }
 
 
     @Test
-    @DisplayName("질문 추가1")
-    void postQuestionTest1() throws Exception {
+    @DisplayName("관리자 답변 추가1")
+    void postAnswerTest1() throws Exception {
 
+        Question question=mockMember.getQuestions().get(1);
         ObjectMapper objectMapper = new ObjectMapper();
 
-        ReqQuestionDto reqQuestionDto=new ReqQuestionDto("제목3","내용3");
-        String requestBody =objectMapper.writeValueAsString(reqQuestionDto);
+        ReqAnswerDto reqAnswerDto=new ReqAnswerDto("새로 추가된 답변 내용");
+        String requestBody =objectMapper.writeValueAsString(reqAnswerDto);
 
         ResultActions resultActions = mockMvc.perform(
-                        post("/my/question")
+                        post("/admin/dashboard/questions/{questionId}/answers",question.id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .content(requestBody)
@@ -204,8 +208,8 @@ public class QuestionControllerTest {
 
 
         resultActions
-                .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("postQuestion"))
+                .andExpect(handler().handlerType(AnswerController.class))
+                .andExpect(handler().methodName("postAnswer"))
                 .andExpect(status().isCreated());
 
 
@@ -213,17 +217,19 @@ public class QuestionControllerTest {
 
 
     @Test
-    @DisplayName("사용자 질문 수정1")
+    @DisplayName("관리자 답변 수정1")
     void putQuestionTest1() throws Exception {
+
+        Question question=mockMember.getQuestions().getFirst();
+        Answer answer =question.getAnswers().getFirst();
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        ReqQuestionDto reqQuestionDto=new ReqQuestionDto("수정된 제목","수정된 내용");
-        String requestBody =objectMapper.writeValueAsString(reqQuestionDto);
+        ReqAnswerDto reqAnswerDto=new ReqAnswerDto("수정된 답변 내용");
+        String requestBody =objectMapper.writeValueAsString(reqAnswerDto);
 
-        Long id=1L;
         ResultActions resultActions = mockMvc.perform(
-                        put("/my/question/{id}", id)
+                        put("/admin/dashboard/questions/{questionId}/answers/{answerId}", question.id,answer.id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .content(requestBody)
@@ -233,8 +239,8 @@ public class QuestionControllerTest {
 
 
         resultActions
-                .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("putQuestion"))
+                .andExpect(handler().handlerType(AnswerController.class))
+                .andExpect(handler().methodName("modifyAnswer"))
                 .andExpect(status().isOk());
 
 
@@ -242,12 +248,13 @@ public class QuestionControllerTest {
 
     @Test
     @DisplayName("사용자 질문 삭제1")
-    void deleteQuestionTest1() throws Exception {
+    void deleteAnswerTest1() throws Exception {
 
-        Long id=1L;
+        Question question=mockMember.getQuestions().getFirst();
+        Answer answer =question.getAnswers().getFirst();
 
         ResultActions resultActions = mockMvc.perform(
-                        delete("/my/question/{id}", id)
+                        delete("/admin/dashboard/questions/{questionId}/answers/{answerId}", question.id,answer.id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding(StandardCharsets.UTF_8)
 
@@ -256,12 +263,10 @@ public class QuestionControllerTest {
 
 
         resultActions
-                .andExpect(handler().handlerType(QuestionController.class))
-                .andExpect(handler().methodName("deleteQuestion"))
+                .andExpect(handler().handlerType(AnswerController.class))
+                .andExpect(handler().methodName("deleteAnswer"))
                 .andExpect(status().isNoContent());
 
 
     }
-
-
 }
