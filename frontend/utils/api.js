@@ -12,6 +12,12 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// 주문 유형 enum
+export const OrderType = {
+  CART: 'CART', // 장바구니 결제
+  DIRECT: 'DIRECT', // 바로 결제
+};
+
 // 📌 전체 도서 목록 가져오기
 export const fetchBooks = async (page = 0, pageSize = 10, sortType = 'PUBLISHED_DATE') => {
   try {
@@ -155,26 +161,21 @@ export const fetchCurrentUser = async () => {
   }
 };
 
-// 📌 장바구니 결제 정보 가져오기 (장바구니 목록, 상품 금액 등)
-export const fetchPaymentInfo = async () => {
+// 📌 통합된 결제 정보 조회 API
+export const fetchPaymentInfo = async (orderType = OrderType.CART, bookId, quantity) => {
   try {
-    const response = await api.get('/my/orders/payment');
-    return response.data; // { cartList, priceStandard, pricesSales } 형태
-  } catch (error) {
-    console.error('결제 정보 불러오기 오류:', error);
-    throw error;
-  }
-};
+    const params = { orderType };
 
-// 📌 바로결제 결제 정보 가져오기
-export const fetchSinglePaymentInfo = async (bookId, quantity) => {
-  try {
-    const response = await api.get('/my/orders/payment/single', {
-      params: {
-        bookId,
-        quantity,
-      },
-    });
+    // 바로 결제인 경우 책 ID와 수량 추가
+    if (orderType === OrderType.DIRECT) {
+      if (!bookId || !quantity) {
+        throw new Error('바로 결제 시 책 ID와 수량이 필요합니다.');
+      }
+      params.bookId = bookId;
+      params.quantity = quantity;
+    }
+
+    const response = await api.get('/my/orders/payment-info', { params });
     return response.data;
   } catch (error) {
     console.error('결제 정보 불러오기 오류:', error);
@@ -182,10 +183,20 @@ export const fetchSinglePaymentInfo = async (bookId, quantity) => {
   }
 };
 
-// 📌 주문 생성 (배송 정보와 함께 주문 생성)
+// 📌 장바구니 결제 정보 가져오기 (기존 API, 하위 호환성 유지)
+export const fetchCartPaymentInfo = async () => {
+  return fetchPaymentInfo(OrderType.CART);
+};
+
+// 📌 바로결제 결제 정보 가져오기 (기존 API, 하위 호환성 유지)
+export const fetchSinglePaymentInfo = async (bookId, quantity) => {
+  return fetchPaymentInfo(OrderType.DIRECT, bookId, quantity);
+};
+
+// 📌 통합된 주문 생성 API
 export const createOrder = async (orderData) => {
   try {
-    const response = await api.post('/my/orders/create', orderData);
+    const response = await api.post('/my/orders', orderData);
     return response.data;
   } catch (error) {
     console.error('주문 생성 오류:', error);
@@ -193,27 +204,33 @@ export const createOrder = async (orderData) => {
   }
 };
 
-// 📌 빠른 주문 정보 가져오기
-// export const fetchFastOrderInfo = async (bookId, quantity) => {
-//   try {
-//     const response = await api.post(`/my/orders/create/fast?bookId=${bookId}&quantity=${quantity}`);
-//     return response.data;
-//   } catch (error) {
-//     console.error('빠른 주문 정보 불러오기 오류:', error);
-//     throw error;
-//   }
-// };
+// 📌 장바구니 주문 생성 (기존 API, 하위 호환성 유지)
+export const createCartOrder = async (orderData) => {
+  const updatedOrderData = {
+    ...orderData,
+    orderType: OrderType.CART,
+  };
+  return createOrder(updatedOrderData);
+};
 
-export const fetchFastOrderInfo = async (orderData, bookId, quantity) => {
+// 📌 바로 주문 생성 (기존 API, 하위 호환성 유지)
+export const createFastOrder = async (orderData, bookId, quantity) => {
+  const updatedOrderData = {
+    ...orderData,
+    bookId,
+    quantity,
+    orderType: OrderType.DIRECT,
+  };
+  return createOrder(updatedOrderData);
+};
+
+// 📌 결제 완료 처리 API
+export const completePayment = async (paymentData) => {
   try {
-    // 쿼리 파라미터로 bookId와 quantity를 함께 전송
-    const response = await api.post(
-      `/my/orders/create/fast?bookId=${bookId}&quantity=${quantity}`,
-      orderData,
-    );
+    const response = await api.post('/my/orders/payment/complete', paymentData);
     return response.data;
   } catch (error) {
-    console.error('주문 생성 오류:', error);
+    console.error('결제 완료 처리 오류:', error);
     throw error;
   }
 };

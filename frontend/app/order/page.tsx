@@ -3,10 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { fetchPaymentInfo, fetchSinglePaymentInfo } from '@/utils/api';
 import Script from 'next/script';
 import { DeliveryInformationDto } from '@/app/my/types';
 import DeliveryInformation from '@/app/components/order/DeliveryInformation';
+
+// 주문 유형 enum
+enum OrderType {
+  CART = 'CART', // 장바구니 결제
+  DIRECT = 'DIRECT', // 바로 결제
+}
 
 interface OrderItemData {
   bookId: number;
@@ -22,6 +27,81 @@ interface PaymentInfo {
   pricesSales: number;
   orderId: string;
 }
+
+// API 호출 함수들
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+/**
+ * 통합된 결제 정보 조회 API
+ */
+const fetchPaymentInfo = async (
+  orderType: OrderType = OrderType.CART,
+  bookId?: number,
+  quantity?: number,
+): Promise<PaymentInfo> => {
+  try {
+    const params: any = { orderType };
+
+    // 바로 결제인 경우 책 ID와 수량 추가
+    if (orderType === OrderType.DIRECT) {
+      if (!bookId || !quantity) {
+        throw new Error('바로 결제 시 책 ID와 수량이 필요합니다.');
+      }
+      params.bookId = bookId;
+      params.quantity = quantity;
+    }
+
+    const response = await fetch(
+      `${API_URL}/my/orders/payment-info?` + new URLSearchParams(params),
+      {
+        credentials: 'include',
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('결제 정보 조회 실패');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('결제 정보 조회 실패:', error);
+    throw error;
+  }
+};
+
+/**
+ * 주문 생성 API
+ */
+const createOrder = async (orderData: {
+  postCode: string;
+  fullAddress: string;
+  recipient: string;
+  phone: string;
+  paymentMethod: string;
+  bookId?: number;
+  quantity?: number;
+  orderType: OrderType;
+}) => {
+  try {
+    const response = await fetch(`${API_URL}/my/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      throw new Error('주문 생성 실패');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('주문 생성 실패:', error);
+    throw error;
+  }
+};
 
 export default function OrderPage() {
   const router = useRouter();
@@ -81,15 +161,13 @@ export default function OrderPage() {
           const { bookId, quantity } = getBookParams();
           if (!bookId || !quantity) return;
 
-          data = await fetchSinglePaymentInfo(bookId, quantity);
-
-          if (!data?.cartList?.length) {
-            throw new Error('서버에서 유효한 도서 정보를 반환하지 않았습니다.');
-          }
+          data = await fetchPaymentInfo(OrderType.DIRECT, bookId, quantity);
+        } else {
+          data = await fetchPaymentInfo(OrderType.CART);
         }
-        // 일반 결제인 경우 (장바구니)
-        else {
-          data = await fetchPaymentInfo();
+
+        if (!data?.cartList?.length) {
+          throw new Error('서버에서 유효한 도서 정보를 반환하지 않았습니다.');
         }
 
         // 결제 정보 설정
@@ -220,6 +298,22 @@ export default function OrderPage() {
     }
 
     try {
+      // 주문 생성 요청
+      const { bookId, quantity } =
+        fastOrderParam === 'true' ? getBookParams() : { bookId: undefined, quantity: undefined };
+
+      // 통합 API 사용하여 주문 생성
+      await createOrder({
+        postCode,
+        fullAddress: `${roadAddress} ${detailAddress}`.trim(),
+        recipient,
+        phone,
+        paymentMethod: 'CARD', // 기본값 설정
+        bookId,
+        quantity,
+        orderType: fastOrderParam === 'true' ? OrderType.DIRECT : OrderType.CART,
+      });
+
       const orderName =
         orderItems.length > 1
           ? `${orderItems[0].title} 외 ${orderItems.length - 1}건`

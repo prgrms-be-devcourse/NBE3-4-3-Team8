@@ -123,12 +123,14 @@ const CartList = () => {
   };
 
   // "구매하기" 버튼 클릭 시 주문 페이지로 이동
-  const handlePurchase = () => {
-    if (user) {
-      router.push('/order');
-    } else {
-      alert('로그인 후 이용해주세요.');
+  const handleCheckout = () => {
+    if (items.length === 0) {
+      alert('선택된 상품이 없습니다.');
+      return;
     }
+
+    // 주문 페이지로 이동 (장바구니 결제)
+    router.push('/order');
   };
 
   useEffect(() => {
@@ -173,10 +175,13 @@ const CartList = () => {
               <span>{totalPrice.toLocaleString()}원</span>
             </div>
             <button
-              onClick={handlePurchase}
-              className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
+              onClick={handleCheckout}
+              disabled={items.length === 0}
+              className={`w-full py-3 rounded text-white ${
+                items.length === 0 ? 'bg-gray-400' : 'bg-black hover:bg-gray-800'
+              } transition-colors`}
             >
-              구매하기
+              결제하기
             </button>
           </div>
         </div>

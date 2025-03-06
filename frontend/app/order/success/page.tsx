@@ -1,3 +1,5 @@
+// /frontend/app/order/success/page.tsx
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -42,45 +44,33 @@ const OrderSuccessPage = () => {
       </h1>
 
       {/* 주문 정보 카드 */}
-      <div className="w-full bg-gray-50 rounded-xl p-6 mb-10 shadow-md">
-        <h2 className="text-xl font-semibold mb-5 pb-3 border-b border-gray-200 text-gray-800">
-          주문 정보
-        </h2>
-
-        <div className="space-y-4">
-          <div className="flex justify-between pb-3 border-b border-gray-200">
-            <span className="font-medium text-gray-600">주문 번호</span>
-            <span className="font-semibold text-gray-800">{orderData.orderId}</span>
-          </div>
-
-          <div className="flex justify-between pb-3 border-b border-gray-200">
-            <span className="font-medium text-gray-600">결제 금액</span>
-            <span className="font-semibold text-gray-800">
-              {orderData.amount.toLocaleString()}원
-            </span>
-          </div>
-
+      <div className="w-full bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4 pb-2 border-b">주문 정보</h2>
+        <div className="space-y-3">
           <div className="flex justify-between">
-            <span className="font-medium text-gray-600">결제 키</span>
-            <span className="font-semibold text-gray-800">{orderData.paymentKey}</span>
+            <span className="text-gray-600">주문 번호</span>
+            <span className="font-medium">{orderData.orderId}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">결제 금액</span>
+            <span className="font-medium">{orderData.amount.toLocaleString()}원</span>
           </div>
         </div>
       </div>
 
       {/* 버튼 그룹 */}
-      <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
         <Link
           href="/my/orders"
-          className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg text-center transition-all hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5"
+          className="flex-1 bg-gray-800 text-white py-3 px-6 rounded-md text-center font-medium hover:bg-gray-700 transition-colors"
         >
-          주문 내역 확인
+          주문 내역 보기
         </Link>
-
         <Link
           href="/"
-          className="px-6 py-3 bg-white text-indigo-600 font-semibold border border-indigo-600 rounded-lg text-center transition-all hover:bg-gray-50 hover:shadow-md hover:-translate-y-0.5"
+          className="flex-1 bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded-md text-center font-medium hover:bg-gray-50 transition-colors"
         >
-          쇼핑 계속하기
+          홈으로 가기
         </Link>
       </div>
     </div>

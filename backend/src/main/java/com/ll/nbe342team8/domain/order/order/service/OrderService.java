@@ -17,7 +17,6 @@ import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -66,11 +66,31 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
+    /**
+     * 통합된 주문 처리 메서드
+     * 장바구니 결제와 바로 결제를 모두 처리
+     */
     @Transactional
-    public Order createOrder(Member member, OrderRequestDto orderRequestDTO) {
-        List<Cart> cartList = cartService.findCartByMember(member);
+    public Order createOrder(Member member, OrderRequestDto orderRequestDto) {
+        if (orderRequestDto.isCartOrder()) {
+            return processCartOrder(member, orderRequestDto);
+        } else if (orderRequestDto.isDirectOrder()) {
+            return processDirectOrder(member, orderRequestDto);
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 주문 유형입니다.");
+        }
+    }
 
-        Order order = buildOrder(member, orderRequestDTO, calculateTotalPriceSales(cartList));
+    /**
+     * 장바구니 주문 처리
+     */
+    private Order processCartOrder(Member member, OrderRequestDto orderRequestDto) {
+        List<Cart> cartList = cartService.findCartByMember(member);
+        if (cartList.isEmpty()) {
+            throw new IllegalStateException("장바구니가 비어있습니다.");
+        }
+
+        Order order = buildOrder(member, orderRequestDto, calculateTotalPriceSales(cartList));
         orderRepository.save(order);
 
         List<DetailOrder> detailOrders = cartList.stream()
@@ -83,15 +103,21 @@ public class OrderService {
         return order;
     }
 
-    @Transactional
-    public Order createFastOrder(Member member, OrderRequestDto orderRequestDTO, Long bookId, int quantity) {
-        Book book = bookService.getBookById(bookId);
-        long totalPrice = (long) book.getPricesSales() * quantity;
+    /**
+     * 바로 결제 주문 처리
+     */
+    private Order processDirectOrder(Member member, OrderRequestDto orderRequestDto) {
+        if (orderRequestDto.bookId() == null || orderRequestDto.quantity() == null) {
+            throw new IllegalArgumentException("바로 결제 시 책 ID와 수량이 필요합니다.");
+        }
 
-        Order order = buildOrder(member, orderRequestDTO, totalPrice);
+        Book book = bookService.getBookById(orderRequestDto.bookId());
+        long totalPrice = (long) book.getPricesSales() * orderRequestDto.quantity();
+
+        Order order = buildOrder(member, orderRequestDto, totalPrice);
         orderRepository.save(order);
 
-        DetailOrder detailOrder = buildDetailOrder(order, book, quantity);
+        DetailOrder detailOrder = buildDetailOrder(order, book, orderRequestDto.quantity());
         detailOrderRepository.save(detailOrder);
 
         return order;
@@ -131,8 +157,32 @@ public class OrderService {
                 .sum();
     }
 
-    public PaymentResponseDto createPaymentInfo(Member member) {
+    /**
+     * 통합된 결제 정보 생성 메서드
+     */
+    public PaymentResponseDto createPaymentInfo(Member member, OrderRequestDto.OrderType orderType,
+                                                Long bookId, Integer quantity) {
+        if (OrderRequestDto.OrderType.CART.equals(orderType)) {
+            return createCartPaymentInfo(member);
+        } else if (OrderRequestDto.OrderType.DIRECT.equals(orderType)) {
+            if (bookId == null || quantity == null) {
+                throw new IllegalArgumentException("바로 결제 시 책 ID와 수량이 필요합니다.");
+            }
+            return createDirectPaymentInfo(member, bookId, quantity);
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 주문 유형입니다.");
+        }
+    }
+
+    /**
+     * 장바구니 결제 정보 생성
+     */
+    private PaymentResponseDto createCartPaymentInfo(Member member) {
         List<Cart> cartList = cartService.findCartByMember(member);
+        if (cartList.isEmpty()) {
+            throw new IllegalStateException("장바구니가 비어있습니다.");
+        }
+
         List<CartResponseDto> cartResponseDtoList = cartList.stream()
                 .map(CartResponseDto::from)
                 .collect(Collectors.toList());
@@ -144,7 +194,10 @@ public class OrderService {
                 generateOrderId());
     }
 
-    public PaymentResponseDto createSinglePaymentInfo(Member member, Long bookId, int quantity) {
+    /**
+     * 바로 결제 정보 생성
+     */
+    private PaymentResponseDto createDirectPaymentInfo(Member member, Long bookId, int quantity) {
         Book book = bookService.getBookById(bookId);
         Cart tempCart = new Cart(member, book, quantity);
 

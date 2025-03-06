@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/my/orders")
@@ -26,61 +25,134 @@ public class OrderController {
     private final OrderService orderService;
     private final AuthService authService;
 
-    // 주문조회
+    /**
+     * 주문 목록 조회
+     */
     @GetMapping
     public Page<OrderDTO> getOrdersByMember(@AuthenticationPrincipal SecurityUser securityUser, Pageable pageable) {
-        Member member = securityUser.getMember(); // 인증된 사용자의 Member 객체를 가져옴
+        Member member = securityUser.getMember();
         return orderService.getOrdersByMember(member, pageable);
     }
 
-    // 주문삭제
+    /**
+     * 주문 삭제
+     */
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId,
-                                              @CookieValue(value = "accessToken", required = false) String token) {
+    public ResponseEntity<String> deleteOrder(
+            @PathVariable Long orderId,
+            @CookieValue(value = "accessToken", required = false) String token) {
         Member member = authService.validateTokenAndGetMember(token);
         orderService.deleteOrder(orderId, member);
         return ResponseEntity.ok("주문 삭제 완료");
     }
 
-    // 주문등록 (일반 주문: 장바구니 기반)
-    @PostMapping("/create")
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
-                                                        @AuthenticationPrincipal SecurityUser securityUser) {
-        System.out.println("orderRequestDto = " + orderRequestDto);
+    /**
+     * 통합된 주문 생성 API
+     * 장바구니 주문과 바로 주문 모두 처리
+     */
+    @PostMapping
+    public ResponseEntity<OrderResponseDto> createOrder(
+            @RequestBody @Valid OrderRequestDto orderRequestDto,
+            @AuthenticationPrincipal SecurityUser securityUser) {
         Member member = securityUser.getMember();
         Order order = orderService.createOrder(member, orderRequestDto);
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
-    // 주문등록 (단일 상품 주문)
+    /**
+     * 통합된 결제 정보 조회 API
+     */
+    @GetMapping("/payment-info")
+    public ResponseEntity<PaymentResponseDto> getPaymentInfo(
+            @RequestParam OrderRequestDto.OrderType orderType,
+            @RequestParam(required = false) Long bookId,
+            @RequestParam(required = false) Integer quantity,
+            @AuthenticationPrincipal SecurityUser securityUser) {
+        Member member = securityUser.getMember();
+        PaymentResponseDto paymentInfo = orderService.createPaymentInfo(
+                member, orderType, bookId, quantity);
+        return ResponseEntity.ok(paymentInfo);
+    }
+
+    /**
+     * 기존 장바구니 주문 API - 새 API로 리다이렉트
+     * @deprecated 새로운 통합 API를 사용하세요
+     */
+    @PostMapping("/create")
+    public ResponseEntity<OrderResponseDto> legacyCreateOrder(
+            @RequestBody @Valid OrderRequestDto orderRequestDto,
+            @AuthenticationPrincipal SecurityUser securityUser) {
+
+        // 장바구니 주문 타입으로 설정
+        OrderRequestDto updatedRequest = new OrderRequestDto(
+                orderRequestDto.postCode(),
+                orderRequestDto.fullAddress(),
+                orderRequestDto.recipient(),
+                orderRequestDto.phone(),
+                orderRequestDto.paymentMethod(),
+                null,
+                null,
+                OrderRequestDto.OrderType.CART
+        );
+
+        return createOrder(updatedRequest, securityUser);
+    }
+
+    /**
+     * 기존 바로 주문 API - 새 API로 리다이렉트
+     * @deprecated 새로운 통합 API를 사용하세요
+     */
     @PostMapping("/create/fast")
-    public ResponseEntity<OrderResponseDto> createFastOrder(
+    public ResponseEntity<OrderResponseDto> legacyCreateFastOrder(
             @RequestBody @Valid OrderRequestDto orderRequestDto,
             @RequestParam("bookId") Long bookId,
             @RequestParam("quantity") int quantity,
             @AuthenticationPrincipal SecurityUser securityUser) {
 
-        System.out.println("orderRequestDto = " + orderRequestDto + ", bookId = " + bookId + ", quantity = " + quantity);
-        Member member = securityUser.getMember();
-        Order order = orderService.createFastOrder(member, orderRequestDto, bookId, quantity);
-        return ResponseEntity.ok(OrderResponseDto.from(order));
+        // 바로 주문 타입으로 설정
+        OrderRequestDto updatedRequest = new OrderRequestDto(
+                orderRequestDto.postCode(),
+                orderRequestDto.fullAddress(),
+                orderRequestDto.recipient(),
+                orderRequestDto.phone(),
+                orderRequestDto.paymentMethod(),
+                bookId,
+                quantity,
+                OrderRequestDto.OrderType.DIRECT
+        );
+
+        return createOrder(updatedRequest, securityUser);
     }
 
+    /**
+     * 기존 장바구니 결제 정보 API - 새 API로 리다이렉트
+     * @deprecated 새로운 통합 API를 사용하세요
+     */
     @GetMapping("/payment")
-    public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser) {
-        Member member = securityUser.getMember();
-        PaymentResponseDto paymentResponseDto = orderService.createPaymentInfo(member);
-        System.out.println("paymentResponseDto = " + paymentResponseDto);
-        return ResponseEntity.ok(paymentResponseDto);
+    public ResponseEntity<PaymentResponseDto> legacyPayment(
+            @AuthenticationPrincipal SecurityUser securityUser) {
+        return getPaymentInfo(
+                OrderRequestDto.OrderType.CART,
+                null,
+                null,
+                securityUser
+        );
     }
 
+    /**
+     * 기존 바로 결제 정보 API - 새 API로 리다이렉트
+     * @deprecated 새로운 통합 API를 사용하세요
+     */
     @GetMapping("/payment/single")
-    public ResponseEntity<PaymentResponseDto> payment(@AuthenticationPrincipal SecurityUser securityUser,
-                                                      @RequestParam("bookId") Long bookId,
-                                                      @RequestParam("quantity") int quantity) {
-        Member member = securityUser.getMember();
-        PaymentResponseDto paymentResponseDto = orderService.createSinglePaymentInfo(member, bookId, quantity);
-        System.out.println("paymentResponseDto = " + paymentResponseDto);
-        return ResponseEntity.ok(paymentResponseDto);
+    public ResponseEntity<PaymentResponseDto> legacySinglePayment(
+            @AuthenticationPrincipal SecurityUser securityUser,
+            @RequestParam("bookId") Long bookId,
+            @RequestParam("quantity") int quantity) {
+        return getPaymentInfo(
+                OrderRequestDto.OrderType.DIRECT,
+                bookId,
+                quantity,
+                securityUser
+        );
     }
 }
