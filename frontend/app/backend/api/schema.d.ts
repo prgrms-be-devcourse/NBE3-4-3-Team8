@@ -896,12 +896,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            unpaged?: boolean;
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
+            unpaged?: boolean;
         };
         ReviewResponseDto: {
             /** Format: int64 */
@@ -920,8 +920,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
         };
         Pageable: {
             /** Format: int32 */
@@ -940,6 +940,8 @@ export interface components {
             createDate?: string;
             coverImage?: string;
             title?: string;
+            /** Format: int64 */
+            id?: number;
         };
         PageOrderDTO: {
             /** Format: int32 */

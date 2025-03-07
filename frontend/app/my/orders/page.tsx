@@ -9,6 +9,7 @@ interface Order {
   title: string;
   totalPrice: number;
   coverImage?: string;
+  id: number; // bookId를 id로 변경
 }
 
 export default function OrdersPage() {
@@ -83,92 +84,92 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1 p-6">
-        <h1 className="text-2xl font-bold">나의 주문 내역</h1>
-        <div className="my-4">
-          <label htmlFor="dateFilter" className="mr-2">날짜별 조회:</label>
-          <input
-            id="dateFilter"
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="border p-2 rounded"
-          />
-        </div>
-        {error && <p className="text-red-500">{error}</p>}
-        <ul>
-          {filteredOrders.length === 0 ? (
-            <p className="text-gray-600">해당 날짜의 주문이 없습니다.</p>
-          ) : (
-            filteredOrders.map((order) => (
-              <li key={order.orderId} className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 flex flex-col max-w-lg w-full mx-auto relative">
-                {order.createDate && (
-                  <p className="text-sm text-gray-600 absolute top-2 left-2">
-                    {new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR')}
-                  </p>
-                )}
-                {order.coverImage && (
-                  <div className="relative mb-4 flex items-center">
-                    <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mr-4" />
-                    <div className="flex flex-col justify-center">
-                      <p className="text-xl font-semibold">책 제목: {order.title}</p>
-                      <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
-                    </div>
-                  </div>
-                )}
-                <div className="flex justify-between mt-4 space-x-2">
-                  <button
-                    className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
-                    onClick={() => {
-                      if (order.orderId) {
-                        router.push(`/my/orders/${order.orderId}/details`);
-                      } else {
-                        console.error('Order ID is missing.');
-                      }
-                    }}
-                  >
-                    <span role="img" aria-label="detail" className="text-xl">🔍</span>
-                    <span className="text-lg font-medium">상세 조회</span>
-                  </button>
-                  <button
-                    className="text-white bg-blue-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
-                    onClick={() => {
-                      if (order.orderId) {
-                        router.push(`/my/orders/${order.orderId}/review`);
-                      } else {
-                        console.error('Order ID is missing.');
-                      }
-                    }}
-                  >
-                    <span role="img" aria-label="write review" className="text-xl">✍️</span>
-                    <span className="text-lg font-medium">리뷰 작성</span>
-                  </button>
-                  {!confirmedOrders.has(order.orderId) && (
-                    <button
-                      className="text-white bg-green-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
-                      onClick={() => handleConfirmPurchase(order.orderId)}
-                    >
-                      <span role="img" aria-label="confirm purchase" className="text-xl">✅</span>
-                      <span className="text-lg font-medium">구매 확정</span>
-                    </button>
-                  )}
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
-        <div className="flex justify-center mt-4">
-          <button onClick={() => handlePageChange(page - 1)} disabled={page === 0} className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50">
-            이전
-          </button>
-          <span className="mx-4">페이지 {page + 1} / {totalPages}</span>
-          <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages - 1} className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50">
-            다음
-          </button>
-        </div>
-      </main>
-    </div>
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-1 p-6">
+          <h1 className="text-2xl font-bold">나의 주문 내역</h1>
+          <div className="my-4">
+            <label htmlFor="dateFilter" className="mr-2">날짜별 조회:</label>
+            <input
+                id="dateFilter"
+                type="date"
+                value={selectedDate}
+                onChange={handleDateChange}
+                className="border p-2 rounded"
+            />
+          </div>
+          {error && <p className="text-red-500">{error}</p>}
+          <ul>
+            {filteredOrders.length === 0 ? (
+                <p className="text-gray-600">해당 날짜의 주문이 없습니다.</p>
+            ) : (
+                filteredOrders.map((order) => (
+                    <li key={order.orderId} className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 flex flex-col max-w-lg w-full mx-auto relative">
+                      {order.createDate && (
+                          <p className="text-sm text-gray-600 absolute top-2 left-2">
+                            {new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR')}
+                          </p>
+                      )}
+                      {order.coverImage && (
+                          <div className="relative mb-4 flex items-center">
+                            <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mr-4" />
+                            <div className="flex flex-col justify-center">
+                              <p className="text-xl font-semibold">책 제목: {order.title}</p>
+                              <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
+                            </div>
+                          </div>
+                      )}
+                      <div className="flex justify-between mt-4 space-x-2">
+                        <button
+                            className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                            onClick={() => {
+                              if (order.orderId) {
+                                router.push(`/my/orders/${order.orderId}/details`);
+                              } else {
+                                console.error('Order ID is missing.');
+                              }
+                            }}
+                        >
+                          <span role="img" aria-label="detail" className="text-xl">🔍</span>
+                          <span className="text-lg font-medium">상세 조회</span>
+                        </button>
+                        <button
+                            className="text-white bg-blue-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                            onClick={() => {
+                              if (order.id) {
+                                router.push(`/books/${order.id}`);
+                              } else {
+                                console.error('Book ID is missing.');
+                              }
+                            }}
+                        >
+                          <span role="img" aria-label="write review" className="text-xl">✍️</span>
+                          <span className="text-lg font-medium">리뷰 작성</span>
+                        </button>
+                        {!confirmedOrders.has(order.orderId) && (
+                            <button
+                                className="text-white bg-green-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                                onClick={() => handleConfirmPurchase(order.orderId)}
+                            >
+                              <span role="img" aria-label="confirm purchase" className="text-xl">✅</span>
+                              <span className="text-lg font-medium">구매 확정</span>
+                            </button>
+                        )}
+                      </div>
+                    </li>
+                ))
+            )}
+          </ul>
+          <div className="flex justify-center mt-4">
+            <button onClick={() => handlePageChange(page - 1)} disabled={page === 0} className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50">
+              이전
+            </button>
+            <span className="mx-4">페이지 {page + 1} / {totalPages}</span>
+            <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages - 1} className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50">
+              다음
+            </button>
+          </div>
+        </main>
+      </div>
   );
 }

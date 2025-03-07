@@ -39,13 +39,15 @@ class OrderService(
             val detailOrder = order.detailOrders.firstOrNull()
             val coverImage = detailOrder?.book?.coverImage ?: ""
             val title = detailOrder?.book?.title ?: "제목 없음"
+            val Id = detailOrder?.book?.id ?: 0L
             OrderDTO(
                 order.id ?: 0L,
                 order.orderStatus.name,
                 order.totalPrice,
                 order.createDate,
                 coverImage,
-                title
+                title,
+                Id
             )
         }
     }
