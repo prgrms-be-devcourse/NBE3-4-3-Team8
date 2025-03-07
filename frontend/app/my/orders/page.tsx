@@ -121,7 +121,7 @@ export default function OrdersPage() {
                       )}
                       <div className="flex justify-between mt-4 space-x-2">
                         <button
-                            className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                            className="flex items-center justify-center w-full p-4 rounded-xl shadow-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold hover:from-indigo-600 hover:to-purple-500 transform hover:scale-105 transition-all duration-300"
                             onClick={() => {
                               if (order.orderId) {
                                 router.push(`/my/orders/${order.orderId}/details`);
@@ -130,11 +130,11 @@ export default function OrdersPage() {
                               }
                             }}
                         >
-                          <span role="img" aria-label="detail" className="text-xl">🔍</span>
-                          <span className="text-lg font-medium">상세 조회</span>
+                          🔍 <span className="ml-2">상세 조회</span>
                         </button>
+
                         <button
-                            className="text-white bg-blue-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                            className="flex items-center justify-center w-full p-4 rounded-xl shadow-md bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-700 hover:to-blue-500 transform hover:scale-105 transition-all duration-300"
                             onClick={() => {
                               if (order.id) {
                                 router.push(`/books/${order.id}`);
@@ -143,16 +143,15 @@ export default function OrdersPage() {
                               }
                             }}
                         >
-                          <span role="img" aria-label="write review" className="text-xl">✍️</span>
-                          <span className="text-lg font-medium">리뷰 작성</span>
+                          ✍️ <span className="ml-2">리뷰 작성</span>
                         </button>
+
                         {!confirmedOrders.has(order.orderId) && (
                             <button
-                                className="text-white bg-green-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                                className="flex items-center justify-center w-full p-4 rounded-xl shadow-md bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold hover:from-green-700 hover:to-green-500 transform hover:scale-105 transition-all duration-300"
                                 onClick={() => handleConfirmPurchase(order.orderId)}
                             >
-                              <span role="img" aria-label="confirm purchase" className="text-xl">✅</span>
-                              <span className="text-lg font-medium">구매 확정</span>
+                              ✅ <span className="ml-2">구매 확정</span>
                             </button>
                         )}
                       </div>
