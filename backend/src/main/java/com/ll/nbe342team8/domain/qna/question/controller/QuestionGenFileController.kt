@@ -8,7 +8,6 @@ import com.ll.nbe342team8.domain.qna.question.service.QuestionService
 import com.ll.nbe342team8.global.config.AppConfig
 import com.ll.nbe342team8.global.exceptions.ServiceException
 import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil
-import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil.isAllowedFileType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -56,7 +55,7 @@ class QuestionGenFileController (
 
         val genFile = question.genFiles
             .find { it.fileNo == fileNo }
-            ?: throw NoSuchElementException("File not found")
+            ?: throw ServiceException(HttpStatus.NOT_FOUND.value(),"사진 파일이 존재하지 않습니다.")
 
         val filePath = genFile.filePath
         val resource = InputStreamResource(FileInputStream(filePath))
@@ -86,7 +85,7 @@ class QuestionGenFileController (
             .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다.") }
 
         // 파일 검사 과정 필요
-
+        checkFileDanger(file)
 
         checkActorCanMakeNewGenFile(member, question)
 
@@ -101,7 +100,7 @@ class QuestionGenFileController (
 
     @DeleteMapping("/{questionId}/{fileNo}/{typeCode}")
     @Operation(summary = "삭제")
-    fun deleteNewFile(
+    fun deleteImageFile(
         @PathVariable questionId: Long,
         @PathVariable fileNo: Int,
         @PathVariable typeCode: String
@@ -138,6 +137,7 @@ class QuestionGenFileController (
         if (originalFilename == null || !FileUploadUtil.isAllowedFileType(originalFilename, file.contentType)) {
             throw ServiceException(HttpStatus.BAD_REQUEST.value(), "허용되지 않은 파일 형식입니다.")
         }
+        if(!FileUploadUtil.checkFileType(file)) { throw ServiceException(HttpStatus.BAD_REQUEST.value(), "허용되지 않은 파일 형식입니다.")}
 
     }
 }

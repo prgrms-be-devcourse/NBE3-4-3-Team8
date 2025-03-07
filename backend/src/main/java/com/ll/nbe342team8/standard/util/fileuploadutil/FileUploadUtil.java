@@ -1,14 +1,16 @@
 package com.ll.nbe342team8.standard.util.fileuploadutil;
 
 import com.ll.nbe342team8.global.config.AppConfig;
-import com.ll.nbe342team8.standard.util.Ut;
+
 import lombok.SneakyThrows;
+import org.apache.tika.Tika;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -20,11 +22,14 @@ import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import org.springframework.mock.web.MockMultipartFile;
 
 
 public class FileUploadUtil {
 
     private static final String ORIGINAL_FILE_NAME_SEPARATOR = "--originalFileName_";
+    private static final List<String> ALLOWED_MIME_TYPES = List.of( "image/jpeg", "image/png", "image/gif", "application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" );
+    private static final List<String> ALLOWED_EXTENSION_TYPES = List.of("jpg", "jpeg", "png", "gif", "pdf", "txt", "docx");
 
     private static final Map<String, String> MIME_TYPE_MAP = new LinkedHashMap<>() {{
         put("application/json", "json");
@@ -71,6 +76,20 @@ public class FileUploadUtil {
                 StandardCopyOption.REPLACE_EXISTING
         );
     }
+
+    @SneakyThrows
+    public static void copy(String sourceFilePath, String destinationFilePath) {
+        // 목적지 디렉토리가 없으면 생성
+        mkdir(Paths.get(destinationFilePath).getParent().toString());
+
+        // 파일 복사
+        Files.copy(
+                Path.of(sourceFilePath),
+                Path.of(destinationFilePath),
+                StandardCopyOption.REPLACE_EXISTING
+        );
+    }
+
 
     private static String getExtensionFromResponse(HttpResponse<?> response) {
         return response.headers()
@@ -248,12 +267,19 @@ public class FileUploadUtil {
         return filePath;
     }
 
-    // ✅ 허용된 파일 확장자 및 MIME 타입 검증
+
     public static boolean isAllowedFileType(String filename, String contentType) {
-        String[] allowedExtensions = { "jpg", "jpeg", "png", "gif", "pdf", "txt", "docx" };
-        String[] allowedMimeTypes = { "image/jpeg", "image/png", "image/gif", "application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
 
         String fileExtension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
-        return Arrays.asList(allowedExtensions).contains(fileExtension) && Arrays.asList(allowedMimeTypes).contains(contentType);
+        return ALLOWED_EXTENSION_TYPES.contains(fileExtension) && ALLOWED_MIME_TYPES.contains(contentType);
     }
+
+    public static Boolean checkFileType(MultipartFile file) throws IOException {
+        Tika tika = new Tika();
+        String detectedType = tika.detect(file.getBytes());
+
+        return ALLOWED_MIME_TYPES.contains(detectedType);
+    }
+
+
 }

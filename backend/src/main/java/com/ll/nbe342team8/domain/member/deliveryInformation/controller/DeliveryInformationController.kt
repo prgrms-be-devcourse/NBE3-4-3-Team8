@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import java.time.Duration
 
 @Tag(name = "DeliveryInformationController", description = "배송 정보 컨트롤러")
 @RestController
@@ -38,6 +39,9 @@ class DeliveryInformationController(
 
         val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
             .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+
+        // 단 시간 내 중복 등록 방지
+        validateExistsDuplicateDeliveryInformationInShortTime(member,reqDeliveryInformationDto,Duration.ofSeconds(5))
 
         //배송 정보 설정은 5개 까지 허용한다. 5개 일때 배송지 추가 등록 요청이 올 경우 에러를 반환한다.
         if (member.deliveryInformations.size >= 5) {
@@ -107,6 +111,12 @@ class DeliveryInformationController(
         val resMemberMyPageDto = ResMemberMyPageDto(member)
 
         return ResponseEntity.ok(resMemberMyPageDto)
+    }
+
+    private fun validateExistsDuplicateDeliveryInformationInShortTime(member: Member, dto : ReqDeliveryInformationDto, duration: Duration) {
+        if (deliveryInformationService.existsDuplicateDeliveryInformationInShortTime(dto, member , duration)) {
+            throw ServiceException(HttpStatus.TOO_MANY_REQUESTS.value(), "너무 빠르게 동일한 답변을 등록할 수 없습니다.")
+        }
     }
 
     //사용자 권한 확인, 관리자 계정이여도 접근 가능
