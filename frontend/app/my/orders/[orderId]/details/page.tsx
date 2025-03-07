@@ -5,10 +5,11 @@ import { useParams } from 'next/navigation';
 
 interface OrderDetail {
     orderId: string;
-    bookId: string;
+    bookTitle: string;
     bookQuantity: number;
+    totalPrice: number; // totalPrice 필드 추가
     deliveryStatus: string;
-    coverImage: string; // Add this field
+    coverImage: string | null; // coverImage 필드 수정
 }
 
 export default function OrderDetailsPage() {
@@ -50,12 +51,20 @@ export default function OrderDetailsPage() {
             <h2 className="text-2xl font-bold mb-6 text-center">주문 상세 정보</h2>
             <div className="space-y-4">
                 {detailOrders.map((detail) => (
-                    <div key={`${detail.orderId}-${detail.bookId}`} className="bg-gray-50 p-4 rounded-lg shadow">
-                        <p><strong>주문 ID:</strong> {detail.orderId}</p>
-                        <p><strong>도서 ID:</strong> {detail.bookId}</p>
-                        <p><strong>수량:</strong> {detail.bookQuantity}</p>
-                        <p><strong>배송 상태:</strong> {detail.deliveryStatus}</p>
-                        {detail.coverImage && <img src={detail.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mt-4" />} {/* Display the cover image */}
+                    <div key={`${detail.orderId}-${detail.bookTitle}`} className="bg-gray-50 p-4 rounded-lg shadow flex items-center space-x-4">
+                        {/* 이미지 왼쪽에 배치 */}
+                        {detail.coverImage && (
+                            <img src={detail.coverImage} alt="Book Cover" className="w-32 h-32 object-cover" />
+                        )}
+
+                        {/* 정보 오른쪽에 배치 */}
+                        <div>
+                            <p><strong>주문 ID:</strong> {detail.orderId}</p>
+                            <p><strong>도서 제목:</strong> {detail.bookTitle}</p>
+                            <p><strong>수량:</strong> {detail.bookQuantity}</p>
+                            <p><strong>총 금액:</strong> {detail.totalPrice.toLocaleString()}원</p>
+                            <p><strong>배송 상태:</strong> {detail.deliveryStatus}</p>
+                        </div>
                     </div>
                 ))}
             </div>

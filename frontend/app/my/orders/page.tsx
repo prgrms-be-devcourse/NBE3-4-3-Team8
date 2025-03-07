@@ -19,6 +19,7 @@ export default function OrdersPage() {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
+  const [confirmedOrders, setConfirmedOrders] = useState<Set<string>>(new Set());
   const router = useRouter();
 
   useEffect(() => {
@@ -76,6 +77,11 @@ export default function OrdersPage() {
     setPage(newPage);
   };
 
+  const handleConfirmPurchase = (orderId: string) => {
+    setConfirmedOrders(prev => new Set(prev).add(orderId));
+    console.log(`구매 확정: ${orderId}`);
+  };
+
   return (
     <div className="flex">
       <Sidebar />
@@ -97,22 +103,24 @@ export default function OrdersPage() {
             <p className="text-gray-600">해당 날짜의 주문이 없습니다.</p>
           ) : (
             filteredOrders.map((order) => (
-              <li key={order.orderId} className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 flex max-w-lg w-full mx-auto relative">
+              <li key={order.orderId} className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 flex flex-col max-w-lg w-full mx-auto relative">
                 {order.createDate && (
                   <p className="text-sm text-gray-600 absolute top-2 left-2">
                     {new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR')}
                   </p>
                 )}
                 {order.coverImage && (
-                  <div className="relative">
+                  <div className="relative mb-4 flex items-center">
                     <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mr-4" />
+                    <div className="flex flex-col justify-center">
+                      <p className="text-xl font-semibold">책 제목: {order.title}</p>
+                      <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
+                    </div>
                   </div>
                 )}
-                <div className="flex flex-col justify-center">
-                  <p className="text-xl font-semibold">책 제목: {order.title}</p>
-                  <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
+                <div className="flex justify-between mt-4 space-x-2">
                   <button
-                    className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-4"
+                    className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
                     onClick={() => {
                       if (order.orderId) {
                         router.push(`/my/orders/${order.orderId}/details`);
@@ -124,6 +132,28 @@ export default function OrdersPage() {
                     <span role="img" aria-label="detail" className="text-xl">🔍</span>
                     <span className="text-lg font-medium">상세 조회</span>
                   </button>
+                  <button
+                    className="text-white bg-blue-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                    onClick={() => {
+                      if (order.orderId) {
+                        router.push(`/my/orders/${order.orderId}/review`);
+                      } else {
+                        console.error('Order ID is missing.');
+                      }
+                    }}
+                  >
+                    <span role="img" aria-label="write review" className="text-xl">✍️</span>
+                    <span className="text-lg font-medium">리뷰 작성</span>
+                  </button>
+                  {!confirmedOrders.has(order.orderId) && (
+                    <button
+                      className="text-white bg-green-500 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                      onClick={() => handleConfirmPurchase(order.orderId)}
+                    >
+                      <span role="img" aria-label="confirm purchase" className="text-xl">✅</span>
+                      <span className="text-lg font-medium">구매 확정</span>
+                    </button>
+                  )}
                 </div>
               </li>
             ))

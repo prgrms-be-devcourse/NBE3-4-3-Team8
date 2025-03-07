@@ -24,9 +24,10 @@ class DetailOrderService(
         return detailOrders.map { detailOrder ->
             DetailOrderDto(
                 orderId = detailOrder.order.id!!,
-                bookId = detailOrder.book.id!!,
+                bookTitle = detailOrder.book.title,
                 bookQuantity = detailOrder.bookQuantity,
-                deliveryStatus = detailOrder.deliveryStatus,
+                totalPrice = detailOrder.order.totalPrice.toDouble(), // 총 금액 필드 사용
+                deliveryStatus = detailOrder.deliveryStatus.name,
                 coverImage = detailOrder.book.coverImage
             )
         }
