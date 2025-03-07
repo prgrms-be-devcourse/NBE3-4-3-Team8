@@ -30,9 +30,12 @@ export default function OrdersPage() {
           throw new Error('Invalid response format');
         }
 
-        setOrders(data.content); // 데이터 목록
+        // Sort orders by createDate in descending order
+        const sortedOrders = data.content.sort((a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime());
+
+        setOrders(sortedOrders); // 데이터 목록
         setTotalPages(data.totalPages); // 전체 페이지 수
-        setFilteredOrders(data.content); // 필터링된 주문 목록
+        setFilteredOrders(sortedOrders); // 필터링된 주문 목록
       } catch (err) {
         console.error('Failed to load order list', err);
         setError('주문 목록을 불러오는 데 실패했습니다.');
@@ -98,8 +101,8 @@ export default function OrdersPage() {
                 <div className="absolute top-2 left-2 text-sm text-gray-500">
                   {order.createDate ? new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR') : '날짜 정보 없음'}
                 </div>
-                <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
-                <p className="text-xl font-semibold">Total Price: {order.totalPrice.toLocaleString()}원</p>
+                <p className="text-xl font-semibold">책 제목: {order.title}</p>
+                <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
                 {order.coverImage && <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mt-4" />}
                 <button
                   className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"

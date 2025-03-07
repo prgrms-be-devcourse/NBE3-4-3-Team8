@@ -36,13 +36,16 @@ class OrderService(
         }
 
         return ordersPage.map { order ->
-            val coverImage = order.detailOrders.firstOrNull()?.book?.coverImage ?: ""
+            val detailOrder = order.detailOrders.firstOrNull()
+            val coverImage = detailOrder?.book?.coverImage ?: ""
+            val title = detailOrder?.book?.title ?: "제목 없음"
             OrderDTO(
                 order.id ?: 0L,
                 order.orderStatus.name,
                 order.totalPrice,
                 order.createDate,
-                coverImage
+                coverImage,
+                title
             )
         }
     }
