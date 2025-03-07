@@ -156,7 +156,7 @@ public class OrderService {
         // Order 엔티티 생성 및 저장
         Order order = Order.builder()
                 .member(member)
-                .orderStatus(OrderStatus.COMPLETE)
+                .orderStatus(OrderStatus.ORDERED)
                 .fullAddress(orderCacheDto.getFullAddress())
                 .postCode(orderCacheDto.getPostCode())
                 .phone(orderCacheDto.getPhone())

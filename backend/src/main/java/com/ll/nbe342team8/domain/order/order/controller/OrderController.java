@@ -53,7 +53,7 @@ public class OrderController {
      */
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
-                                                        @AuthenticationPrincipal SecurityUser securityUser) {
+                                         @AuthenticationPrincipal SecurityUser securityUser) {
 
         Member member = securityUser.getMember();
         String tossOrderId = orderService.createOrder(member, orderRequestDto);

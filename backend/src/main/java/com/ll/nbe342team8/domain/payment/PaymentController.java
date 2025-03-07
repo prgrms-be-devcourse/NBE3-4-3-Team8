@@ -55,15 +55,15 @@ public class PaymentController {
     public ResponseEntity<?> tossPaymentFail(@RequestParam String code,
                                              @RequestParam String message,
                                              @RequestParam(required = false) String orderId) {
-        // 결제 실패 로그 기록
+
         log.error("결제 실패: code={}, message={}, orderId={}", code, message, orderId);
 
-        // 실패한 주문 상태 업데이트 (필요한 경우)
-        if (orderId != null && !orderId.isEmpty()) {
-            // orderService.updateOrderStatusToFailed(orderId);
-        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("http://localhost:3000/order/fail" +
+                                       "?code=" + code +
+                                       "&message=" + message +
+                                       "&orderId=" + orderId));
 
-        // 결제 실패 정보 반환
         return ResponseEntity.badRequest().body(Map.of(
                 "message", message,
                 "code", code

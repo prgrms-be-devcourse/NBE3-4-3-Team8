@@ -146,7 +146,7 @@ export default function OrderPage() {
       setRoadAddress(defaultDelivery.addressName);
       setDetailAddress(defaultDelivery.detailAddress);
       setRecipient(defaultDelivery.recipient);
-      setPhone(defaultDelivery.phone);
+      setPhone(defaultDelivery.phone.replace(/-/g, ''));
     }
   }, []);
 
