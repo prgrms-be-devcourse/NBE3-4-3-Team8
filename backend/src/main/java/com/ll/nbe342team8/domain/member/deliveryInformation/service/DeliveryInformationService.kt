@@ -7,6 +7,8 @@ import com.ll.nbe342team8.domain.member.member.entity.Member
 import lombok.RequiredArgsConstructor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -59,5 +61,22 @@ class DeliveryInformationService(
     //수정, 삭제하려는 게시글을 사용자가 작성한지 학인
     fun isDeliveryInformationOwner(member: Member, deliveryInformation: DeliveryInformation): Boolean {
         return deliveryInformation.member.id == member.id
+    }
+
+    fun existsDuplicateDeliveryInformationInShortTime(
+        dto: ReqDeliveryInformationDto,
+        member: Member,
+        duration: Duration
+    ): Boolean {
+        val cutoffTime = LocalDateTime.now().minus(duration)
+        return deliveryInformationRepository.existsDuplicateInShortTime(
+            member,
+            dto.addressName,
+            dto.postCode,
+            dto.detailAddress,
+            dto.recipient,
+            dto.phone,
+            cutoffTime
+        )
     }
 }

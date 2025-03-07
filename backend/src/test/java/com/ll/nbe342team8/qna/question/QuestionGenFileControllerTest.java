@@ -76,7 +76,8 @@ public class QuestionGenFileControllerTest {
 
     @Autowired
     HttpServletRequest request;
-
+    
+    // 해당 경로에 테스트용 업로드 이미지 데이터가 필요함
     String filePath="c:/temp/glog_dev/postGenFileTest/testImage.png";
 
     @BeforeEach
