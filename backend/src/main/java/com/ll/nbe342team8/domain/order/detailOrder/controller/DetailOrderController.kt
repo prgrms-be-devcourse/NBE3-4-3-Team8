@@ -25,10 +25,6 @@ class DetailOrderController(
 
         val member: Member = securityUser.member
         val detailOrderDtoList = detailOrderService.getDetailOrdersByOrderIdAndMember(orderId, member)
-        println("실행됨")
-        println("orderId = $orderId")
-        println("detailOrderDtoList = $detailOrderDtoList")
-        println("출력 결과 end")
 
         return detailOrderDtoList
     }

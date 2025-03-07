@@ -1,6 +1,5 @@
 package com.ll.nbe342team8.domain.order.order.service
 
-import com.ll.nbe342team8.domain.book.book.entity.Book
 import com.ll.nbe342team8.domain.book.book.service.BookService
 import com.ll.nbe342team8.domain.cart.dto.CartResponseDto
 import com.ll.nbe342team8.domain.cart.entity.Cart
@@ -14,9 +13,7 @@ import com.ll.nbe342team8.domain.order.order.dto.OrderDTO
 import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto
 import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto
 import com.ll.nbe342team8.domain.order.order.entity.Order
-import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -28,7 +25,7 @@ class OrderService(
     private val detailOrderRepository: DetailOrderRepository,
     private val memberRepository: MemberRepository,
     private val cartService: CartService,
-    private val bookService: BookService // Book 정보를 가져오기 위한 서비스
+    private val bookService: BookService
 ) {
 
     @Transactional(readOnly = true)
@@ -39,11 +36,13 @@ class OrderService(
         }
 
         return ordersPage.map { order ->
+            val coverImage = order.detailOrders.firstOrNull()?.book?.coverImage ?: ""
             OrderDTO(
                 order.id ?: 0L,
                 order.orderStatus.name,
                 order.totalPrice,
-                order.createDate
+                order.createDate,
+                coverImage
             )
         }
     }
@@ -52,7 +51,7 @@ class OrderService(
     fun deleteOrder(orderId: Long, member: Member) {
         val order = orderRepository.findByIdAndMember(orderId, member)
             .orElseThrow { IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다.") }
-        if (order.orderStatus != OrderStatus.COMPLETE) {
+        if (order.orderStatus != Order.OrderStatus.COMPLETE) {
             throw IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.")
         }
         detailOrderRepository.deleteByOrderId(orderId)
@@ -65,7 +64,7 @@ class OrderService(
 
         val order = Order(
             member = member,
-            orderStatus = OrderStatus.ORDERED,
+            orderStatus = Order.OrderStatus.ORDERED,
             fullAddress = orderRequestDTO.fullAddress(),
             postCode = orderRequestDTO.postCode(),
             phone = orderRequestDTO.phone(),
@@ -98,7 +97,7 @@ class OrderService(
         val cartList = cartService.findCartByMember(member)
         val order = Order(
             member = member,
-            orderStatus = OrderStatus.ORDERED,
+            orderStatus = Order.OrderStatus.ORDERED,
             fullAddress = orderRequestDTO.fullAddress(),
             postCode = orderRequestDTO.postCode(),
             phone = orderRequestDTO.phone(),
@@ -130,7 +129,7 @@ class OrderService(
 
         val order = Order(
             member = member,
-            orderStatus = OrderStatus.ORDERED,
+            orderStatus = Order.OrderStatus.ORDERED,
             fullAddress = orderRequestDTO.fullAddress(),
             postCode = orderRequestDTO.postCode(),
             phone = orderRequestDTO.phone(),

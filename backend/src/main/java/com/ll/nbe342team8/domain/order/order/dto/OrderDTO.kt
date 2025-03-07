@@ -6,5 +6,6 @@ data class OrderDTO(
         val orderId: Long,
         val orderStatus: String,
         val totalPrice: Long,
-        val createDate: LocalDateTime
+        val createDate: LocalDateTime,
+        val coverImage: String
 )

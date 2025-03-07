@@ -17,7 +17,7 @@ class DetailOrderService(
     @Transactional
     // 주문상세조회
     fun getDetailOrdersByOrderIdAndMember(orderId: Long, member: Member): List<DetailOrderDto> {
-        // 레포지토리에서 orderId와 member로 주문 상세 조회
+
         val detailOrders: List<DetailOrder> = detailOrderRepository.findByOrderId(orderId)
         println("detailOrders = $detailOrders")
         // 주문 상세 정보를 DetailOrderDto로 변환하여 반환

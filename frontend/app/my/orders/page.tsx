@@ -14,14 +14,6 @@ export default function OrdersPage() {
   const router = useRouter();
 
   useEffect(() => {
-//     const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='));
-//     const accessToken = token ? token.split('=')[1] : null;
-//
-//     if (!accessToken) {
-//       setError('Access token is missing');
-//       return;
-//     }
-
     const fetchOrders = async () => {
       try {
         const res = await fetch(`http://localhost:8080/my/orders?page=${page}&size=${pageSize}`, {
@@ -108,6 +100,7 @@ export default function OrdersPage() {
                 </div>
                 <p className="text-xl font-semibold">Order ID: {order.orderId}</p>
                 <p className="text-xl font-semibold">Total Price: {order.totalPrice.toLocaleString()}원</p>
+                {order.coverImage && <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mt-4" />}
                 <button
                   className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
                   onClick={() => {

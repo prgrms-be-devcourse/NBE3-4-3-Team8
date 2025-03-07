@@ -938,6 +938,7 @@ export interface components {
             totalPrice?: number;
             /** Format: date-time */
             createDate?: string;
+            coverImage?: string;
         };
         PageOrderDTO: {
             /** Format: int64 */
