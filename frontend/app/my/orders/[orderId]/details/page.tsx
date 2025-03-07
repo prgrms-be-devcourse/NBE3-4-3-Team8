@@ -8,6 +8,7 @@ interface OrderDetail {
     bookId: string;
     bookQuantity: number;
     deliveryStatus: string;
+    coverImage: string; // Add this field
 }
 
 export default function OrderDetailsPage() {
@@ -54,6 +55,7 @@ export default function OrderDetailsPage() {
                         <p><strong>도서 ID:</strong> {detail.bookId}</p>
                         <p><strong>수량:</strong> {detail.bookQuantity}</p>
                         <p><strong>배송 상태:</strong> {detail.deliveryStatus}</p>
+                        {detail.coverImage && <img src={detail.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mt-4" />} {/* Display the cover image */}
                     </div>
                 ))}
             </div>

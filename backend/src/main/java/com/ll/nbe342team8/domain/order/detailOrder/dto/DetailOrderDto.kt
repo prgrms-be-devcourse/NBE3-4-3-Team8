@@ -6,5 +6,6 @@ data class DetailOrderDto(
     val orderId: Long,
     val bookId: Long,
     val bookQuantity: Int,
-    val deliveryStatus: DeliveryStatus
+    val deliveryStatus: DeliveryStatus,
+    val  coverImage: String
 )

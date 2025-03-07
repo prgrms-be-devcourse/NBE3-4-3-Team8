@@ -19,14 +19,15 @@ class DetailOrderService(
     fun getDetailOrdersByOrderIdAndMember(orderId: Long, member: Member): List<DetailOrderDto> {
 
         val detailOrders: List<DetailOrder> = detailOrderRepository.findByOrderId(orderId)
-        println("detailOrders = $detailOrders")
+
         // 주문 상세 정보를 DetailOrderDto로 변환하여 반환
         return detailOrders.map { detailOrder ->
             DetailOrderDto(
                 orderId = detailOrder.order.id!!,
                 bookId = detailOrder.book.id!!,
                 bookQuantity = detailOrder.bookQuantity,
-                deliveryStatus = detailOrder.deliveryStatus
+                deliveryStatus = detailOrder.deliveryStatus,
+                coverImage = detailOrder.book.coverImage
             )
         }
     }

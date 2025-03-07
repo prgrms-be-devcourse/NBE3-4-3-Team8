@@ -3,14 +3,22 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/app/components/my/Sidebar';
 
+interface Order {
+  orderId: string;
+  createDate: string;
+  title: string;
+  totalPrice: number;
+  coverImage?: string;
+}
+
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [page, setPage] = useState(0); // 현재 페이지
+  const [page, setPage] = useState(0);
   const [pageSize] = useState(3);
-  const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수
+  const [totalPages, setTotalPages] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -30,12 +38,11 @@ export default function OrdersPage() {
           throw new Error('Invalid response format');
         }
 
-        // Sort orders by createDate in descending order
-        const sortedOrders = data.content.sort((a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime());
+        const sortedOrders = data.content.sort((a: Order, b: Order) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime());
 
-        setOrders(sortedOrders); // 데이터 목록
-        setTotalPages(data.totalPages); // 전체 페이지 수
-        setFilteredOrders(sortedOrders); // 필터링된 주문 목록
+        setOrders(sortedOrders);
+        setTotalPages(data.totalPages);
+        setFilteredOrders(sortedOrders);
       } catch (err) {
         console.error('Failed to load order list', err);
         setError('주문 목록을 불러오는 데 실패했습니다.');
@@ -73,69 +80,61 @@ export default function OrdersPage() {
     <div className="flex">
       <Sidebar />
       <main className="flex-1 p-6">
-
         <h1 className="text-2xl font-bold">나의 주문 내역</h1>
-
         <div className="my-4">
           <label htmlFor="dateFilter" className="mr-2">날짜별 조회:</label>
           <input
-              id="dateFilter"
-              type="date"
-              value={selectedDate}
-              onChange={handleDateChange}
-              className="border p-2 rounded"
+            id="dateFilter"
+            type="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+            className="border p-2 rounded"
           />
         </div>
-
         {error && <p className="text-red-500">{error}</p>}
-
         <ul>
           {filteredOrders.length === 0 ? (
             <p className="text-gray-600">해당 날짜의 주문이 없습니다.</p>
           ) : (
             filteredOrders.map((order) => (
-              <li
-                key={order.orderId}
-                className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 relative max-w-lg w-full mx-auto"
-              >
-                <div className="absolute top-2 left-2 text-sm text-gray-500">
-                  {order.createDate ? new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR') : '날짜 정보 없음'}
+              <li key={order.orderId} className="border p-6 my-4 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-300 flex max-w-lg w-full mx-auto relative">
+                {order.createDate && (
+                  <p className="text-sm text-gray-600 absolute top-2 left-2">
+                    {new Date(order.createDate.replace(' ', 'T')).toLocaleDateString('ko-KR')}
+                  </p>
+                )}
+                {order.coverImage && (
+                  <div className="relative">
+                    <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mr-4" />
+                  </div>
+                )}
+                <div className="flex flex-col justify-center">
+                  <p className="text-xl font-semibold">책 제목: {order.title}</p>
+                  <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
+                  <button
+                    className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-4"
+                    onClick={() => {
+                      if (order.orderId) {
+                        router.push(`/my/orders/${order.orderId}/details`);
+                      } else {
+                        console.error('Order ID is missing.');
+                      }
+                    }}
+                  >
+                    <span role="img" aria-label="detail" className="text-xl">🔍</span>
+                    <span className="text-lg font-medium">상세 조회</span>
+                  </button>
                 </div>
-                <p className="text-xl font-semibold">책 제목: {order.title}</p>
-                <p className="text-xl font-semibold">총 금액: {order.totalPrice.toLocaleString()}원</p>
-                {order.coverImage && <img src={order.coverImage} alt="Book Cover" className="w-32 h-32 object-cover mt-4" />}
-                <button
-                  className="text-white bg-gradient-to-r from-indigo-500 to-indigo-700 p-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mt-6"
-                  onClick={() => {
-                    if (order.orderId) {
-                      router.push(`/my/orders/${order.orderId}/details`);
-                    } else {
-                      console.error('Order ID is missing.');
-                    }
-                  }}
-                >
-                  <span role="img" aria-label="detail" className="text-xl">🔍</span>
-                  <span className="text-lg font-medium">상세 조회</span>
-                </button>
               </li>
             ))
           )}
         </ul>
-
         <div className="flex justify-center mt-4">
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 0}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50"
-          >
+          <button onClick={() => handlePageChange(page - 1)} disabled={page === 0} className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50">
             이전
           </button>
           <span className="mx-4">페이지 {page + 1} / {totalPages}</span>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            disabled={page === totalPages - 1}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50"
-          >
+          <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages - 1} className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:opacity-50">
             다음
           </button>
         </div>
