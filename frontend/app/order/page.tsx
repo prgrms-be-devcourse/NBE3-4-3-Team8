@@ -330,8 +330,7 @@ export default function OrderPage() {
         customerMobilePhone: phone,
       });
     } catch (error) {
-      console.error('결제 처리 중 오류:', error);
-      alert('결제 처리 중 오류가 발생했습니다.');
+      alert('사용자가 결제를 취소했습니다.');
     }
   };
 

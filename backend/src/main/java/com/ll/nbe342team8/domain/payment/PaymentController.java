@@ -2,6 +2,9 @@ package com.ll.nbe342team8.domain.payment;
 
 import com.ll.nbe342team8.domain.cart.service.CartService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.member.member.service.MemberService;
+import com.ll.nbe342team8.domain.order.order.dto.OrderCacheDto;
+import com.ll.nbe342team8.domain.order.order.service.OrderCacheService;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +24,16 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final CartService cartService;
     private final OrderService orderService;
+    private final OrderCacheService orderCacheService;
+    private final MemberService memberService;
 
     @GetMapping("/order/success")
     public ResponseEntity<?> tossPaymentSuccess(@RequestParam String paymentKey,
                                                 @RequestParam String orderId,
                                                 @RequestParam long amount) {
 
-        Member member = orderService.getOrderById(orderId).getMember();
+        OrderCacheDto orderCacheDto = orderCacheService.getOrderFromCache(orderId);
+        Member member = memberService.getMemberById(orderCacheDto.getMemberId());
         PaymentResponse paymentResponse = paymentService.confirmPayment(paymentKey, orderId, amount);
 
         if(orderId.startsWith("CART")){

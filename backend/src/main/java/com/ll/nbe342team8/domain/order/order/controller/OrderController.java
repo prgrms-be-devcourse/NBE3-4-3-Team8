@@ -1,13 +1,11 @@
 package com.ll.nbe342team8.domain.order.order.controller;
 
+import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.oauth.SecurityUser;
-import com.ll.nbe342team8.domain.jwt.AuthService;
 import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
 import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto;
-import com.ll.nbe342team8.domain.order.order.dto.OrderResponseDto;
 import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
-import com.ll.nbe342team8.domain.order.order.entity.Order;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/my/orders")
@@ -51,12 +52,16 @@ public class OrderController {
      * 장바구니 주문과 바로 주문 모두 처리
      */
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
+    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto,
                                                         @AuthenticationPrincipal SecurityUser securityUser) {
 
         Member member = securityUser.getMember();
-        Order order = orderService.createOrder(member, orderRequestDto);
-        return ResponseEntity.ok(OrderResponseDto.from(order));
+        String tossOrderId = orderService.createOrder(member, orderRequestDto);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("orderId", tossOrderId);
+
+        return ResponseEntity.ok(response);
     }
 
     /**

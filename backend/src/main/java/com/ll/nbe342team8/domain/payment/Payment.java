@@ -1,6 +1,5 @@
 package com.ll.nbe342team8.domain.payment;
 
-import com.ll.nbe342team8.domain.order.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +29,4 @@ public class Payment {
     private LocalDateTime paySuccessDate;   // 결제 성공 시각
 
     private String method;                  // 결제 수단
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;                    // order_id와 1대1 매핑
 }

@@ -23,6 +23,7 @@ public class Order extends BaseTime {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(unique = true)
 	private String tossOrderId;
 
 	@ManyToOne

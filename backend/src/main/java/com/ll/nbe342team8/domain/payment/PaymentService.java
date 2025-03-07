@@ -1,5 +1,7 @@
 package com.ll.nbe342team8.domain.payment;
 
+import com.ll.nbe342team8.domain.order.order.service.OrderCacheService;
+import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,8 @@ import java.util.Base64;
 public class PaymentService {
     private final RestTemplate restTemplate;
     private final PaymentRepository paymentRepository;
+    private final OrderService orderService;
+    private final OrderCacheService orderCacheService;
 
     @Value("${payment.toss.secret-key}")
     private String secretKey;
@@ -77,7 +81,8 @@ public class PaymentService {
                 .method(response.getMethod())
                 .build());
 
-        // OrderService를 통해 주문 내역, 상세 주문 내역 저장하는 로직 추가
+        orderService.completeOrderFromCache(response.getOrderId());
+        orderCacheService.deleteOrderFromCache(response.getOrderId());
     }
 
     // 내부 클래스로 요청 객체 정의

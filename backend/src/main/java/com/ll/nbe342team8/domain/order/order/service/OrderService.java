@@ -6,9 +6,11 @@ import com.ll.nbe342team8.domain.cart.dto.CartResponseDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.service.CartService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import com.ll.nbe342team8.domain.member.member.service.MemberService;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DeliveryStatus;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
+import com.ll.nbe342team8.domain.order.order.dto.OrderCacheDto;
 import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
 import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto;
 import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -34,6 +37,8 @@ public class OrderService {
     private final DetailOrderRepository detailOrderRepository;
     private final CartService cartService;
     private final BookService bookService;
+    private final MemberService memberService;
+    private final OrderCacheService orderCacheService;
     private final Random random = new Random();
 
     @Transactional(readOnly = true)
@@ -64,45 +69,52 @@ public class OrderService {
     }
 
     /**
-     * 통합된 주문 처리 메서드
-     * 장바구니 결제와 바로 결제를 모두 처리
+     * 통합된 주문 처리 메서드 - Redis 캐시 사용
+     * 장바구니 결제와 바로 결제를 모두 처리하고 Redis에 임시 저장
      */
     @Transactional
-    public Order createOrder(Member member, OrderRequestDto orderRequestDto) {
+    public String createOrder(Member member, OrderRequestDto orderRequestDto) {
         if (orderRequestDto.isCartOrder()) {
-            return processCartOrder(member, orderRequestDto);
+            return processCartOrderToCache(member, orderRequestDto);
         } else if (orderRequestDto.isDirectOrder()) {
-            return processDirectOrder(member, orderRequestDto);
+            return processDirectOrderToCache(member, orderRequestDto);
         } else {
             throw new IllegalArgumentException("유효하지 않은 주문 유형입니다.");
         }
     }
 
     /**
-     * 장바구니 주문 처리
+     * 장바구니 주문 처리 - Redis 캐시에 저장
      */
-    private Order processCartOrder(Member member, OrderRequestDto orderRequestDto) {
+    private String processCartOrderToCache(Member member, OrderRequestDto orderRequestDto) {
         List<Cart> cartList = cartService.findCartByMember(member);
         if (cartList.isEmpty()) {
             throw new IllegalStateException("장바구니가 비어있습니다.");
         }
 
-        Order order = buildOrder(member, orderRequestDto, calculateTotalPriceSales(cartList));
-        orderRepository.save(order);
+        Long totalPrice = calculateTotalPriceSales(cartList);
 
-        List<DetailOrder> detailOrders = cartList.stream()
-                .map(cart -> buildDetailOrder(order, cart.getBook(), cart.getQuantity()))
+        // 상세 주문 정보 생성
+        List<OrderCacheDto.DetailOrderCacheDto> detailOrderCacheDtos = cartList.stream()
+                .map(cart -> OrderCacheDto.DetailOrderCacheDto.builder()
+                        .bookId(cart.getBook().getId())
+                        .quantity(cart.getQuantity())
+                        .build())
                 .collect(Collectors.toList());
 
-        detailOrderRepository.saveAll(detailOrders);
+        // 주문 캐시 DTO 생성
+        OrderCacheDto orderCacheDto = OrderCacheDto.from(member, orderRequestDto, totalPrice, detailOrderCacheDtos);
 
-        return order;
+        // Redis에 캐싱
+        orderCacheService.cacheOrder(orderRequestDto.tossOrderId(), orderCacheDto);
+
+        return orderRequestDto.tossOrderId();
     }
 
     /**
-     * 바로 결제 주문 처리
+     * 바로 결제 주문 처리 - Redis 캐시에 저장
      */
-    private Order processDirectOrder(Member member, OrderRequestDto orderRequestDto) {
+    private String processDirectOrderToCache(Member member, OrderRequestDto orderRequestDto) {
         if (orderRequestDto.bookId() == null || orderRequestDto.quantity() == null) {
             throw new IllegalArgumentException("바로 결제 시 책 ID와 수량이 필요합니다.");
         }
@@ -110,11 +122,74 @@ public class OrderService {
         Book book = bookService.getBookById(orderRequestDto.bookId());
         long totalPrice = (long) book.getPricesSales() * orderRequestDto.quantity();
 
-        Order order = buildOrder(member, orderRequestDto, totalPrice);
+        // 상세 주문 정보 생성
+        List<OrderCacheDto.DetailOrderCacheDto> detailOrderCacheDtos = List.of(
+                OrderCacheDto.DetailOrderCacheDto.builder()
+                        .bookId(book.getId())
+                        .quantity(orderRequestDto.quantity())
+                        .build()
+        );
+
+        // 주문 캐시 DTO 생성
+        OrderCacheDto orderCacheDto = OrderCacheDto.from(member, orderRequestDto, totalPrice, detailOrderCacheDtos);
+
+        // Redis에 캐싱
+        orderCacheService.cacheOrder(orderRequestDto.tossOrderId(), orderCacheDto);
+
+        return orderRequestDto.tossOrderId();
+    }
+
+    /**
+     * 결제 완료 후 Redis 캐시에서 주문 정보를 가져와 DB에 저장
+     */
+    @Transactional
+    public Order completeOrderFromCache(String tossOrderId) {
+        // Redis에서 주문 정보 조회
+        OrderCacheDto orderCacheDto = orderCacheService.getOrderFromCache(tossOrderId);
+        if (orderCacheDto == null) {
+            throw new IllegalArgumentException("주문 정보를 찾을 수 없습니다.");
+        }
+
+        // 회원 정보 조회
+        Member member = memberService.getMemberById(orderCacheDto.getMemberId());
+
+        // Order 엔티티 생성 및 저장
+        Order order = Order.builder()
+                .member(member)
+                .orderStatus(OrderStatus.COMPLETE)
+                .fullAddress(orderCacheDto.getFullAddress())
+                .postCode(orderCacheDto.getPostCode())
+                .phone(orderCacheDto.getPhone())
+                .recipient(orderCacheDto.getRecipient())
+                .paymentMethod(orderCacheDto.getPaymentMethod())
+                .totalPrice(orderCacheDto.getTotalPrice())
+                .tossOrderId(tossOrderId)
+                .build();
+
         orderRepository.save(order);
 
-        DetailOrder detailOrder = buildDetailOrder(order, book, orderRequestDto.quantity());
-        detailOrderRepository.save(detailOrder);
+        // DetailOrder 엔티티 생성 및 저장
+        List<DetailOrder> detailOrders = new ArrayList<>();
+        for (OrderCacheDto.DetailOrderCacheDto detailDto : orderCacheDto.getDetailOrders()) {
+            Book book = bookService.getBookById(detailDto.getBookId());
+            DetailOrder detailOrder = DetailOrder.builder()
+                    .order(order)
+                    .deliveryStatus(DeliveryStatus.PENDING)
+                    .book(book)
+                    .bookQuantity(detailDto.getQuantity())
+                    .build();
+            detailOrders.add(detailOrder);
+        }
+
+        detailOrderRepository.saveAll(detailOrders);
+
+        // 장바구니가 있는 경우 비우기 (장바구니 주문인 경우)
+        if (orderCacheDto.getDetailOrders().size() > 1) {
+            cartService.deleteProduct(member);
+        }
+
+        // Redis에서 캐시 삭제
+        orderCacheService.deleteOrderFromCache(tossOrderId);
 
         return order;
     }
