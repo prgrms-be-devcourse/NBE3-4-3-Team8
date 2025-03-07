@@ -1,7 +1,5 @@
 package com.ll.nbe342team8.domain.payment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +12,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -24,8 +21,6 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class PaymentService {
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-    private final OrderService orderService; // 주문 관련 로직 주입
     private final PaymentRepository paymentRepository;
 
     @Value("${payment.toss.secret-key}")
@@ -86,27 +81,9 @@ public class PaymentService {
     }
 
     // 내부 클래스로 요청 객체 정의
-    public static class TossPaymentRequest {
-        private String paymentKey;
-        private String orderId;
-        private Long amount;
-
-        public TossPaymentRequest(String paymentKey, String orderId, Long amount) {
-            this.paymentKey = paymentKey;
-            this.orderId = orderId;
-            this.amount = amount;
-        }
-
-        public String getPaymentKey() {
-            return paymentKey;
-        }
-
-        public String getOrderId() {
-            return orderId;
-        }
-
-        public Long getAmount() {
-            return amount;
-        }
+    public record TossPaymentRequest(
+            String paymentKey,
+            String orderId,
+            Long amount) {
     }
 }

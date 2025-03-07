@@ -1,18 +1,16 @@
 package com.ll.nbe342team8.domain.order.order.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,6 +22,8 @@ public class Order extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	private String tossOrderId;
 
 	@ManyToOne
 	private Member member;

@@ -13,7 +13,8 @@ public record OrderRequestDto(
 
         Long bookId,          // 바로 결제 시 책 ID
         Integer quantity,     // 바로 결제 시 수량
-        OrderType orderType   // 주문 유형
+        OrderType orderType,  // 주문 유형
+        String tossOrderId    //주문번호
 ) {
         public enum OrderType {
                 CART,    // 장바구니 결제

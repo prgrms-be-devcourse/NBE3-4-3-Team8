@@ -44,6 +44,7 @@ class CartService(
         cartRepository.saveAll(cartsToSave)
     }
 
+    @Transactional
     fun deleteProduct(member: Member, cartRequestDto: CartRequestDto) {
         cartRequestDto.cartItems.forEach { cartItemRequestDto ->
             val book = bookService.getBookById(cartItemRequestDto.bookId)
@@ -55,6 +56,7 @@ class CartService(
         }
     }
 
+    @Transactional
     fun deleteProduct(member: Member) {
         cartRepository.deleteByMember(member)
     }

@@ -6,7 +6,6 @@ import com.ll.nbe342team8.domain.cart.dto.CartResponseDto;
 import com.ll.nbe342team8.domain.cart.entity.Cart;
 import com.ll.nbe342team8.domain.cart.service.CartService;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DeliveryStatus;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -34,7 +32,6 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final DetailOrderRepository detailOrderRepository;
-    private final MemberRepository memberRepository;
     private final CartService cartService;
     private final BookService bookService;
     private final Random random = new Random();
@@ -98,7 +95,6 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         detailOrderRepository.saveAll(detailOrders);
-        cartService.deleteProduct(member); // 주문 완료 후 장바구니 비우기
 
         return order;
     }
@@ -133,6 +129,7 @@ public class OrderService {
                 .recipient(dto.recipient())
                 .paymentMethod(dto.paymentMethod())
                 .totalPrice(totalPrice)
+                .tossOrderId(dto.tossOrderId())
                 .build();
     }
 
@@ -191,7 +188,7 @@ public class OrderService {
                 cartResponseDtoList,
                 calculateTotalPriceStandard(cartList),
                 calculateTotalPriceSales(cartList),
-                generateOrderId());
+                generateOrderId("CART"));
     }
 
     /**
@@ -205,13 +202,17 @@ public class OrderService {
                 List.of(CartResponseDto.from(tempCart)),
                 (long) book.getPriceStandard() * quantity,
                 (long) book.getPricesSales() * quantity,
-                generateOrderId());
+                generateOrderId("DIRECT"));
     }
 
-    private String generateOrderId() {
+    private String generateOrderId(String orderType) {
         LocalDateTime now = LocalDateTime.now();
         String timestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         int randomNum = random.nextInt(1000);
-        return String.format("ORDER_%s_%03d", timestamp, randomNum);
+        return String.format("%s_%s_%03d", orderType, timestamp, randomNum);
+    }
+
+    public Order getOrderById(String tossOrderId) {
+        return orderRepository.findByTossOrderId(tossOrderId).orElse(null);
     }
 }

@@ -81,6 +81,7 @@ const createOrder = async (orderData: {
   bookId?: number;
   quantity?: number;
   orderType: OrderType;
+  tossOrderId: String;
 }) => {
   try {
     const response = await fetch(`${API_URL}/my/orders`, {
@@ -312,6 +313,7 @@ export default function OrderPage() {
         bookId,
         quantity,
         orderType: fastOrderParam === 'true' ? OrderType.DIRECT : OrderType.CART,
+        tossOrderId: orderId,
       });
 
       const orderName =
@@ -323,7 +325,7 @@ export default function OrderPage() {
         orderId,
         orderName,
         successUrl: `http://localhost:8080/order/success`,
-        failUrl: `${window.location.origin}/order/fail`,
+        failUrl: `http://localhost:8080//order/fail`,
         customerName: recipient,
         customerMobilePhone: phone,
       });
