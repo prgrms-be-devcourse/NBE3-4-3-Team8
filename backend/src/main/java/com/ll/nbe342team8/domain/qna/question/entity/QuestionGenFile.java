@@ -18,21 +18,21 @@ public class QuestionGenFile extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    private Long id;
+    public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Question question;
+    public Question question;
 
-    private String typeCode;
-    private String fileDateDir;
-    private String originalFileName;
-    private String fileExt;
-    private String fileName;
-    private int fileSize;
-    private String fileExtTypeCode;
-    private String fileExtType2Code;
-    private String metadata;
-    private int fileNo;
+    public String typeCode;
+    public String fileDateDir;
+    public String originalFileName;
+    public String fileExt;
+    public String fileName;
+    public int fileSize;
+    public String fileExtTypeCode;
+    public String fileExtType2Code;
+    public String metadata;
+    public int fileNo;
 
 
     public String getFilePath() {

@@ -134,7 +134,8 @@ public class Question extends BaseTime {
 				.build();
 		genFiles.add(genFile);
 
-		FileUploadUtil.mv(filePath, genFile.getFilePath());
+		//임시 저장 디렉토리에서 복사해 이동, 임시저장 경로는 주기적으로 초기화
+		FileUploadUtil.copy(filePath, genFile.getFilePath());
 
 		return genFile;
 	}

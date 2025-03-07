@@ -105,5 +105,6 @@ class QuestionService(
 
     fun flush() {
         questionRepository.flush() // em.flush(); 와 동일
+
     }
 }

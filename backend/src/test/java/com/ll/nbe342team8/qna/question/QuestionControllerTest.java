@@ -39,9 +39,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -208,6 +211,11 @@ public class QuestionControllerTest {
                 .andExpect(handler().methodName("postQuestion"))
                 .andExpect(status().isCreated());
 
+        Optional<Question> savedQuestion = questionRepository.findByTitle("제목3");
+
+        assertTrue(savedQuestion.isPresent(), "데이터베이스에 저장된 질문이 존재해야 합니다.");
+        assertEquals("제목이 일치해야합니다","제목3" , savedQuestion.get().getTitle());
+        assertEquals("내용이 일치해야합니다", "내용3", savedQuestion.get().getContent());
 
     }
 
@@ -237,6 +245,11 @@ public class QuestionControllerTest {
                 .andExpect(handler().methodName("putQuestion"))
                 .andExpect(status().isOk());
 
+        Optional<Question> modifyedQuestion = questionRepository.findByTitle("수정된 제목");
+
+        assertEquals("제목이 일치해야합니다","수정된 제목" , modifyedQuestion.get().getTitle());
+        assertEquals("내용이 일치해야합니다", "수정된 내용", modifyedQuestion.get().getContent());
+
 
     }
 
@@ -244,7 +257,7 @@ public class QuestionControllerTest {
     @DisplayName("사용자 질문 삭제1")
     void deleteQuestionTest1() throws Exception {
 
-        Long id=1L;
+        Long id =mockMember.getQuestions().getFirst().getId();
 
         ResultActions resultActions = mockMvc.perform(
                         delete("/my/question/{id}", id)
@@ -260,6 +273,9 @@ public class QuestionControllerTest {
                 .andExpect(handler().methodName("deleteQuestion"))
                 .andExpect(status().isNoContent());
 
+        Optional<Question> deletedQuestion = questionRepository.findById(id);
+
+        assertTrue(deletedQuestion.isEmpty(), "데이터 삭제에 실패했습니다.");
 
     }
 

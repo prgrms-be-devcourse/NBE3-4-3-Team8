@@ -9,6 +9,7 @@ import com.ll.nbe342team8.domain.qna.answer.dto.AnswerDto;
 import com.ll.nbe342team8.domain.qna.answer.dto.GetResAnswersDto;
 import com.ll.nbe342team8.domain.qna.answer.dto.ReqAnswerDto;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
+import com.ll.nbe342team8.domain.qna.answer.repository.AnswerRepository;
 import com.ll.nbe342team8.domain.qna.answer.service.AnswerService;
 import com.ll.nbe342team8.domain.qna.question.controller.QuestionController;
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto;
@@ -41,9 +42,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -68,6 +72,9 @@ public class AnswerControllerTest {
 
     @Autowired
     QuestionRepository questionRepository;
+
+    @Autowired
+    AnswerRepository answerRepository;
 
     @BeforeEach
     void setup() {
@@ -212,6 +219,11 @@ public class AnswerControllerTest {
                 .andExpect(handler().methodName("postAnswer"))
                 .andExpect(status().isCreated());
 
+        Optional<Answer> savedAnswer = answerRepository.findByContent("새로 추가된 답변 내용");
+
+        assertTrue(savedAnswer.isPresent(), "데이터베이스에 저장된 질문이 존재해야 합니다.");
+        assertEquals("내용이 일치해야합니다", "새로 추가된 답변 내용", savedAnswer.get().getContent());
+
 
     }
 
@@ -243,6 +255,10 @@ public class AnswerControllerTest {
                 .andExpect(handler().methodName("modifyAnswer"))
                 .andExpect(status().isOk());
 
+        Optional<Answer> savedAnswer = answerRepository.findByContent("수정된 답변 내용");
+
+        assertTrue(savedAnswer.isPresent(), "데이터베이스에 저장된 질문이 존재해야 합니다.");
+        assertEquals("내용이 일치해야합니다", "수정된 답변 내용", savedAnswer.get().getContent());
 
     }
 
@@ -267,6 +283,9 @@ public class AnswerControllerTest {
                 .andExpect(handler().methodName("deleteAnswer"))
                 .andExpect(status().isNoContent());
 
+        Optional<Answer> savedAnswer = answerRepository.findById(answer.id);
+
+        assertTrue(savedAnswer.isEmpty(), "데이터가 삭제되지 않았습니다..");
 
     }
 }
