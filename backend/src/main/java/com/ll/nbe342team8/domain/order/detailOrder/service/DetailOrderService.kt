@@ -28,7 +28,10 @@ class DetailOrderService(
                 bookQuantity = detailOrder.bookQuantity,
                 totalPrice = detailOrder.order.totalPrice.toDouble(), // 총 금액 필드 사용
                 deliveryStatus = detailOrder.deliveryStatus.name,
-                coverImage = detailOrder.book.coverImage
+                coverImage = detailOrder.book.coverImage,
+                recipient = detailOrder.order.recipient ?: "",  // 수령인
+                phone = detailOrder.order.phone ?: "",          // 전화번호
+                fullAddress = detailOrder.order.fullAddress ?: "" // 배송 주소
             )
         }
     }

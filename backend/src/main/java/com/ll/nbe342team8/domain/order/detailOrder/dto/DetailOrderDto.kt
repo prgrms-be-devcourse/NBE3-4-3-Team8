@@ -6,5 +6,8 @@ data class DetailOrderDto(
     val bookQuantity: Int,
     val totalPrice: Double,
     val deliveryStatus: String,
-    val coverImage: String?
+    val coverImage: String?,
+    val recipient: String,
+    val phone: String,
+    val fullAddress: String
 )

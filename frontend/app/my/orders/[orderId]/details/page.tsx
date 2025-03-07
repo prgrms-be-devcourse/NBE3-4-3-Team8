@@ -3,17 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
-interface OrderDetail {
+interface DetailOrder {
     orderId: string;
     bookTitle: string;
     bookQuantity: number;
-    totalPrice: number; // totalPrice 필드 추가
+    totalPrice: number;
     deliveryStatus: string;
-    coverImage: string | null; // coverImage 필드 수정
+    coverImage: string | null;
+    recipient: string;
+    phone: string;
+    fullAddress: string;
 }
 
 export default function OrderDetailsPage() {
-    const [detailOrders, setDetailOrders] = useState<OrderDetail[]>([]);
+    const [detailOrders, setDetailOrders] = useState<DetailOrder[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const params = useParams();
@@ -30,7 +33,7 @@ export default function OrderDetailsPage() {
                     throw new Error('주문 상세 정보를 불러오지 못했습니다');
                 }
 
-                const data: OrderDetail[] = await response.json();
+                const data: DetailOrder[] = await response.json();
                 setDetailOrders(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다');
@@ -49,6 +52,8 @@ export default function OrderDetailsPage() {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen bg-white">
             <h2 className="text-2xl font-bold mb-6 text-center">주문 상세 정보</h2>
+
+            {/* 주문 상세 정보 출력 */}
             <div className="space-y-4">
                 {detailOrders.map((detail) => (
                     <div key={`${detail.orderId}-${detail.bookTitle}`} className="bg-gray-50 p-4 rounded-lg shadow flex items-center space-x-4">
@@ -65,6 +70,18 @@ export default function OrderDetailsPage() {
                             <p><strong>총 금액:</strong> {detail.totalPrice.toLocaleString()}원</p>
                             <p><strong>배송 상태:</strong> {detail.deliveryStatus}</p>
                         </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* 배송 정보 박스 */}
+            <div className="bg-gray-50 p-4 mt-6 rounded-lg shadow">
+                <h3 className="text-xl font-semibold mb-4">배송 정보</h3>
+                {detailOrders.map((detail) => (
+                    <div key={`${detail.orderId}-shipping`} className="space-y-2">
+                        <p><strong>수령인:</strong> {detail.recipient}</p>
+                        <p><strong>휴대폰:</strong> {detail.phone}</p>
+                        <p><strong>주소:</strong> {detail.fullAddress}</p>
                     </div>
                 ))}
             </div>
