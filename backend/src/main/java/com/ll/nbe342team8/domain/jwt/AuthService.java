@@ -3,6 +3,7 @@ package com.ll.nbe342team8.domain.jwt;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import com.ll.nbe342team8.global.exceptions.ServiceException;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,22 @@ public class AuthService {
             throw new ServiceException(401, "Invalid token");
         }
 
-        String kakaoId = jwtService.getKakaoIdFromToken(token);
-        return memberRepository.findByoAuthId(kakaoId)
-                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
+        Claims claims = jwtService.extractAllClaims(token);
+
+        Long id = claims.get("id", Long.class);
+        String oAuthId = claims.getSubject();
+        String email = claims.get("email", String.class);
+        String name = claims.get("name", String.class);
+        String memberTypeStr = claims.get("memberType", String.class);
+        Member.MemberType memberType = Member.MemberType.valueOf(memberTypeStr);
+
+        return Member.builder()
+                .id(id)
+                .oAuthId(oAuthId)
+                .email(email)
+                .name(name)
+                .memberType(memberType)
+                .build();
     }
 
     // ✅ JWT 기반 로그인 처리 - 쿠키로 `accessToken`, `refreshToken` 설정
@@ -62,18 +76,7 @@ public class AuthService {
 
     // ✅ 사용자 정보 조회 - 쿠키 기반 인증 적용
     public Member getMemberFromToken(@CookieValue(value = "accessToken", required = false) String token) {
-        if (token == null) {
-            throw new ServiceException(401, "로그인이 필요합니다.");
-        }
-
-        if (!jwtService.validateToken(token)) {
-            throw new ServiceException(401, "Invalid token");
-        }
-
-        String kakaoId = jwtService.getKakaoIdFromToken(token);
-        return memberRepository.findByoAuthId(kakaoId)
-                .orElseThrow(() -> new ServiceException(404, "사용자를 찾을 수 없습니다."));
-
+        return validateTokenAndGetMember(token);
     }
 
     // ✅ 로그아웃 - `Set-Cookie`로 `accessToken`, `refreshToken` 삭제

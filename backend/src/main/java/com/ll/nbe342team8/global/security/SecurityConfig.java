@@ -65,7 +65,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/reviews/**", "/cart").permitAll()
 						.anyRequest().authenticated()
 				)
-				.addFilterBefore(new JwtAuthenticationFilter(jwtService, memberService),
+				.addFilterBefore(new JwtAuthenticationFilter(jwtService),
 						UsernamePasswordAuthenticationFilter.class)
 				.headers((headers) -> headers
 						.addHeaderWriter(new XFrameOptionsHeaderWriter(
