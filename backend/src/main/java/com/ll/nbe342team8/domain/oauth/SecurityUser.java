@@ -10,10 +10,10 @@ import java.util.Map;
 
 @Getter
 public class SecurityUser extends User implements OAuth2User {
-    public final long id;
-    public final String nickname;
-    public final String email;
-    public final Member member;
+    private final long id;
+    private final String nickname;
+    private final String email;
+    private final Member member;
 
     public SecurityUser(Member member) {
         super(

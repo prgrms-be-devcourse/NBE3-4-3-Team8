@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { GetMyPage, GetMyNextPage, GetMyBeforePage } from "./api"; // API 함수 가져오기
+import { GetMyPage } from "./api"; // API 함수 가져오기
 import { PageDto, QuestionListDto } from "./types"; // DTO 타입 가져오기
 import Sidebar from '@/app/components/my/Sidebar';
 import { useRouter } from 'next/navigation';
@@ -11,13 +11,10 @@ export default function Home() {
     
     const router = useRouter();
     const [pageData, setPageData] = useState<PageDto<QuestionListDto> | null>(null);
-    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
+    const [currentPage, setCurrentPage] = useState(0); // 현재 페이지 번호
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [lastQuestionId, setLastQuestionId] = useState<number | null>(null);
-    const [firstQuestionId, setFirstQuestionId] = useState<number | null>(null);
-    const pageSize = 10;
-    
+  
     // 🔹 질문 목록 데이터 가져오기
     useEffect(() => {
       async function fetchData() {
@@ -25,17 +22,11 @@ export default function Home() {
         setError(null);
   
         try {
-          const response = await GetMyPage(currentPage-1);
+          const response = await GetMyPage(currentPage);
           if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
   
           const data: PageDto<QuestionListDto> = await response.json();
-          console.log(data)
           setPageData(data);
-
-          if (data.items.length > 0) {
-            setFirstQuestionId(data.items[0].id);
-            setLastQuestionId(data.items[data.items.length - 1].id);
-          }
         } catch (error) {
           setError(error instanceof Error ? error.message : "알 수 없는 오류 발생");
         } finally {
@@ -44,116 +35,7 @@ export default function Home() {
       }
   
       fetchData();
-    }, []);
-
-     // ✅ 페이지네이션 버튼 생성 로직 (5개씩 그룹화)
-     const renderPaginationButtons = () => {
-      if (!pageData) return null;
-
-      const totalPages = pageData.totalPages;
-
-      if (totalPages <= 1) return null; // 페이지가 1개 이하일 경우 숨김
-
-      let startPage = 1;
-      let endPage = totalPages;
-
-      if (totalPages > pageSize) {
-          startPage = Math.floor((currentPage - 1) / pageSize) * pageSize + 1;
-          endPage = Math.min(startPage + pageSize - 1, totalPages);
-      }
-
-      const pageNumbers = [];
-      for (let i = startPage; i <= endPage; i++) {
-          pageNumbers.push(
-              <button
-                  key={i}
-                  onClick={() => handlePageChange(i)}
-                  className={`px-3 py-1 rounded-md transition ${
-                      currentPage === i ? "bg-blue-500 text-white font-bold" : "bg-gray-200 text-gray-700"
-                  }`}
-              >
-                  {i}
-              </button>
-          );
-      }
-
-      // 🔹 페이지 변경 핸들러
-      const handlePageChange = async (page: number) => {
-        if (page !== currentPage) {
-          try {
-            let data: PageDto<QuestionListDto>;
-            if (page - currentPage === 1 && lastQuestionId) {
-              const response = await GetMyNextPage(lastQuestionId);
-              if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
-              data = await response.json();
-              setPageData(prev => prev ? { ...prev, items: [ ...data.items] } : data);
-            } else if (page - currentPage === -1 && firstQuestionId) {
-              const response = await GetMyBeforePage(firstQuestionId);
-              if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
-              data = await response.json();
-              setPageData(prev => prev ? { ...prev, items: [...data.items] } : data);
-            } else {
-              const response = await GetMyPage(page - 1);
-              if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
-              data = await response.json();
-              setPageData(data);
-            }
-            setCurrentPage(page);
-            if (data.items.length > 0) {
-              setFirstQuestionId(data.items[0].id);
-              setLastQuestionId(data.items[data.items.length - 1].id);
-            }
-          } catch (error) {
-            setError(error instanceof Error ? error.message : "알 수 없는 오류 발생");
-          }
-        }
-      };
-
-      
-
-      return (
-          <div className="flex justify-center mt-6 gap-2">
-              {/* ✅ 처음 페이지 이동 */}
-              <button
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(1)}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
-              >
-                  처음
-              </button>
-
-              {/* ✅ 이전 페이지 */}
-              <button
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
-              >
-                  이전
-              </button>
-
-              {/* ✅ 페이지 번호 */}
-              {pageNumbers}
-
-              {/* ✅ 다음 페이지 */}
-              <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
-              >
-                  다음
-              </button>
-
-              {/* ✅ 마지막 페이지 이동 */}
-              <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(totalPages)}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
-              >
-                  마지막
-              </button>
-          </div>
-      );
-  };
+    }, [currentPage]);
   
     return (
       <div className="flex">
@@ -199,8 +81,27 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                {/*페이지네이션 버튼 */}
-                {renderPaginationButtons()}         
+  
+                {/* ✅ 페이지네이션 버튼 (간격 조정) */}
+                <div className="flex justify-center mt-6 gap-2">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                  >
+                    이전
+                  </button>
+                  <span className="text-gray-700 flex items-center">
+                    {pageData.currentPageNumber} / {pageData.totalPages}
+                  </span>
+                  <button
+                    disabled={currentPage >= pageData.totalPages}
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                  >
+                    다음
+                  </button>
+                </div>
               </>
             )}
           </div>

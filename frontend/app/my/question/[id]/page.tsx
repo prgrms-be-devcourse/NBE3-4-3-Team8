@@ -2,7 +2,7 @@
 
 import { useEffect, useState,use  } from 'react';
 import { useRouter, useParams, usePathname } from "next/navigation"; 
-import { QuestionDto,QuestionGenFileDto,ImageUrlDto } from "./types"; // ✅ 타입 정의 파일 import
+import { QuestionDto,QuestionGenFileDto } from "./types"; // ✅ 타입 정의 파일 import
 import { useFetchImages } from "./api";
 import { GetQuestion,DeleteQuestion } from "./api";
 
@@ -59,7 +59,7 @@ export default function Home()  {
        
     }, [id, pathname]); // ✅ `id` 값이 변경될 때 실행
 
-    const imageUrlDtos: ImageUrlDto[] = useFetchImages(question);
+    const imageUrls = useFetchImages(question!);
   
     const handleModify = () => {
       if (!id || isNaN(Number(id))) {
@@ -77,7 +77,7 @@ export default function Home()  {
         id,
         title: question?.title || "",
         content: question?.content || "",
-        imageUrlDtos: imageUrlDtos || null,
+        imageUrls: imageUrls || null,
         
       }));
   
@@ -124,12 +124,12 @@ export default function Home()  {
 
       <div className="p-6 border rounded-md shadow-md bg-white">
       <div className="mt-6">
-          {imageUrlDtos.length > 0 ? (
+          {imageUrls.length > 0 ? (
               <div className="grid grid-cols-3 gap-4 mt-4">
-                   {imageUrlDtos.map((dto, index) => (
+                   {imageUrls.map((url, index) => (
                        <img
                            key={index}
-                           src={dto.imageUrl}
+                           src={url}
                            alt={`Image ${index}`}
                            className="rounded-lg shadow-lg"
                       />

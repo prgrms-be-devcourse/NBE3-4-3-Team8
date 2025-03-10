@@ -11,39 +11,30 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Answer extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    public Long id;
+    private Long id;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    public String content;
+    private String content;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public Question question;
+    private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public Member member;
+    private Member member;
 
     public void updateAnswerInfo(ReqAnswerDto dto) {
-        this.content=dto.getContent();
+        this.content=dto.content();
     }
 
-    // Private constructor to enforce the use of the from method
-    private Answer(String content, Member member, Question question) {
-        this.content = content;
-        this.member = member;
+    public void setQuestion(Question question) {
         this.question = question;
-    }
-
-    // Static from method to create an Answer instance
-    public static Answer from(String content, Member member, Question question) {
-        return new Answer(content, member, question);
     }
 
 }
