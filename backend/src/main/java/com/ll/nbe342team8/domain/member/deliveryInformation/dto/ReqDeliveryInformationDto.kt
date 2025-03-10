@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
 data class ReqDeliveryInformationDto(
-    val id: Long?,
+    val id: Long? = null,
 
     @field:Size(max = 50)
     val addressName: String = "",
@@ -19,11 +19,11 @@ data class ReqDeliveryInformationDto(
     val detailAddress: String = "",
 
     @field:Size(max = 50)
-    val recipient: String= "",
+    val recipient: String = "",
 
     @field:Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "휴대폰 번호 형식이 올바르지 않습니다. (010-XXXX-XXXX)")
     val phone: String = "",
 
-    @get:JsonProperty("isDefaultAddress")
-    val isDefaultAddress: Boolean
+    @JsonProperty("isDefaultAddress")
+    val isDefaultAddress: Boolean = false
 )

@@ -54,20 +54,14 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
   };
 
   // "바로 구매" 버튼 클릭 시 현재 책 정보를 URL 파라미터로 전달하며 주문 페이지로 이동
-  const handleFastPurchase = () => {
-    if (user) {
-      const orderItem = {
-        bookId: book.id,
-        title: book.title,
-        coverImage: book.coverImage || '/default-book.png',
-        price: book.priceSales, // 판매가 사용
-        quantity,
-      };
-      const orderItemStr = encodeURIComponent(JSON.stringify(orderItem));
-      router.push(`/order?fastOrder=true&orderItem=${orderItemStr}`);
-    } else {
-      alert('로그인 후 이용해주세요.');
+  const handleBuyNow = () => {
+    if (!user) {
+      alert('로그인을 해주세요');
+      return;
     }
+
+    // 주문 페이지로 이동 (바로 구매 파라미터 추가)
+    router.push(`/order?fastOrder=true&bookId=${book.id}&quantity=${quantity}`);
   };
 
   const averageRating =
@@ -133,7 +127,7 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
             {/* 기존에는 장바구니 페이지로 이동했지만, 이제 바로 주문 페이지로 이동 */}
             <button
               className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600"
-              onClick={handleFastPurchase}
+              onClick={handleBuyNow}
             >
               바로구매
             </button>
