@@ -37,22 +37,22 @@ import lombok.Setter;
 public class Member extends BaseTime implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-	private Long id;
+	public Long id;
 
-	private String name; // 사용자 이름
+	public String name; // 사용자 이름
 
-	private String phoneNumber; // 전화번호
+	public String phoneNumber; // 전화번호
 
 	@Enumerated(EnumType.STRING)
-	private MemberType memberType; // 사용자 역할(사용자, 관리자)
+	public MemberType memberType; // 사용자 역할(사용자, 관리자)
 
-	private String oAuthId; // 필드 이름 변경
+	public String oAuthId; // 필드 이름 변경
 
-	private String email; // 사용자 이메일
+	public String email; // 사용자 이메일
 
-	private String password;
+	public String password;
 
-	private String username;
+	public String username;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DeliveryInformation> deliveryInformations;

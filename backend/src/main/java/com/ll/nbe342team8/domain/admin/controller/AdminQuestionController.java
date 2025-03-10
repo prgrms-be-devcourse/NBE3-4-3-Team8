@@ -2,6 +2,7 @@ package com.ll.nbe342team8.domain.admin.controller;
 
 import java.util.List;
 
+import com.ll.nbe342team8.domain.admin.dto.AdminQuestionDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ll.nbe342team8.domain.admin.dto.AdminQuestionDto;
 import com.ll.nbe342team8.domain.admin.service.AdminQuestionService;
 import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
 import com.ll.nbe342team8.domain.qna.answer.repository.AnswerRepository;

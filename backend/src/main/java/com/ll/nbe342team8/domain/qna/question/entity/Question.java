@@ -39,27 +39,27 @@ public class Question extends BaseTime {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-	private Long id;
+	public Long id;
 
 	@Column(nullable = true) // 질문 제목
-	private String title;
+	public String title;
 
 	@Column(nullable = true) // 질문 내용
-	private String content;
+	public String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false) // 회원이 반드시 존재해야 한다.
-	private Member member;
+	public Member member;
 
 	@BatchSize(size = 10)
 	@OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-	private List<Answer> answers;
+	public List<Answer> answers;
 
-	private Boolean isAnswer;
+	public Boolean isAnswer;
 
 	@OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	@Builder.Default
-	private List<QuestionGenFile> genFiles = new ArrayList<>();
+	public List<QuestionGenFile> genFiles = new ArrayList<>();
 
 
 	public void updateQuestionInfo(ReqQuestionDto dto) {
