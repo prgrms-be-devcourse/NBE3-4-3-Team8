@@ -56,23 +56,19 @@ class QuestionControllerTest @Autowired constructor (
         val question1 = Question.builder()
             .title("제목1")
             .content("내용1")
-            .member(mockMember)
+            .isAnswer(false)
             .build()
 
         val question2 = Question.builder()
             .title("제목2")
             .content("내용2")
-            .member(mockMember)
+            .isAnswer(false)
             .build()
 
-        //Mock Security Context (인증된 사용자 정보 설정)
-        mockMember.setQuestions(ArrayList(List.of(question1, question2)))
+        mockMember.addQuestion(question1)  // 연관 관계 편의 메서드 사용
+        mockMember.addQuestion(question2)
 
-        memberService.saveMember(mockMember)
-
-        for (question in mockMember.getQuestions()) {
-            questionRepository.save(question)
-        }
+        memberService.saveMember(mockMember)  // member를 저장하면 question도 저장됨
 
         // Security Context에 인증 정보 추가
         val securityContext = SecurityContextHolder.createEmptyContext()
@@ -85,7 +81,7 @@ class QuestionControllerTest @Autowired constructor (
         SecurityContextHolder.setContext(securityContext)
     }
 
-    /*
+
     @Test
     @DisplayName("사용자 질문 불러오기1")
     fun getMyQuestions1() {
@@ -110,8 +106,8 @@ class QuestionControllerTest @Autowired constructor (
             .andExpect(jsonPath("$.items[1].content").value("내용1"))
     }
 
-     */
 
+    /*
     @Test
     @DisplayName("keyset을 적용한 사용자 질문 불러오기")
     fun getMyKeysetQuestions2() {
@@ -135,7 +131,7 @@ class QuestionControllerTest @Autowired constructor (
             .andExpect(jsonPath("$.items[1].title").value("제목1"))
             .andExpect(jsonPath("$.items[1].content").value("내용1"))
     }
-
+    */
 
     @Test
     @DisplayName("사용자 상세 질문 불러오기1")

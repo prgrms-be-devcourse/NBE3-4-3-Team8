@@ -1,8 +1,10 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.BatchSize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,15 +16,6 @@ import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,8 +54,8 @@ public class Member extends BaseTime implements UserDetails {
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
 	public List<Cart> carts;
 
-	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-	public List<Question> questions;
+	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	public List<Question> questions = new ArrayList<>();;
 
   	public String profileImageUrl;
 
@@ -71,6 +64,13 @@ public class Member extends BaseTime implements UserDetails {
       USER,
       ADMIN
   }
+
+	@PrePersist
+	public void prePersist() {
+		if (this.profileImageUrl == null || this.profileImageUrl.isEmpty()) {
+			this.profileImageUrl = "defaultUrl";
+		}
+	}
   
  	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
 		this.name = dto.getName();
@@ -142,4 +142,14 @@ public class Member extends BaseTime implements UserDetails {
 				""
 		);
 	}
+
+	public boolean checkAdmin() {
+		return this.memberType == Member.MemberType.ADMIN;
+	}
+
+	public void addQuestion(Question question) {
+		this.questions.add(question);
+		question.setMember(this);
+	}
+
 }

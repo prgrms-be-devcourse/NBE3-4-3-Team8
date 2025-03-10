@@ -14,7 +14,7 @@ import jakarta.validation.Valid
 import lombok.RequiredArgsConstructor
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
 
@@ -23,7 +23,6 @@ import java.time.Duration
 @RequiredArgsConstructor
 class DeliveryInformationController(
     private val deliveryInformationService: DeliveryInformationService,
-    private val memberService: MemberService
 ) {
 
     // 배송 정보 등록. 5개 까지 등록 할 수 있으며 한번에 하나씩 등록한다.
@@ -31,17 +30,14 @@ class DeliveryInformationController(
     @Operation(summary = "배송 정보 등록(최대 5개)")
     @PostMapping("/my/deliveryInformation")
     fun postDeliveryInformation(
-        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto
+        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
-
-        val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // 단 시간 내 중복 등록 방지
-        validateExistsDuplicateDeliveryInformationInShortTime(member,reqDeliveryInformationDto,Duration.ofSeconds(5))
+        deliveryInformationService.validateExistsDuplicateDeliveryInformationInShortTime(member,reqDeliveryInformationDto,Duration.ofSeconds(5))
 
         //배송 정보 설정은 5개 까지 허용한다. 5개 일때 배송지 추가 등록 요청이 올 경우 에러를 반환한다.
         if (member.deliveryInformations.size >= 5) {
@@ -60,20 +56,17 @@ class DeliveryInformationController(
     @Operation(summary = "배송 정보 삭제 (한개)")
     @DeleteMapping("/my/deliveryInformation/{id}")
     fun deleteDeliveryInformation(
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
-
-        val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // 삭제할 배송 정보를 id로 탐색
         val deliveryInformation = deliveryInformationService.findById(id)
             .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "배송정보를 찾을 수 없습니다.") }!!
 
-        validateDeliveryInformationOwner(member, deliveryInformation)
+        deliveryInformationService.validateDeliveryInformationOwner(member, deliveryInformation)
 
         //배송 정보 id로 배송 정보를 찾아 삭제
         deliveryInformationService.deleteDeliveryInformation(deliveryInformation, member)
@@ -88,20 +81,17 @@ class DeliveryInformationController(
     @PutMapping("/my/deliveryInformation/{id}")
     fun putDeliveryInformation(
         @PathVariable id: Long,
-        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto
+        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
-
-        val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // 갱신할 배송 정보를 id로 탐색
         val deliveryInformation = deliveryInformationService.findById(id)
             .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "배송 정보를 찾을 수 없습니다.") }!!
 
-        validateDeliveryInformationOwner(member, deliveryInformation)
+        deliveryInformationService.validateDeliveryInformationOwner(member, deliveryInformation)
 
         //validateExistsDuplicateQuestionInShortTime 추가 필요(매개변수 너무 많은거 해결 필요)
 
@@ -113,25 +103,10 @@ class DeliveryInformationController(
         return ResponseEntity.ok(resMemberMyPageDto)
     }
 
-    private fun validateExistsDuplicateDeliveryInformationInShortTime(member: Member, dto : ReqDeliveryInformationDto, duration: Duration) {
-        if (deliveryInformationService.existsDuplicateDeliveryInformationInShortTime(dto, member , duration)) {
-            throw ServiceException(HttpStatus.TOO_MANY_REQUESTS.value(), "너무 빠르게 동일한 답변을 등록할 수 없습니다.")
-        }
-    }
-
-    //사용자 권한 확인, 관리자 계정이여도 접근 가능
-    private fun validateDeliveryInformationOwner(member: Member, deliveryInformation: DeliveryInformation) {
-        if (!(deliveryInformationService.isDeliveryInformationOwner(
-                member,
-                deliveryInformation
-            ) || checkAdmin(member))
-        ) {
-            throw ServiceException(HttpStatus.FORBIDDEN.value(), "권한이 없습니다.")
-        }
-    }
 
 
-    private fun checkAdmin(member: Member): Boolean {
-        return member.memberType == Member.MemberType.ADMIN
-    }
+
+
+
+
 }

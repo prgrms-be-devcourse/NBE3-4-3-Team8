@@ -64,6 +64,7 @@ class AnswerControllerTest @Autowired constructor (
             .content("내용1")
             .member(mockMember)
             .answers(ArrayList())
+            .isAnswer(false)
             .build()
 
         val question2 = Question.builder()

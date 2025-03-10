@@ -66,8 +66,10 @@ class QuestionGenFileControllerTest @Autowired constructor(
         var question = Question.builder()
             .title("제목1")
             .content("내용1")
+            .isAnswer(false)
             .member(mockMember)
             .build()
+
 
         //Mock Security Context (인증된 사용자 정보 설정)
         mockMember.setQuestions(ArrayList(List.of(question)))

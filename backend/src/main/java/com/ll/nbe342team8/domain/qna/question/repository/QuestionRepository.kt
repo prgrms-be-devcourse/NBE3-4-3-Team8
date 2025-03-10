@@ -55,6 +55,9 @@ interface QuestionRepository : JpaRepository<Question, Long> {
     @Query("SELECT q FROM Question q LEFT JOIN FETCH q.genFiles WHERE q.id = :id")
     fun findByIdWithGenFiles(@Param("id") id: Long?): Optional<Question?>?
 
+    @Query("SELECT q FROM Question q JOIN FETCH q.member WHERE q.id = :id")
+    fun findByIdWithMember(@Param("id") id: Long): Optional<Question>
+
 
 
 
