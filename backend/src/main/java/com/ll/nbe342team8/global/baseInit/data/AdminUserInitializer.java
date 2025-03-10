@@ -12,7 +12,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class AdminUserInitializer {
 	private final MemberRepository memberRepository;
