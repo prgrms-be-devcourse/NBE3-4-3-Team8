@@ -39,7 +39,7 @@ class AnswerController (
         @PathVariable questionId: Long,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<GetResAnswersDto> {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
         val question = getQuestionById(questionId)
 
@@ -58,7 +58,7 @@ class AnswerController (
         @PathVariable answerId: Long,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<AnswerDto> {
-        val admin: Member = securityUser?.member
+        val admin: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
         answerService.validateAdmin(admin)
 
@@ -76,7 +76,7 @@ class AnswerController (
         @RequestBody @Valid reqAnswerDto: ReqAnswerDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Void> {
-        val admin: Member = securityUser?.member
+        val admin: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
         answerService.validateAdmin(admin)
 
@@ -96,7 +96,7 @@ class AnswerController (
         @RequestBody @Valid reqAnswerDto: ReqAnswerDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Void> {
-        val admin: Member = securityUser?.member
+        val admin: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
         answerService.validateAdmin(admin)
 
@@ -114,7 +114,7 @@ class AnswerController (
         @PathVariable answerId: Long,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Void> {
-        val admin: Member = securityUser?.member
+        val admin: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
         answerService.validateAdmin(admin)
 
