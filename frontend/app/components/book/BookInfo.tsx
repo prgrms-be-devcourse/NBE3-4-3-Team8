@@ -7,7 +7,6 @@ import type { Book } from '@/types/book';
 import { addToCart } from '@/utils/api';
 import StarRating from '@/app/search/components/StarRating';
 import { useAuth } from '@/app/hooks/useAuth';
-import {isLoggedIn} from "@/utils/auth";
 
 interface BookInfoProps {
   book: Book;
@@ -56,8 +55,8 @@ export const BookInfo: React.FC<BookInfoProps> = ({ book }) => {
 
   // "바로 구매" 버튼 클릭 시 현재 책 정보를 URL 파라미터로 전달하며 주문 페이지로 이동
   const handleBuyNow = () => {
-    if (!isLoggedIn) {
-      router.push('/login');
+    if (!user) {
+      alert('로그인을 해주세요');
       return;
     }
 

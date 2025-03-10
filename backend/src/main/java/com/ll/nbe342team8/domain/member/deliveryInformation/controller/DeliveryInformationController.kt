@@ -32,7 +32,7 @@ class DeliveryInformationController(
     @Operation(summary = "배송 정보 등록(최대 5개)")
     @PostMapping("/my/deliveryInformation")
     fun postDeliveryInformation(
-        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto,
+        @RequestBody @Valid reqDeliveryInformationDto: ReqDeliveryInformationDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
         val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
@@ -104,11 +104,4 @@ class DeliveryInformationController(
 
         return ResponseEntity.ok(resMemberMyPageDto)
     }
-
-
-
-
-
-
-
 }
