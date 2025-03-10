@@ -43,22 +43,7 @@ class QuestionService(
         return PageDto(pagingOrderDto)
     }
 
-    @Transactional(readOnly = true)
-    fun getNextOrBeforePage(member: Member, lastQuestionId: Long?, firstQuestionId: Long?): PageDto<QuestionListDto> {
-        val pageSize = 10 // 페이지 크기
-        val pageable = PageRequest.of(0, pageSize) // 첫 페이지, pageSize만큼의 결과
 
-        // Keyset Pagination 적용
-        val questionList: List<QuestionListDtoProjection> = if (lastQuestionId != null) {
-            questionRepository.findByMemberWithKeysetNext(member, lastQuestionId, pageable)
-        } else {
-            questionRepository.findByMemberWithKeysetPrev(member, firstQuestionId!!, pageable)
-        }
-
-        val questionDtoList = questionList.map { QuestionListDto(it) }
-
-        return PageDto(questionDtoList)
-    }
 
 
 

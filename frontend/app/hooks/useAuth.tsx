@@ -1,53 +1,54 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-interface DeliveryInformation {
-  id: number;
-  addressName: string;
-  address: string;
-  detailAddress: string;
-  phoneNumber: string;
-  isDefaultAddress: boolean;
-}
+const API_BASE_URL = 'http://localhost:8080';
 
-interface User {
-  id: number;
-  name: string;
+type User = {
+  id: string;
   email: string;
-  phoneNumber: string;
-  memberType: 'USER' | 'ADMIN';
-  oauthId: string;
-  deliveryInformations: DeliveryInformation[];
-  profileImageUrl: string;
-}
+  name: string;
+  profileImage?: string;
+  // 필요한 다른 사용자 속성들
+};
 
-interface AuthState {
+type AuthState = {
   user: User | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
-}
+};
 
-interface AuthContextProps extends AuthState {
+type AuthContextType = AuthState & {
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<boolean>;
-  refreshAuth: () => Promise<void>;
   updateUserInfo: (updates: Partial<User>) => Promise<boolean>;
-}
+  refreshAuth: () => Promise<void>;
+};
 
-const API_BASE_URL = 'http://localhost:8080';
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthContext = createContext<AuthContextProps>({
-  user: null,
-  loading: true,
-  error: null,
-  isAuthenticated: false,
-  logout: async () => false,
-  refreshAuth: async () => {},
-  updateUserInfo: async () => false,
-});
+const refreshAccessToken = async (): Promise<boolean> => {
+  try {
+    await axios.post(
+      `${API_BASE_URL}/api/auth/refresh`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    return true;
+  } catch (error) {
+    console.error('토큰 갱신 실패:', error);
+    return false;
+  }
+};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -59,6 +60,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const fetchUser = async () => {
+    // 이미 인증 상태를 확인 중이거나 인증되지 않은 상태라면 요청을 보내지 않음
+    if (!authState.loading && !authState.isAuthenticated) {
+      setAuthState((prev) => ({ ...prev, loading: false }));
+      return;
+    }
+
     try {
       const response = await axios.get<User>(`${API_BASE_URL}/api/auth/me`, {
         withCredentials: true,
@@ -66,7 +73,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
+        
       });
+
+      console.log("userDate:")
+      console.log(response.data)
 
       setAuthState({
         user: response.data,
@@ -99,11 +110,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const refreshAccessToken = async (): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/auth/refresh`,
-        {},
+        `${API_BASE_URL}/api/auth/login`,
+        { email, password },
         {
           withCredentials: true,
           headers: {
@@ -113,9 +124,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         },
       );
 
-      return response.status === 200;
+      if (response.status === 200) {
+        await fetchUser();
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error('토큰 갱신 실패:', error);
+      console.error('로그인 실패:', error);
       return false;
     }
   };
@@ -174,11 +189,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshAuth = async () => {
-    setAuthState((prev) => ({ ...prev, loading: true }));
+    setAuthState((prev) => ({ ...prev, loading: true, isAuthenticated: true }));
     await fetchUser();
   };
 
   useEffect(() => {
+    // 초기 로딩 시 한 번만 사용자 정보를 가져옴
     fetchUser();
   }, []);
 
@@ -186,9 +202,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{
         ...authState,
+        login,
         logout,
-        refreshAuth,
         updateUserInfo,
+        refreshAuth,
       }}
     >
       {children}
@@ -197,4 +214,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Context를 활용하는 커스텀 훅
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

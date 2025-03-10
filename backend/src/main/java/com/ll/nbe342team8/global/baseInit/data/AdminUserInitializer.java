@@ -11,6 +11,7 @@ import com.ll.nbe342team8.domain.member.member.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
+
 @Component
 @RequiredArgsConstructor
 public class AdminUserInitializer {

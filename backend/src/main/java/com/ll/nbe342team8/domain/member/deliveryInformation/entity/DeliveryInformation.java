@@ -32,7 +32,7 @@ public class DeliveryInformation extends BaseTime {
 
     public String phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     public Member member;
 
     public DeliveryInformation(ReqDeliveryInformationDto dto, Member member) {
