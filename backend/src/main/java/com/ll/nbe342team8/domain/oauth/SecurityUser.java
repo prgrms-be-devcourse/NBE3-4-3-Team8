@@ -10,15 +10,14 @@ import java.util.Map;
 @Getter
 public class SecurityUser extends User implements OAuth2User {
     public final long id;
-    private final String nickname;
-    private final String email;
-    // member는 이제 public 접근 대신 getter를 통해 접근합니다.
+    public final String nickname;
+    public final String email;
     public final Member member;
 
     public SecurityUser(Member member) {
         super(
                 member.getUsername(),  // oAuthId를 username으로 사용
-                "",                    // 비밀번호는 빈 문자열
+                "",                   // 비밀번호는 빈 문자열
                 member.getAuthorities() // Member에서 정의한 권한 사용
         );
         this.id = member.getId();
