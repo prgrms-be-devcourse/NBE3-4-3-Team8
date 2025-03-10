@@ -18,7 +18,7 @@ spring:
       client:
         registration:
           kakao:
-            clientId: c47345d326ca974bf9ce4525ae5ddeef
+            clientId: 6d7b673f68e36faa4f581fbc771b861d
             scope:
               - profile_nickname
               - profile_image

@@ -41,23 +41,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/my/question/genFile/{questionId}/{fileId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 수정 */
-        put: operations["putNewFile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/my/deliveryInformation/{id}": {
         parameters: {
             query?: never;
@@ -158,7 +141,7 @@ export interface paths {
             cookie?: never;
         };
         /** 사용자가 작성한 qna 질문 목록 조회 */
-        get: operations["getQuesitons"];
+        get: operations["getQuestions"];
         put?: never;
         /** 사용자가 qna 질문 등록 */
         post: operations["postQuestion"];
@@ -305,7 +288,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** 사용자가 작성한 QnA 질문에 대한 답변 조회 */
+        get: operations["getAnswers"];
         put?: never;
         /** 질문에 답변 등록 (관리자 전용) */
         post: operations["postAnswer"];
@@ -431,7 +415,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/my/question/genFile/download/{questionId}/{fileName}": {
+    "/my/question/genFile/download/{questionId}/{fileNo}": {
         parameters: {
             query?: never;
             header?: never;
@@ -439,7 +423,7 @@ export interface paths {
             cookie?: never;
         };
         /** 이미지 전송 */
-        get: operations["download"];
+        get: operations["loadImage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -649,23 +633,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/dashboard/question/{questionId}/answer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 사용자가 작성한 QnA 질문에 대한 답변 조회 */
-        get: operations["getAnswers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/admin/books": {
         parameters: {
             query?: never;
@@ -697,7 +664,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** 삭제 */
-        delete: operations["deleteNewFile"];
+        delete: operations["deleteImageFile"];
         options?: never;
         head?: never;
         patch?: never;
@@ -726,16 +693,33 @@ export interface components {
         ReqQuestionDto: {
             title: string;
             content: string;
+            cleanTitle?: string;
+            cleanContent?: string;
         };
         ReqDeliveryInformationDto: {
             /** Format: int64 */
             id?: number;
-            addressName: string;
-            postCode: string;
-            detailAddress: string;
-            recipient: string;
-            phone: string;
-            isDefaultAddress: boolean;
+            addressName?: string;
+            postCode?: string;
+            detailAddress?: string;
+            recipient?: string;
+            phone?: string;
+            isDefaultAddress?: boolean;
+        };
+        DeliveryInformationDto: {
+            /** Format: int64 */
+            id?: number;
+            addressName?: string;
+            postCode?: string;
+            detailAddress?: string;
+            recipient?: string;
+            phone?: string;
+            isDefaultAddress?: boolean;
+        };
+        ResMemberMyPageDto: {
+            name?: string;
+            phoneNumber?: string;
+            deliveryInformationDtos?: components["schemas"]["DeliveryInformationDto"][];
         };
         CartItemRequestDto: {
             /** Format: int64 */
@@ -748,16 +732,59 @@ export interface components {
             cartItems: components["schemas"]["CartItemRequestDto"][];
         };
         PutReqMemberMyPageDto: {
-            name: string;
-            phoneNumber: string;
+            name?: string;
+            phoneNumber?: string;
         };
         ReqAnswerDto: {
-            content: string;
+            content?: string;
         };
         ReviewRequestDto: {
             content?: string;
             /** Format: double */
             rating?: number;
+        };
+        AnswerDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            content?: string;
+        };
+        QuestionDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            title?: string;
+            content?: string;
+            answers?: components["schemas"]["AnswerDto"][];
+            genFiles?: components["schemas"]["QuestionGenFileDto"][];
+            answer?: boolean;
+        };
+        QuestionGenFileDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            postId?: number;
+            fileName?: string;
+            typeCode?: string;
+            fileExtTypeCode?: string;
+            fileExtType2Code?: string;
+            /** Format: int64 */
+            fileSize?: number;
+            /** Format: int64 */
+            fileNo?: number;
+            fileExt?: string;
+            fileDateDir?: string;
+            originalFileName?: string;
         };
         OrderRequestDto: {
             postCode?: string;
@@ -922,6 +949,28 @@ export interface components {
             empty?: boolean;
             unsorted?: boolean;
             sorted?: boolean;
+        };
+        PageDtoQuestionListDto: {
+            /** Format: int32 */
+            currentPageNumber: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int64 */
+            totalPages: number;
+            /** Format: int64 */
+            totalItems: number;
+            items: components["schemas"]["QuestionListDto"][];
+        };
+        QuestionListDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            title?: string;
+            content?: string;
+            answer?: boolean;
         };
         Pageable: {
             /** Format: int32 */
@@ -1114,15 +1163,6 @@ export interface components {
             hasAnswer?: boolean;
             answer?: components["schemas"]["AnswerDto"];
         };
-        AnswerDto: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: date-time */
-            createDate?: string;
-            /** Format: date-time */
-            modifyDate?: string;
-            content: string;
-        };
         PageDtoAdminQuestionDto: {
             /** Format: int32 */
             currentPageNumber: number;
@@ -1134,7 +1174,9 @@ export interface components {
             totalItems: number;
             items: components["schemas"]["AdminQuestionDto"][];
         };
-        GetResAnswersDto: Record<string, never>;
+        GetResAnswersDto: {
+            answers?: components["schemas"]["AnswerDto"][];
+        };
         AdminBookListDto: {
             /** Format: int64 */
             id?: number;
@@ -1245,7 +1287,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["QuestionDto"];
                 };
             };
         };
@@ -1270,9 +1312,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
+                content?: never;
             };
         };
     };
@@ -1292,39 +1332,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
-            };
-        };
-    };
-    putNewFile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                questionId: number;
-                fileId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    /** Format: binary */
-                    file: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
+                content?: never;
             };
         };
     };
@@ -1349,7 +1357,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1371,7 +1379,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1477,7 +1485,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1501,7 +1509,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1599,7 +1607,7 @@ export interface operations {
             };
         };
     };
-    getQuesitons: {
+    getQuestions: {
         parameters: {
             query?: {
                 page?: number;
@@ -1616,7 +1624,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["PageDtoQuestionListDto"];
                 };
             };
         };
@@ -1640,7 +1648,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["QuestionDto"];
                 };
             };
         };
@@ -1666,9 +1674,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
+                content?: never;
             };
         };
     };
@@ -1742,7 +1748,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1833,6 +1839,28 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getAnswers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["GetResAnswersDto"];
                 };
             };
         };
@@ -2055,13 +2083,13 @@ export interface operations {
             };
         };
     };
-    download: {
+    loadImage: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 questionId: number;
-                fileName: string;
+                fileNo: number;
             };
             cookie?: never;
         };
@@ -2352,28 +2380,6 @@ export interface operations {
             };
         };
     };
-    getAnswers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                questionId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["GetResAnswersDto"];
-                };
-            };
-        };
-    };
     getAllBooks_1: {
         parameters: {
             query?: {
@@ -2398,7 +2404,7 @@ export interface operations {
             };
         };
     };
-    deleteNewFile: {
+    deleteImageFile: {
         parameters: {
             query?: never;
             header?: never;
@@ -2416,9 +2422,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
+                content?: never;
             };
         };
     };
