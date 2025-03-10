@@ -1,8 +1,11 @@
 package com.ll.nbe342team8.domain.member.member.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,15 +16,6 @@ import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
 import com.ll.nbe342team8.global.jpa.entity.BaseTime;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,29 +48,40 @@ public class Member extends BaseTime implements UserDetails {
 
 	public String username;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DeliveryInformation> deliveryInformations;
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	public List<DeliveryInformation> deliveryInformations;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-	private List<Cart> carts;
+	public List<Cart> carts;
 
-	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-	private List<Question> questions;
+	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	public List<Question> questions = new ArrayList<>();;
 
-  private String profileImageUrl;
+  	public String profileImageUrl;
 
   // Enum 사용자 역할
   public enum MemberType {
       USER,
       ADMIN
   }
+
+	@PrePersist
+	public void prePersist() {
+		if (this.profileImageUrl == null || this.profileImageUrl.isEmpty()) {
+			this.profileImageUrl = "defaultUrl";
+		}
+	}
   
  	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
-		this.name = dto.name();
-		this.phoneNumber = dto.phoneNumber();
+		this.name = dto.getName();
+		this.phoneNumber = dto.getPhoneNumber();
 	}
 
 	public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
+		if (this.deliveryInformations == null) {
+			this.deliveryInformations = new ArrayList<>();
+		}
+
 		this.deliveryInformations.add(deliveryInformation);
 	}
 
@@ -121,4 +126,34 @@ public class Member extends BaseTime implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
+
+	private Member(String oAuthId, String email, String name, String phoneNumber, MemberType memberType, String password) {
+		this.oAuthId = oAuthId;
+		this.email = email;
+		this.name = name;
+		this.phoneNumber = phoneNumber;
+		this.memberType = memberType;
+		this.password = password;
+	}
+
+	public static Member of(String oAuthId, String email, PutReqMemberMyPageDto dto) {
+		return new Member(
+				oAuthId,
+				email,
+				dto.getName(),
+				dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "", // 전화번호가 없으면 빈 문자열 저장
+				MemberType.USER,
+				""
+		);
+	}
+
+	public boolean checkAdmin() {
+		return this.memberType == Member.MemberType.ADMIN;
+	}
+
+	public void addQuestion(Question question) {
+		this.questions.add(question);
+		question.setMember(this);
+	}
+
 }

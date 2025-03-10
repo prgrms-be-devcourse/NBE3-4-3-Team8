@@ -52,6 +52,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework:spring-test'
     testImplementation 'org.hamcrest:hamcrest:2.2'
     implementation("org.springframework.boot:spring-boot-starter-validation")
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -77,8 +78,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation "org.jetbrains.kotlin:kotlin-reflect"
-
-
+//    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {

@@ -12,21 +12,19 @@ import com.ll.nbe342team8.standard.util.Ut;
 
 import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 @Entity
-@Getter
 @NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @Table(
 		name = "question",
 		indexes = {
-				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 추가
+				@Index(name = "idx_question_createDate", columnList = "createDate") // createDate 인덱스 나중에 내림차순 인덱스 mysql에 직접 설정
 		},
 		uniqueConstraints = {
 				@UniqueConstraint(
@@ -52,7 +50,7 @@ public class Question extends BaseTime {
 	public Member member;
 
 	@BatchSize(size = 10)
-	@OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "question")
 	public List<Answer> answers;
 
 	public Boolean isAnswer;
@@ -63,19 +61,29 @@ public class Question extends BaseTime {
 
 
 	public void updateQuestionInfo(ReqQuestionDto dto) {
-      this.title= dto.title();
-      this.content=dto.content();
+      this.title= dto.getTitle();
+      this.content=dto.getContent();
   	}
 
   	public static Question create(ReqQuestionDto dto,Member member) {
 		Question question = Question.builder()
-				.title(dto.title())
-				.content(dto.content())
+				.title(dto.getTitle())
+				.content(dto.getContent())
 				.member(member)
+				.answers(new ArrayList<>())
+				.isAnswer(false)
 				.build();
 
 		return question;
   	}
+
+
+	public Boolean getIsAnswer() {
+		if(this.isAnswer ==null) {this.isAnswer= false;}
+		return  this.isAnswer;
+	}
+
+
 
 	public void addAnswer(Answer answer) {
 		this.answers.add(answer);
@@ -125,7 +133,8 @@ public class Question extends BaseTime {
 				.build();
 		genFiles.add(genFile);
 
-		FileUploadUtil.mv(filePath, genFile.getFilePath());
+		//임시 저장 디렉토리에서 복사해 이동, 임시저장 경로는 주기적으로 초기화
+		FileUploadUtil.copy(filePath, genFile.getFilePath());
 
 		return genFile;
 	}
@@ -141,9 +150,10 @@ public class Question extends BaseTime {
 	public Optional<QuestionGenFile> getGenFileByTypeCodeAndFileNo(String typeCode, int fileNo) {
 		return genFiles.stream()
 				.filter(genFile -> genFile.getTypeCode().equals(typeCode))
-				.filter(genFile -> genFile.getFileNo() == fileNo)
+				.filter(genFile -> genFile.getFileNo()==fileNo)
 				.findFirst();
 	}
+
 
 	public void deleteGenFile(String typeCode, int fileNo) {
 		getGenFileByTypeCodeAndFileNo(typeCode, fileNo)
@@ -153,57 +163,6 @@ public class Question extends BaseTime {
 					FileUploadUtil.rm(filePath);
 				});
 	}
-
-	public void modifyGenFile(String typeCode, int fileNo, String filePath) {
-		getGenFileByTypeCodeAndFileNo(
-				typeCode,
-				fileNo
-		)
-				.ifPresent(genFile -> {
-					FileUploadUtil.rm(genFile.getFilePath());
-					String originalFileName = FileUploadUtil.getOriginalFileName(filePath);
-					String fileExt = FileUploadUtil.getFileExt(filePath);
-					String fileExtTypeCode = FileUploadUtil.getFileExtTypeCodeFromFileExt(fileExt);
-					String fileExtType2Code = FileUploadUtil.getFileExtType2CodeFromFileExt(fileExt);
-					Map<String, Object> metadata = FileUploadUtil.getMetadata(filePath);
-					String metadataStr = metadata
-							.entrySet()
-							.stream()
-							.map(entry -> entry.getKey() + "-" + entry.getValue())
-							.collect(Collectors.joining(";"));
-					String fileName = UUID.randomUUID() + "." + fileExt;
-					int fileSize = FileUploadUtil.getFileSize(filePath);
-					genFile.setOriginalFileName(originalFileName);
-					genFile.setMetadata(metadataStr);
-					genFile.setFileDateDir(Ut.date.getCurrentDateFormatted("yyyy_MM_dd"));
-					genFile.setFileExt(fileExt);
-					genFile.setFileExtTypeCode(fileExtTypeCode);
-					genFile.setFileExtType2Code(fileExtType2Code);
-					genFile.setFileName(fileName);
-					genFile.setFileSize(fileSize);
-					FileUploadUtil.mv(filePath, genFile.getFilePath());
-				});
-	}
-
-    public void putGenFile(String typeCode, int fileNo, String filePath) {
-        Optional<QuestionGenFile> opQuestionGenFile = getGenFileByTypeCodeAndFileNo(
-                typeCode,
-                fileNo
-        );
-
-        if (opQuestionGenFile.isPresent()) {
-            modifyGenFile(typeCode, fileNo, filePath);
-        } else {
-            addGenFile(typeCode, fileNo, filePath);
-        }
-    }
-
-	public Optional<QuestionGenFile> getGenFileById(Long id) {
-		return genFiles.stream()
-				.filter(genFile -> genFile.getId().equals(id))
-				.findFirst();
-	}
-
 
 
 

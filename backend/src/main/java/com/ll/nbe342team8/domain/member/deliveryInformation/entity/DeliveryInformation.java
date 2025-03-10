@@ -18,40 +18,40 @@ public class DeliveryInformation extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    private Long id;
+    public Long id;
 
-    private String addressName;
+    public String addressName;
 
-    private String postCode;
+    public String postCode;
 
-    private String detailAddress;
+    public String detailAddress;
 
-    private Boolean isDefaultAddress;
+    public Boolean isDefaultAddress;
 
-    private String recipient;
+    public String recipient;
 
-    private String phone;
+    public String phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    @ManyToOne
+    public Member member;
 
     public DeliveryInformation(ReqDeliveryInformationDto dto, Member member) {
-        this.addressName = dto.addressName();
-        this.postCode = dto.postCode();
-        this.detailAddress = dto.detailAddress();
-        this.recipient = dto.recipient();
-        this.phone = dto.phone();
-        this.isDefaultAddress=dto.isDefaultAddress();
+        this.addressName = dto.getAddressName();
+        this.postCode = dto.getPostCode();
+        this.detailAddress = dto.getDetailAddress();
+        this.recipient = dto.getRecipient();
+        this.phone = dto.getPhone();
+        this.isDefaultAddress= dto.isDefaultAddress();
         this.member=member;
     }
 
     public void updateDeliveryInfo(ReqDeliveryInformationDto dto) {
-        this.addressName = dto.addressName();
-        this.postCode = dto.postCode();
-        this.detailAddress = dto.detailAddress();
-        this.recipient = dto.recipient();
-        this.phone = dto.phone();
-        this.isDefaultAddress=dto.isDefaultAddress();
+        this.addressName = dto.getAddressName();
+        this.postCode = dto.getPostCode();
+        this.detailAddress = dto.getDetailAddress();
+        this.recipient = dto.getRecipient();
+        this.phone = dto.getPhone();
+        this.isDefaultAddress= dto.isDefaultAddress();
 
     }
 
