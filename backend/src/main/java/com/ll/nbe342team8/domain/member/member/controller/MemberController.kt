@@ -52,7 +52,7 @@ class MemberController (
     fun getMyPage(@AuthenticationPrincipal securityUser: SecurityUser?): ResponseEntity<ResMemberMyPageDto>
     //마이페이지 데이터를 불러온다. 마이페이지는 resMemberMyPageDto 데이터를 이용해 마이페이지를 구성한다.
     {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         //마이페이지 구성을 위한 데이터 반환
@@ -68,7 +68,7 @@ class MemberController (
         @RequestBody putReqMemberMyPageDto: @Valid PutReqMemberMyPageDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // jwt 토큰으로 찾은 사용자 개체 갱신
@@ -89,7 +89,7 @@ class MemberController (
     @Operation(summary = "사용자 리뷰 조회")
     fun getMemberReviews(@RequestParam(defaultValue = "0") page: Int,
                          @AuthenticationPrincipal securityUser: SecurityUser?): ResponseEntity<PageDto<ReviewsResponseDto>> {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         val reviews = reviewService.getMemberReviewPage(member, page)

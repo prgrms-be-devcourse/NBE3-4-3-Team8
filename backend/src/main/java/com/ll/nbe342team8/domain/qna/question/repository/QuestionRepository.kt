@@ -34,22 +34,6 @@ interface QuestionRepository : JpaRepository<Question, Long> {
     ): Boolean
 
 
-    // 다음 페이지 조회 (현재 페이지 마지막 ID보다 작은 데이터)
-    @Query("SELECT q FROM Question q WHERE q.member = :member AND q.id < :lastQuestionId ORDER BY q.createDate DESC")
-    fun findByMemberWithKeysetNext(
-        @Param("member") member: Member,
-        @Param("lastQuestionId") lastQuestionId: Long,
-        pageable: Pageable
-    ): List<QuestionListDtoProjection>
-
-    // 이전 페이지 조회 (현재 페이지 첫 번째 ID보다 큰 데이터)
-    @Query("SELECT q FROM Question q WHERE q.member = :member AND q.id > :firstQuestionId ORDER BY q.createDate ASC")
-    fun findByMemberWithKeysetPrev(
-        @Param("member") member: Member,
-        @Param("firstQuestionId") firstQuestionId: Long,
-        pageable: Pageable
-    ): List<QuestionListDtoProjection>
-
     fun findByTitle(title: String): Optional<Question>
 
     @Query("SELECT q FROM Question q LEFT JOIN FETCH q.genFiles WHERE q.id = :id")
