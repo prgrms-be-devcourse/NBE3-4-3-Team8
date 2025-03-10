@@ -48,7 +48,7 @@ public class BaseInitData {
 
     @Transactional
     public void makeSampleMembers() throws IOException {
-        if (memberService.count() > 10) return;
+        if (memberService.count() > 0) return;
 
         for (int i = 1; i <= 10; i++) {
             Member member = Member.builder()

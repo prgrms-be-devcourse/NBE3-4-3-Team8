@@ -6,7 +6,7 @@ export interface PageDto<QuestionDto> {
     items: QuestionDto[]; // 질문 목록 (제네릭)
   }
   
-  export interface QuestionListDto {
+  export interface QuestionDto {
     id: number; // Long → number
     createDate: string; // LocalDateTime → ISO 문자열 형식 사용
     modifyDate: string;

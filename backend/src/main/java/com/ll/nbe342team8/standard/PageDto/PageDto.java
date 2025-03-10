@@ -1,7 +1,5 @@
 package com.ll.nbe342team8.standard.PageDto;
 
-import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDto;
-import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDtoProjection;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
@@ -28,14 +26,6 @@ public class PageDto<T> {
         this.totalPages = page.getTotalPages();
         this.totalItems = page.getTotalElements();
         this.items = page.getContent();
-    }
-
-    public PageDto(List<T> list) {
-        this.currentPageNumber = 0;
-        this.pageSize = 0;
-        this.totalPages = 0;
-        this.totalItems = 0;
-        this.items = list;
     }
 
     public PageDto() {
