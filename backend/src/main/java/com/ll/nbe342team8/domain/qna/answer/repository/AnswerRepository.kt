@@ -6,6 +6,7 @@ import com.ll.nbe342team8.domain.qna.question.entity.Question
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
+import java.util.Optional
 
 @Repository
 interface AnswerRepository : JpaRepository<Answer, Long> {
@@ -19,4 +20,6 @@ interface AnswerRepository : JpaRepository<Answer, Long> {
     fun findByQuestionOrderByCreateDateDesc(question: Question): List<Answer>
 
     fun findByQuestionId(questionId: Long): List<Answer>
+
+    fun findByContent(content: String) : Optional<Answer>
 }

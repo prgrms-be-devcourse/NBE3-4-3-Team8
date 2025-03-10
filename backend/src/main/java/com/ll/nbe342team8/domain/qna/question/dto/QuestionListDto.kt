@@ -11,7 +11,7 @@ data class QuestionListDto(
     val modifyDate: LocalDateTime,
     val title: String,
     val content: String,
-    val isAnswer: Boolean?
+    val isAnswer: Boolean
 
 
 ) {

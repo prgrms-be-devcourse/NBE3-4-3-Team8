@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
+import java.util.*
 
 @Repository
 interface QuestionRepository : JpaRepository<Question, Long> {
@@ -48,6 +49,18 @@ interface QuestionRepository : JpaRepository<Question, Long> {
         @Param("firstQuestionId") firstQuestionId: Long,
         pageable: Pageable
     ): List<QuestionListDtoProjection>
+
+    fun findByTitle(title: String): Optional<Question>
+
+    @Query("SELECT q FROM Question q LEFT JOIN FETCH q.genFiles WHERE q.id = :id")
+    fun findByIdWithGenFiles(@Param("id") id: Long?): Optional<Question?>?
+
+    @Query("SELECT q FROM Question q JOIN FETCH q.member WHERE q.id = :id")
+    fun findByIdWithMember(@Param("id") id: Long): Optional<Question>
+
+
+
+
 
 
 

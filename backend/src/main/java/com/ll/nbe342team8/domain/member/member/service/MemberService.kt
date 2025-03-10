@@ -3,7 +3,9 @@ package com.ll.nbe342team8.domain.member.member.service
 import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto
 import com.ll.nbe342team8.domain.member.member.entity.Member
 import com.ll.nbe342team8.domain.member.member.repository.MemberRepository
+import com.ll.nbe342team8.global.exceptions.ServiceException
 import lombok.RequiredArgsConstructor
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -43,7 +45,7 @@ class MemberService (
 
 
     fun getMemberById(id: Long): Member {
-        return memberRepository.findById(id).orElseThrow { IllegalArgumentException() }
+        return memberRepository.findById(id).orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
     }
 
     fun create(member: Member): Member {

@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor
 @Getter
 @NoArgsConstructor
 class MemberDto(entity: Member) {
-    private val id: Long? = entity.id
+    private val id: Long = entity.id
     private val oAuthId: String = entity.oAuthId
     private val name: String? = entity.name
     private val email: String = entity.email
     private val memberType: Member.MemberType = entity.memberType
-    private val profileImageUrl: String? = entity.profileImageUrl
+    private val profileImageUrl: String = entity.profileImageUrl
 
     val attributes: Map<String, Any?>
         get() {

@@ -12,15 +12,13 @@ import com.ll.nbe342team8.standard.util.Ut;
 
 import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @Table(
@@ -52,7 +50,7 @@ public class Question extends BaseTime {
 	public Member member;
 
 	@BatchSize(size = 10)
-	@OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "question")
 	public List<Answer> answers;
 
 	public Boolean isAnswer;
@@ -72,6 +70,7 @@ public class Question extends BaseTime {
 				.title(dto.getTitle())
 				.content(dto.getContent())
 				.member(member)
+				.answers(new ArrayList<>())
 				.isAnswer(false)
 				.build();
 
@@ -134,7 +133,8 @@ public class Question extends BaseTime {
 				.build();
 		genFiles.add(genFile);
 
-		FileUploadUtil.mv(filePath, genFile.getFilePath());
+		//임시 저장 디렉토리에서 복사해 이동, 임시저장 경로는 주기적으로 초기화
+		FileUploadUtil.copy(filePath, genFile.getFilePath());
 
 		return genFile;
 	}
@@ -163,8 +163,6 @@ public class Question extends BaseTime {
 					FileUploadUtil.rm(filePath);
 				});
 	}
-
-
 
 
 

@@ -8,7 +8,6 @@ import com.ll.nbe342team8.domain.qna.question.service.QuestionService
 import com.ll.nbe342team8.global.config.AppConfig
 import com.ll.nbe342team8.global.exceptions.ServiceException
 import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil
-import com.ll.nbe342team8.standard.util.fileuploadutil.FileUploadUtil.isAllowedFileType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,6 +19,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -33,7 +33,6 @@ import java.io.FileInputStream
 @Tag(name = "QuestionGenFileController", description = "파일 다운로드 등 다양한 기능 제공")
 class QuestionGenFileController (
     private val questionService: QuestionService,
-    private val memberService: MemberService
     ) {
 
 
@@ -42,21 +41,18 @@ class QuestionGenFileController (
     fun loadImage(
         @PathVariable questionId: Long,
         @PathVariable fileNo: Int,
-        request: HttpServletRequest
+        request: HttpServletRequest,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Resource> {
 
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야 합니다.")
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
-        val member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
-
-        val question = questionService.findById(questionId).orElseThrow { NoSuchElementException("질문을 찾을 수 없습니다") }
+        val question = questionService.findById(questionId)
 
         val genFile = question.genFiles
             .find { it.fileNo == fileNo }
-            ?: throw NoSuchElementException("File not found")
+            ?: throw ServiceException(HttpStatus.NOT_FOUND.value(),"사진 파일이 존재하지 않습니다.")
 
         val filePath = genFile.filePath
         val resource = InputStreamResource(FileInputStream(filePath))
@@ -73,26 +69,22 @@ class QuestionGenFileController (
     fun makeNewFile(
         @PathVariable questionId: Long,
         @PathVariable typeCode: String,
-        @RequestParam("file") @Schema(type = "string", format = "binary") file: MultipartFile
+        @RequestParam("file") @Schema(type = "string", format = "binary") file: MultipartFile,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Void> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야 합니다.")
-
-        val member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         val question = questionService.findById(questionId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다.") }
 
         // 파일 검사 과정 필요
+        checkFileDanger(file)
 
-
-        checkActorCanMakeNewGenFile(member, question)
+        questionService.checkActorCanMakeNewGenFile(member, question)
 
         val filePath = FileUploadUtil.toFile(file, AppConfig.getTempDirPath())
 
-        val postGenFile = question.addGenFile(typeCode, filePath)
+        question.addGenFile(typeCode, filePath)
 
         questionService.flush()
 
@@ -101,20 +93,16 @@ class QuestionGenFileController (
 
     @DeleteMapping("/{questionId}/{fileNo}/{typeCode}")
     @Operation(summary = "삭제")
-    fun deleteNewFile(
+    fun deleteImageFile(
         @PathVariable questionId: Long,
         @PathVariable fileNo: Int,
-        @PathVariable typeCode: String
+        @PathVariable typeCode: String,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Void> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야 합니다.")
-
-        val member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         val question = questionService.findById(questionId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "질문을 찾을 수 없습니다.") }
 
         question.deleteGenFile(typeCode, fileNo)
 
@@ -124,20 +112,13 @@ class QuestionGenFileController (
     }
 
 
-    fun checkActorCanMakeNewGenFile(member: Member?, question: Question) {
-        if (member == null) throw ServiceException(404, "로그인 후 이용해주세요.")
-        if (member.id !== question.member.id) throw ServiceException(404, "게시글 작성 유저만 업로드 할 수 있습니다.")
-        if (question.genFiles.size >= 5) {
-            throw ServiceException(HttpStatus.CONFLICT.value(), "질문 하나에 이미지는 5개까지 설정할수있습니다.")
-        }
-    }
-
     fun checkFileDanger(file : MultipartFile) {
         if (file.size > 10 * 1024 * 1024) { throw ServiceException(HttpStatus.BAD_REQUEST.value(), "파일 크기가 너무 큽니다.") }
         val originalFilename = file.originalFilename
         if (originalFilename == null || !FileUploadUtil.isAllowedFileType(originalFilename, file.contentType)) {
             throw ServiceException(HttpStatus.BAD_REQUEST.value(), "허용되지 않은 파일 형식입니다.")
         }
+        if(!FileUploadUtil.checkFileType(file)) { throw ServiceException(HttpStatus.BAD_REQUEST.value(), "허용되지 않은 파일 형식입니다.")}
 
     }
 }

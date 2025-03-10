@@ -20,8 +20,8 @@ data class QuestionDto(
         modifyDate = question.modifyDate,
         title = question.title,
         content = question.content,
-        isAnswer = question.answers?.isNotEmpty() ?: false,
-        answers = question.answers?.map { AnswerDto(it) } ?: emptyList(),
-        genFiles = question.genFiles?.map { QuestionGenFileDto(it) } ?: emptyList()
+        isAnswer = question.isAnswer,
+        answers = question.answers.map { AnswerDto(it) } ,
+        genFiles = question.genFiles.map { QuestionGenFileDto(it) }
     )
 }

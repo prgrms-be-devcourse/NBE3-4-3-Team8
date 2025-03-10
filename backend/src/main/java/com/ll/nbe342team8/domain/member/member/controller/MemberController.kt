@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
@@ -48,15 +49,11 @@ class MemberController (
 
     @GetMapping("/my")
     @Operation(summary = "사용자 정보 조회")
-    fun getMyPage(): ResponseEntity<ResMemberMyPageDto>
+    fun getMyPage(@AuthenticationPrincipal securityUser: SecurityUser?): ResponseEntity<ResMemberMyPageDto>
     //마이페이지 데이터를 불러온다. 마이페이지는 resMemberMyPageDto 데이터를 이용해 마이페이지를 구성한다.
     {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
-
-        val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         //마이페이지 구성을 위한 데이터 반환
         val memberMyPageDto = ResMemberMyPageDto(member)
@@ -68,19 +65,16 @@ class MemberController (
     @Operation(summary = "사용자 정보 갱신")
     @PutMapping("/my")
     fun putMyPage(
-        @RequestBody putReqMemberMyPageDto: @Valid PutReqMemberMyPageDto
+        @RequestBody putReqMemberMyPageDto: @Valid PutReqMemberMyPageDto,
+        @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
-
-        val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // jwt 토큰으로 찾은 사용자 개체 갱신
         memberService.modifyOrJoin(member.oAuthId, putReqMemberMyPageDto, member.email)
-
-        val resMemberMyPageDto = ResMemberMyPageDto(member)
+        val updateMember: Member =memberService.getMemberById(member.id)
+        val resMemberMyPageDto = ResMemberMyPageDto(updateMember)
 
         return ResponseEntity.ok(resMemberMyPageDto)
     }
@@ -93,13 +87,10 @@ class MemberController (
 
     @GetMapping("/my/reviews")
     @Operation(summary = "사용자 리뷰 조회")
-    fun getMemberReviews(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<PageDto<ReviewsResponseDto>> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val securityUser = authentication?.principal as? SecurityUser
-            ?: throw ServiceException(HttpStatus.UNAUTHORIZED.value(), "로그인을 해야합니다.")
-
-        val member: Member = memberService.findByOauthId(securityUser.member.oAuthId)
-            .orElseThrow { ServiceException(HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다.") }
+    fun getMemberReviews(@RequestParam(defaultValue = "0") page: Int,
+                         @AuthenticationPrincipal securityUser: SecurityUser?): ResponseEntity<PageDto<ReviewsResponseDto>> {
+        val member: Member = securityUser?.member
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         val reviews = reviewService.getMemberReviewPage(member, page)
 

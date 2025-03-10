@@ -4,9 +4,13 @@ import com.ll.nbe342team8.domain.member.deliveryInformation.dto.ReqDeliveryInfor
 import com.ll.nbe342team8.domain.member.deliveryInformation.entity.DeliveryInformation
 import com.ll.nbe342team8.domain.member.deliveryInformation.repository.DeliveryInformationRepository
 import com.ll.nbe342team8.domain.member.member.entity.Member
+import com.ll.nbe342team8.global.exceptions.ServiceException
 import lombok.RequiredArgsConstructor
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -59,5 +63,36 @@ class DeliveryInformationService(
     //수정, 삭제하려는 게시글을 사용자가 작성한지 학인
     fun isDeliveryInformationOwner(member: Member, deliveryInformation: DeliveryInformation): Boolean {
         return deliveryInformation.member.id == member.id
+    }
+
+    fun existsDuplicateDeliveryInformationInShortTime(
+        dto: ReqDeliveryInformationDto,
+        member: Member,
+        duration: Duration
+    ): Boolean {
+        val cutoffTime = LocalDateTime.now().minus(duration)
+        return deliveryInformationRepository.existsDuplicateInShortTime(
+            member,
+            dto.addressName,
+            dto.postCode,
+            dto.detailAddress,
+            dto.recipient,
+            dto.phone,
+            cutoffTime
+        )
+    }
+
+    //사용자 권한 확인, 관리자 계정이여도 접근 가능
+    fun validateDeliveryInformationOwner(member: Member, deliveryInformation: DeliveryInformation) {
+        require(
+            isDeliveryInformationOwner(member, deliveryInformation) || member.checkAdmin()
+        ) { throw ServiceException(HttpStatus.FORBIDDEN.value(), "권한이 없습니다.") }
+    }
+
+
+    fun validateExistsDuplicateDeliveryInformationInShortTime(member: Member, dto : ReqDeliveryInformationDto, duration: Duration) {
+        require(!existsDuplicateDeliveryInformationInShortTime(dto, member , duration)) {
+            throw ServiceException(HttpStatus.TOO_MANY_REQUESTS.value(), "너무 빠르게 동일한 답변을 등록할 수 없습니다.")
+        }
     }
 }
