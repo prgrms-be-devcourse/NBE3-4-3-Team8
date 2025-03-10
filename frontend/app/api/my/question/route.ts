@@ -6,17 +6,17 @@ export async function GET(req: NextRequest)  {
   const cookies = req.headers.get("cookie") || "";
   
   const page = searchParams.get("page");
-  const lastQuestionId = searchParams.get("lastQuestionId");
-  const firstQuestionId = searchParams.get("firstQuestionId");
+  const before = searchParams.get("before");
+  const after = searchParams.get("after");
   
   let apiUrl = "http://localhost:8080/my/question";
 
   if (page !== null) {
     apiUrl += `?page=${page}`;
-  } else if (lastQuestionId !== null) {
-    apiUrl += `?lastQuestionId=${lastQuestionId}`;
-  } else if (firstQuestionId !== null) {
-    apiUrl += `?firstQuestionId=${firstQuestionId}`;
+  } else if (before !== null) {
+    apiUrl += `?before=${before}`;
+  } else if (after !== null) {
+    apiUrl += `?after=${after}`;
   }
 
   console.log("-----------------------------------------------");

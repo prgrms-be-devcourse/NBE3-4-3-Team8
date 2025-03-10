@@ -65,7 +65,7 @@ class MemberController (
     @Operation(summary = "사용자 정보 갱신")
     @PutMapping("/my")
     fun putMyPage(
-        @RequestBody putReqMemberMyPageDto: @Valid PutReqMemberMyPageDto,
+        @Valid @RequestBody putReqMemberMyPageDto: PutReqMemberMyPageDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
         val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }

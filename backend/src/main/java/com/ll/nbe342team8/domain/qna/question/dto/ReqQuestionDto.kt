@@ -9,7 +9,7 @@ import org.jsoup.safety.Safelist
 
 data class ReqQuestionDto @JsonCreator constructor(
     @field:NotBlank
-    val title: String,
+    val title: String ,
     @field:NotNull
     val content: String
 ) {

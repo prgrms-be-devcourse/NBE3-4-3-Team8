@@ -7,9 +7,9 @@ import jakarta.validation.constraints.Size
 data class PutReqMemberMyPageDto(
 
         @field:Size(max = 50)
-        val name: String,
+        val name: String = "",
 
-        val phoneNumber: String
+        val phoneNumber: String = ""
 
         //val profileImageUrl: String
 )
