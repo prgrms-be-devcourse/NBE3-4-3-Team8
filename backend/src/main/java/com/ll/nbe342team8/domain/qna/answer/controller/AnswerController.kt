@@ -30,7 +30,7 @@ class AnswerController (
     private val memberService: MemberService,
     private val questionService: QuestionService,
     private val answerService: AnswerService
-    ) {
+) {
 
 
     @Operation(summary = "사용자가 작성한 QnA 질문에 대한 답변 조회")
@@ -139,10 +139,4 @@ class AnswerController (
     private fun getAnswerById(answerId: Long): Answer {
         return answerService.findById(answerId)
     }
-
-
-
-
-
-
 }

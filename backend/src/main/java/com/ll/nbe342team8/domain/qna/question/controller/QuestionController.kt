@@ -143,9 +143,4 @@ class QuestionController(
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
-
-
-
-
 }
-

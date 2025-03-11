@@ -1,17 +1,14 @@
-package com.ll.nbe342team8.domain.qna.answer.dto;
+package com.ll.nbe342team8.domain.qna.answer.dto
 
-import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.ll.nbe342team8.domain.qna.answer.entity.Answer
 
-public class GetResAnswersDto {
-
-    List<AnswerDto> answers;
-
-    public GetResAnswersDto(List<Answer> answers) {
-
-        this.answers= answers.stream()
-                .map(AnswerDto::new)
-                .collect(Collectors.toList());
+data class GetResAnswersDto(
+    @JsonProperty("answers") val answers: List<AnswerDto>
+) {
+    companion object {
+        fun from(answers: List<Answer>): GetResAnswersDto {
+            return GetResAnswersDto(answers.map { AnswerDto(it) })
+        }
     }
 }

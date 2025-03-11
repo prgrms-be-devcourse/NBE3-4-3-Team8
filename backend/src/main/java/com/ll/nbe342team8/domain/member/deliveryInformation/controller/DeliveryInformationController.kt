@@ -104,11 +104,4 @@ class DeliveryInformationController(
 
         return ResponseEntity.ok(resMemberMyPageDto)
     }
-
-
-
-
-
-
-
 }

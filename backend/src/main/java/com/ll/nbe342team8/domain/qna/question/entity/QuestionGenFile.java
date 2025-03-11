@@ -18,21 +18,21 @@ public class QuestionGenFile extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
-    private Long id;
+    public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Question question;
+    public Question question;
 
-    private String typeCode;
-    private String fileDateDir;
-    private String originalFileName;
-    private String fileExt;
-    private String fileName;
-    private int fileSize;
-    private String fileExtTypeCode;
-    private String fileExtType2Code;
-    private String metadata;
-    private int fileNo;
+    public String typeCode;
+    public String fileDateDir;
+    public String originalFileName;
+    public String fileExt;
+    public String fileName;
+    public int fileSize;
+    public String fileExtTypeCode;
+    public String fileExtType2Code;
+    public String metadata;
+    public int fileNo;
 
 
     public String getFilePath() {
@@ -51,6 +51,54 @@ public class QuestionGenFile extends BaseTime {
     public int hashCode() {
         if (id != null) return super.hashCode();
         return Objects.hash(super.hashCode(), typeCode, fileNo);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public String getFileDateDir() {
+        return fileDateDir;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public String getFileExt() {
+        return fileExt;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public int getFileSize() {
+        return fileSize;
+    }
+
+    public String getFileExtTypeCode() {
+        return fileExtTypeCode;
+    }
+
+    public String getFileExtType2Code() {
+        return fileExtType2Code;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public int getFileNo() {
+        return fileNo;
     }
 
 

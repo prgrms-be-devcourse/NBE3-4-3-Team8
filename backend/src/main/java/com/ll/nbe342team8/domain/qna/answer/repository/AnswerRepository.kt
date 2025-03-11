@@ -1,20 +1,25 @@
-package com.ll.nbe342team8.domain.qna.answer.repository;
+package com.ll.nbe342team8.domain.qna.answer.repository
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.qna.answer.entity.Answer;
-import com.ll.nbe342team8.domain.qna.question.entity.Question;
+import com.ll.nbe342team8.domain.member.member.entity.Member
+import com.ll.nbe342team8.domain.qna.answer.entity.Answer
+import com.ll.nbe342team8.domain.qna.question.entity.Question
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
+import java.util.Optional
 
 @Repository
-public interface AnswerRepository extends JpaRepository<Answer, Long> {
-	boolean existsByQuestionAndMemberAndContentAndCreateDateAfter(Question question, Member member, String content, LocalDateTime cutoffTime);
+interface AnswerRepository : JpaRepository<Answer, Long> {
+    fun existsByQuestionAndMemberAndContentAndCreateDateAfter(
+        question: Question,
+        member: Member,
+        content: String,
+        cutoffTime: LocalDateTime
+    ): Boolean
 
-	List<Answer> findByQuestionOrderByCreateDateDesc(Question question);
+    fun findByQuestionOrderByCreateDateDesc(question: Question): List<Answer>
 
-	List<Answer> findByQuestionId(Long questionId);
+    fun findByQuestionId(questionId: Long): List<Answer>
+
+    fun findByContent(content: String) : Optional<Answer>
 }

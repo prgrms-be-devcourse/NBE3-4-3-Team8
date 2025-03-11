@@ -16,4 +16,3 @@ data class ReqQuestionDto @JsonCreator constructor(
     val cleanTitle: String? = title.let { Jsoup.clean(it, Safelist.basic()) }
     val cleanContent: String? = content.let { Jsoup.clean(it, Safelist.basic()) }
 }
-

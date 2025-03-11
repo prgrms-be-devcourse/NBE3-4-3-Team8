@@ -57,13 +57,13 @@ public class Member extends BaseTime implements UserDetails {
 	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	public List<Question> questions = new ArrayList<>();;
 
-  	public String profileImageUrl;
+	public String profileImageUrl;
 
-  // Enum 사용자 역할
-  public enum MemberType {
-      USER,
-      ADMIN
-  }
+	// Enum 사용자 역할
+	public enum MemberType {
+		USER,
+		ADMIN
+	}
 
 	@PrePersist
 	public void prePersist() {
@@ -71,8 +71,8 @@ public class Member extends BaseTime implements UserDetails {
 			this.profileImageUrl = "defaultUrl";
 		}
 	}
-  
- 	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
+
+	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
 		this.name = dto.getName();
 		this.phoneNumber = dto.getPhoneNumber();
 		this.profileImageUrl = dto.getProfileImageUrl();

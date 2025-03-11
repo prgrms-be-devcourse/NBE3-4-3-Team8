@@ -1,53 +1,38 @@
-package com.ll.nbe342team8.domain.qna.question.dto;
+package com.ll.nbe342team8.domain.qna.question.dto
 
-import com.ll.nbe342team8.domain.qna.question.entity.QuestionGenFile;
-import lombok.Getter;
-import lombok.NonNull;
+import com.ll.nbe342team8.domain.qna.question.entity.QuestionGenFile
+import lombok.Getter
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-
-@Getter
-public class QuestionGenFileDto {
-
-    private long id;
-
-    private LocalDateTime createDate;
-
-    private LocalDateTime modifyDate;
-
-    private long postId;
-
-    private String fileName;
-
-    private String typeCode;
-
-    private String fileExtTypeCode;
-
-    private String fileExtType2Code;
-
-    private long fileSize;
-
-    private long fileNo;
-
-    private String fileExt;
-
-    private String fileDateDir;
-
-    private String originalFileName;
-
-    public QuestionGenFileDto(QuestionGenFile questionGenFile) {
-        this.id = questionGenFile.getId();
-        this.createDate = questionGenFile.getCreateDate();
-        this.modifyDate = questionGenFile.getModifyDate();
-        this.postId = questionGenFile.getQuestion().getId();
-        this.fileName = questionGenFile.getFileName();
-        this.typeCode = questionGenFile.getTypeCode();
-        this.fileExtTypeCode = questionGenFile.getFileExtTypeCode();
-        this.fileExtType2Code = questionGenFile.getFileExtType2Code();
-        this.fileSize = questionGenFile.getFileSize();
-        this.fileNo = questionGenFile.getFileNo();
-        this.fileExt = questionGenFile.getFileExt();
-        this.fileDateDir = questionGenFile.getFileDateDir();
-        this.originalFileName = questionGenFile.getOriginalFileName();
-    }
+data class QuestionGenFileDto(
+    val id: Long,
+    val createDate: LocalDateTime,
+    val modifyDate: LocalDateTime,
+    val postId: Long,
+    val fileName: String,
+    val typeCode: String,
+    val fileExtTypeCode: String,
+    val fileExtType2Code: String,
+    val fileSize: Long,
+    val fileNo: Long,
+    val fileExt: String,
+    val fileDateDir: String,
+    val originalFileName: String
+) {
+    // 보조 생성자 추가
+    constructor(questionGenFile: QuestionGenFile) : this(
+        id = questionGenFile.id,
+        createDate = questionGenFile.createDate,
+        modifyDate = questionGenFile.modifyDate,
+        postId = questionGenFile.question.id,
+        fileName = questionGenFile.fileName,
+        typeCode = questionGenFile.typeCode,
+        fileExtTypeCode = questionGenFile.fileExtTypeCode,
+        fileExtType2Code = questionGenFile.fileExtType2Code,
+        fileSize = questionGenFile.fileSize.toLong(),
+        fileNo = questionGenFile.fileNo.toLong(),
+        fileExt = questionGenFile.fileExt,
+        fileDateDir = questionGenFile.fileDateDir,
+        originalFileName = questionGenFile.originalFileName
+    )
 }

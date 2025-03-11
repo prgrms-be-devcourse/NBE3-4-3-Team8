@@ -1,19 +1,17 @@
-package com.ll.nbe342team8.domain.member.member.repository;
+package com.ll.nbe342team8.domain.member.member.repository
 
-import java.util.Optional;
+import com.ll.nbe342team8.domain.member.member.entity.Member
+import org.springframework.data.jpa.repository.JpaRepository
+import java.util.*
 
-import org.springframework.data.jpa.repository.JpaRepository;
+interface MemberRepository : JpaRepository<Member, Long> {
+    fun findByEmail(email: String): Optional<Member>
 
-import com.ll.nbe342team8.domain.member.member.entity.Member;
+    fun findByoAuthId(oAuthId: String): Optional<Member>
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
-	Optional<Member> findByEmail(String email);
+    // 관리자 계정 조회 (이메일ID, 회원 유형 확인)
+    fun findByEmailAndMemberType(email: String, memberType: Member.MemberType): Optional<Member>
 
-	Optional<Member> findByoAuthId(String oAuthId);
-
-	// 관리자 계정 조회 (이메일ID, 회원 유형 확인)
-	Optional<Member> findByEmailAndMemberType(String email, Member.MemberType memberType);
-
-	// 관리자 계정 개수 확인
-	long countByMemberType(Member.MemberType memberType);
+    // 관리자 계정 개수 확인
+    fun countByMemberType(memberType: Member.MemberType): Long
 }

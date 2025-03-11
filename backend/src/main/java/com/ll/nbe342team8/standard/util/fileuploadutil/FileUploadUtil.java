@@ -1,14 +1,16 @@
 package com.ll.nbe342team8.standard.util.fileuploadutil;
 
 import com.ll.nbe342team8.global.config.AppConfig;
-import com.ll.nbe342team8.standard.util.Ut;
+
 import lombok.SneakyThrows;
+import org.apache.tika.Tika;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -19,15 +21,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import org.springframework.mock.web.MockMultipartFile;
 
 
 public class FileUploadUtil {
 
     private static final String ORIGINAL_FILE_NAME_SEPARATOR = "--originalFileName_";
+    private static final List<String> ALLOWED_MIME_TYPES = List.of( "image/jpeg", "image/png", "image/gif", "application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" );
+    private static final List<String> ALLOWED_EXTENSION_TYPES = List.of("jpg", "jpeg", "png", "gif", "pdf", "txt", "docx");
 
     private static final Map<String, String> MIME_TYPE_MAP = new LinkedHashMap<>() {{
         put("application/json", "json");
@@ -75,6 +77,20 @@ public class FileUploadUtil {
         );
     }
 
+    @SneakyThrows
+    public static void copy(String sourceFilePath, String destinationFilePath) {
+        // 목적지 디렉토리가 없으면 생성
+        mkdir(Paths.get(destinationFilePath).getParent().toString());
+
+        // 파일 복사
+        Files.copy(
+                Path.of(sourceFilePath),
+                Path.of(destinationFilePath),
+                StandardCopyOption.REPLACE_EXISTING
+        );
+    }
+
+
     private static String getExtensionFromResponse(HttpResponse<?> response) {
         return response.headers()
                 .firstValue("Content-Type")
@@ -112,41 +128,41 @@ public class FileUploadUtil {
         HttpClient client = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .build();
-         HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
                 .build();
 
-            String tempFilePath = dirPath + "/" + UUID.randomUUID() + ".tmp";
+        String tempFilePath = dirPath + "/" + UUID.randomUUID() + ".tmp";
 
-            mkdir(dirPath);
+        mkdir(dirPath);
 
-            // 실제 파일 다운로드
-            HttpResponse<Path> response = client.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofFile(Path.of(tempFilePath))
-            );
+        // 실제 파일 다운로드
+        HttpResponse<Path> response = client.send(
+                request,
+                HttpResponse.BodyHandlers.ofFile(Path.of(tempFilePath))
+        );
 
-            // 파일 확장자 추출
-            String extension = getExtensionFromResponse(response);
+        // 파일 확장자 추출
+        String extension = getExtensionFromResponse(response);
 
-            if (extension.equals("tmp")) {
-                extension = getExtensionByTika(tempFilePath);
-            }
-
-            // 파일명 추출
-
-            String filename = getFilenameWithoutExtFromUrl(url);
-            filename = uniqueFilename
-                    ? UUID.randomUUID() + ORIGINAL_FILE_NAME_SEPARATOR + filename
-                    : filename;
-
-            String newFilePath = dirPath + "/" + filename + "." + extension;
-
-            mv(tempFilePath, newFilePath);
-
-            return newFilePath;
+        if (extension.equals("tmp")) {
+            extension = getExtensionByTika(tempFilePath);
         }
+
+        // 파일명 추출
+
+        String filename = getFilenameWithoutExtFromUrl(url);
+        filename = uniqueFilename
+                ? UUID.randomUUID() + ORIGINAL_FILE_NAME_SEPARATOR + filename
+                : filename;
+
+        String newFilePath = dirPath + "/" + filename + "." + extension;
+
+        mv(tempFilePath, newFilePath);
+
+        return newFilePath;
+    }
 
     public static String getOriginalFileName(String filePath) {
         return Path.of(filePath).getFileName().toString();
@@ -250,4 +266,20 @@ public class FileUploadUtil {
 
         return filePath;
     }
+
+
+    public static boolean isAllowedFileType(String filename, String contentType) {
+
+        String fileExtension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        return ALLOWED_EXTENSION_TYPES.contains(fileExtension) && ALLOWED_MIME_TYPES.contains(contentType);
+    }
+
+    public static Boolean checkFileType(MultipartFile file) throws IOException {
+        Tika tika = new Tika();
+        String detectedType = tika.detect(file.getBytes());
+
+        return ALLOWED_MIME_TYPES.contains(detectedType);
+    }
+
+
 }
