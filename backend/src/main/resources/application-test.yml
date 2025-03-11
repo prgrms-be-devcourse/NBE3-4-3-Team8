@@ -43,11 +43,11 @@ springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
 aladin:
-  ttbkey: ${TTBKEY}
+  ttbkey: ttbpcyscott0129001
 
 custom:
   jwt:
-    secretKey: ${SECRETKEY}
+    secretKey: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"

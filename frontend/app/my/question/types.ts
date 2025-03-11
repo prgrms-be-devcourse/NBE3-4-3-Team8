@@ -6,13 +6,18 @@ export interface PageDto<QuestionDto> {
     items: QuestionDto[]; // 질문 목록 (제네릭)
   }
   
-  export interface QuestionDto {
+  export interface QuestionListDto {
     id: number; // Long → number
     createDate: string; // LocalDateTime → ISO 문자열 형식 사용
-    modifyDate: string;
     title: string; // @NotBlank → 빈 문자열 방지 필요
     content: string; // @NotBlank → 빈 문자열 방지 필요
     isAnswer: boolean;
+  }
+
+  interface CursorPageDto<QuestionDto> {
+    items: QuestionDto[]; // 데이터 목록
+    nextCursor: Date | null; // 다음 페이지를 위한 커서 값
+    prevCursor: Date | null; // 이전 페이지를 위한 커서 값
   }
   
     

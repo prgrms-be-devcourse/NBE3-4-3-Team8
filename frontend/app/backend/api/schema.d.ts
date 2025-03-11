@@ -32,10 +32,10 @@ export interface paths {
         /** 사용자의 특정 qna 질문 조회 */
         get: operations["getQuestion"];
         /** 사용자의 특정 qna 질문 수정 */
-        put: operations["modifyQuesiton"];
+        put: operations["putQuestion"];
         post?: never;
         /** 사용자의 특정 qna 질문 삭제 */
-        delete: operations["removeQuesiton"];
+        delete: operations["deleteQuestion"];
         options?: never;
         head?: never;
         patch?: never;
@@ -140,18 +140,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 사용자가 작성한 qna 질문 목록 조회 */
-        get: operations["getQuesitons"];
+        /** 사용자가 작성한 QnA 질문 목록 조회 (페이지네이션 & 커서 페이징 지원) */
+        get: operations["getQuestions"];
         put?: never;
         /** 사용자가 qna 질문 등록 */
-        post: operations["postQuesiton"];
+        post: operations["postQuestion"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/my/orders/create": {
+    "/my/question/genFile/{questionId}/{typeCode}": {
         parameters: {
             query?: never;
             header?: never;
@@ -159,24 +159,25 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        put?: never;
+        /** 등록 */
+        post: operations["makeNewFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrdersByMember"];
         put?: never;
         post: operations["createOrder"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/my/orders/create/fast": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createFastOrder"];
         delete?: never;
         options?: never;
         head?: never;
@@ -210,6 +211,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["getAnonymousCart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payments/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirmPayment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -271,44 +288,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** 사용자가 작성한 QnA 질문에 대한 답변 조회 */
+        get: operations["getAnswers"];
         put?: never;
         /** 질문에 답변 등록 (관리자 전용) */
         post: operations["postAnswer"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/books/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 도서 검색 */
-        post: operations["searchBooks"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/books/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 도서 등록 */
-        post: operations["registerBook"];
         delete?: never;
         options?: never;
         head?: never;
@@ -333,34 +317,6 @@ export interface paths {
          * @description 상세 주문 ID를 이용해 배송 상태를 변경합니다.
          */
         patch: operations["updateDetailStatus"];
-        trace?: never;
-    };
-    "/admin/books/{bookId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 도서 상세 조회
-         * @description 상품(도서)의 상세 정보를 조회한다.
-         */
-        get: operations["getBookDetail"];
-        put?: never;
-        post?: never;
-        /**
-         * 도서 삭제
-         * @description 특정 도서를 삭제한다.
-         */
-        delete: operations["deleteBook_1"];
-        options?: never;
-        head?: never;
-        /**
-         * 도서 수정
-         * @description 특정 도서 정보를 수정한다.
-         */
-        patch: operations["updateBookPart"];
         trace?: never;
     };
     "/reviews": {
@@ -397,14 +353,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/my/orders": {
+    "/order/success": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrdersByMember"];
+        get: operations["tossPaymentSuccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/order/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["tossPaymentFail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/my/question/genFile/download/{questionId}/{fileNo}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 이미지 전송 */
+        get: operations["loadImage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -429,14 +418,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/my/orders/payment": {
+    "/my/orders/payment-info": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["payment"];
+        get: operations["getPaymentInfo"];
         put?: never;
         post?: never;
         delete?: never;
@@ -503,7 +492,7 @@ export interface paths {
             cookie?: never;
         };
         /** 도서 검색 (제목, 저자, ISBN13, 출판사 검색) */
-        get: operations["searchBooks_1"];
+        get: operations["searchBooks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -520,6 +509,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getUserInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me/my/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 사용자 리뷰 조회 */
+        get: operations["getMemberReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -597,44 +603,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/dashboard/question/{questionId}/answer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 사용자가 작성한 QnA 질문에 대한 답변 조회 */
-        get: operations["getAnswers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/books": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 전체 도서 조회
-         * @description DB 전체 도서를 조회한다.(페이징)
-         */
-        get: operations["getAllBooks_1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/my/orders/{orderId}": {
+    "/my/question/genFile/{questionId}/{fileNo}/{typeCode}": {
         parameters: {
             query?: never;
             header?: never;
@@ -644,7 +613,8 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["deleteOrder"];
+        /** 삭제 */
+        delete: operations["deleteImageFile"];
         options?: never;
         head?: never;
         patch?: never;
@@ -660,7 +630,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["deleteQuestion"];
+        delete: operations["deleteQuestion_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -673,16 +643,34 @@ export interface components {
         ReqQuestionDto: {
             title: string;
             content: string;
+            cleanTitle?: string;
+            cleanContent?: string;
         };
         ReqDeliveryInformationDto: {
+            isDefaultAddress?: boolean;
             /** Format: int64 */
             id?: number;
-            addressName: string;
-            postCode: string;
-            detailAddress: string;
-            recipient: string;
-            phone: string;
-            isDefaultAddress: boolean;
+            addressName?: string;
+            postCode?: string;
+            detailAddress?: string;
+            recipient?: string;
+            phone?: string;
+            defaultAddress?: boolean;
+        };
+        DeliveryInformationDto: {
+            /** Format: int64 */
+            id?: number;
+            addressName?: string;
+            postCode?: string;
+            detailAddress?: string;
+            recipient?: string;
+            phone?: string;
+            isDefaultAddress?: boolean;
+        };
+        ResMemberMyPageDto: {
+            name?: string;
+            phoneNumber?: string;
+            deliveryInformationDtos?: components["schemas"]["DeliveryInformationDto"][];
         };
         CartItemRequestDto: {
             /** Format: int64 */
@@ -690,22 +678,66 @@ export interface components {
             /** Format: int32 */
             quantity?: number;
             isAddToCart?: boolean;
+            addToCart?: boolean;
         };
         CartRequestDto: {
             cartItems: components["schemas"]["CartItemRequestDto"][];
         };
         PutReqMemberMyPageDto: {
-            name: string;
-            phoneNumber: string;
+            name?: string;
+            phoneNumber?: string;
             profileImageUrl?: string;
         };
         ReqAnswerDto: {
-            content: string;
+            content?: string;
         };
         ReviewRequestDto: {
             content?: string;
             /** Format: double */
             rating?: number;
+        };
+        AnswerDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            content?: string;
+        };
+        QuestionDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            title?: string;
+            content?: string;
+            answers?: components["schemas"]["AnswerDto"][];
+            genFiles?: components["schemas"]["QuestionGenFileDto"][];
+            answer?: boolean;
+        };
+        QuestionGenFileDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
+            /** Format: int64 */
+            postId?: number;
+            fileName?: string;
+            typeCode?: string;
+            fileExtTypeCode?: string;
+            fileExtType2Code?: string;
+            /** Format: int64 */
+            fileSize?: number;
+            /** Format: int64 */
+            fileNo?: number;
+            fileExt?: string;
+            fileDateDir?: string;
+            originalFileName?: string;
         };
         OrderRequestDto: {
             postCode?: string;
@@ -713,10 +745,15 @@ export interface components {
             recipient?: string;
             phone?: string;
             paymentMethod?: string;
-        };
-        OrderResponseDto: {
             /** Format: int64 */
-            orderId?: number;
+            bookId?: number;
+            /** Format: int32 */
+            quantity?: number;
+            /** @enum {string} */
+            orderType?: "CART" | "DIRECT";
+            tossOrderId?: string;
+            cartOrder?: boolean;
+            directOrder?: boolean;
         };
         CartResponseDto: {
             /** Format: int64 */
@@ -728,25 +765,15 @@ export interface components {
             price?: number;
             coverImage?: string;
         };
+        PaymentConfirmRequest: {
+            paymentKey?: string;
+            orderId?: string;
+            /** Format: int64 */
+            amount?: number;
+        };
         AdminLoginDto: {
             username?: string;
             password?: string;
-        };
-        AdminBookSearchDto: {
-            title?: string;
-            author?: string;
-            isbn13?: string;
-        };
-        AdminBookSearchListDto: {
-            title?: string;
-            author?: string;
-            publisher?: string;
-            pubDate?: string;
-            categoryName?: string;
-            isbn13?: string;
-        };
-        AdminBookRegisterDto: {
-            isbn13?: string;
         };
         UpdateDetailOrderStatusRequest: {
             /**
@@ -767,61 +794,6 @@ export interface components {
             bookQuantity?: number;
             deliveryStatus?: string;
         };
-        AdminBookUpdateDto: {
-            title?: string;
-            author?: string;
-            isbn?: string;
-            isbn13?: string;
-            publisher?: string;
-            /** Format: date */
-            pubDate?: string;
-            /** Format: int32 */
-            priceStandard?: number;
-            /** Format: int32 */
-            priceSales?: number;
-            /** Format: int64 */
-            salesPoint?: number;
-            /** Format: int32 */
-            stock?: number;
-            /** Format: int32 */
-            status?: number;
-            toc?: string;
-            coverImage?: string;
-            /** Format: int32 */
-            categoryId?: number;
-            description?: string;
-            descriptionImage?: string;
-        };
-        AdminBookDetailDto: {
-            /** Format: int64 */
-            id?: number;
-            title?: string;
-            author?: string;
-            publisher?: string;
-            /** Format: date */
-            pubDate?: string;
-            category?: string;
-            isbn?: string;
-            isbn13?: string;
-            coverImage?: string;
-            toc?: string;
-            description?: string;
-            descriptionImage?: string;
-            /** Format: int32 */
-            priceStandard?: number;
-            /** Format: int32 */
-            pricesSales?: number;
-            /** Format: int32 */
-            stock?: number;
-            /** Format: int32 */
-            status?: number;
-            /** Format: int64 */
-            salesPoint?: number;
-            /** Format: double */
-            rating?: number;
-            /** Format: int64 */
-            reviewCount?: number;
-        };
         PageReviewResponseDto: {
             /** Format: int32 */
             totalPages?: number;
@@ -833,22 +805,22 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         PageableObject: {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             unpaged?: boolean;
         };
         ReviewResponseDto: {
@@ -868,8 +840,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
         };
         Pageable: {
             /** Format: int32 */
@@ -886,6 +858,10 @@ export interface components {
             totalPrice?: number;
             /** Format: date-time */
             createDate?: string;
+            coverImage?: string;
+            title?: string;
+            /** Format: int64 */
+            id?: number;
         };
         PageOrderDTO: {
             /** Format: int32 */
@@ -898,22 +874,26 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         DetailOrderDto: {
             /** Format: int64 */
             orderId?: number;
-            /** Format: int64 */
-            bookId?: number;
+            bookTitle?: string;
             /** Format: int32 */
             bookQuantity?: number;
-            /** @enum {string} */
-            deliveryStatus?: "PENDING" | "SHIPPING" | "DELIVERED" | "RETURNED";
+            /** Format: double */
+            totalPrice?: number;
+            deliveryStatus?: string;
+            coverImage?: string;
+            recipient?: string;
+            phone?: string;
+            fullAddress?: string;
         };
         PaymentResponseDto: {
             cartList?: components["schemas"]["CartResponseDto"][];
@@ -921,6 +901,7 @@ export interface components {
             priceStandard?: number;
             /** Format: int64 */
             pricesSales?: number;
+            orderId?: string;
         };
         BookResponseDto: {
             /** Format: int64 */
@@ -966,12 +947,37 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
+        };
+        PageDtoReviewsResponseDto: {
+            /** Format: int32 */
+            currentPageNumber: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int64 */
+            totalPages: number;
+            /** Format: int64 */
+            totalItems: number;
+            items: components["schemas"]["ReviewsResponseDto"][];
+        };
+        ReviewsResponseDto: {
+            /** Format: int64 */
+            bookId?: number;
+            bookTitle?: string;
+            bookContent?: string;
+            /** Format: int64 */
+            reviewId?: number;
+            /** Format: double */
+            rating?: number;
+            /** Format: date-time */
+            createDate?: string;
+            /** Format: date-time */
+            modifyDate?: string;
         };
         AdminOrderDTO: {
             /** Format: int64 */
@@ -994,11 +1000,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         PageAdminDetailOrderDTO: {
@@ -1012,11 +1018,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
             empty?: boolean;
         };
         AdminQuestionDto: {
@@ -1029,15 +1035,6 @@ export interface components {
             hasAnswer?: boolean;
             answer?: components["schemas"]["AnswerDto"];
         };
-        AnswerDto: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: date-time */
-            createDate?: string;
-            /** Format: date-time */
-            modifyDate?: string;
-            content: string;
-        };
         PageDtoAdminQuestionDto: {
             /** Format: int32 */
             currentPageNumber: number;
@@ -1049,43 +1046,8 @@ export interface components {
             totalItems: number;
             items: components["schemas"]["AdminQuestionDto"][];
         };
-        GetResAnswersDto: Record<string, never>;
-        AdminBookListDto: {
-            /** Format: int64 */
-            id?: number;
-            title?: string;
-            author?: string;
-            publisher?: string;
-            /** Format: date */
-            pubDate?: string;
-            categoryName?: string;
-            coverImage?: string;
-            /** Format: int32 */
-            priceStandard?: number;
-            /** Format: int32 */
-            pricesSales?: number;
-            /** Format: int32 */
-            stock?: number;
-            /** Format: int32 */
-            status?: number;
-        };
-        PageAdminBookListDto: {
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["AdminBookListDto"][];
-            /** Format: int32 */
-            number?: number;
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            empty?: boolean;
+        GetResAnswersDto: {
+            answers?: components["schemas"]["AnswerDto"][];
         };
     };
     responses: never;
@@ -1116,7 +1078,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };
@@ -1138,7 +1100,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };
@@ -1160,12 +1122,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["QuestionDto"];
                 };
             };
         };
     };
-    modifyQuesiton: {
+    putQuestion: {
         parameters: {
             query?: never;
             header?: never;
@@ -1185,13 +1147,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
+                content?: never;
             };
         };
     };
-    removeQuesiton: {
+    deleteQuestion: {
         parameters: {
             query?: never;
             header?: never;
@@ -1207,9 +1167,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
-                };
+                content?: never;
             };
         };
     };
@@ -1234,7 +1192,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1256,7 +1214,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1362,7 +1320,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1386,7 +1344,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1484,10 +1442,12 @@ export interface operations {
             };
         };
     };
-    getQuesitons: {
+    getQuestions: {
         parameters: {
             query?: {
                 page?: number;
+                before?: string;
+                after?: string;
             };
             header?: never;
             path?: never;
@@ -1506,7 +1466,7 @@ export interface operations {
             };
         };
     };
-    postQuesiton: {
+    postQuestion: {
         parameters: {
             query?: never;
             header?: never;
@@ -1525,7 +1485,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["QuestionDto"];
+                };
+            };
+        };
+    };
+    makeNewFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                typeCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": string;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getOrdersByMember: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["PageOrderDTO"];
                 };
             };
         };
@@ -1549,34 +1556,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["OrderResponseDto"];
-                };
-            };
-        };
-    };
-    createFastOrder: {
-        parameters: {
-            query: {
-                bookId: number;
-                quantity: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["OrderRequestDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["OrderResponseDto"];
+                    "application/json;charset=UTF-8": Record<string, never>;
                 };
             };
         };
@@ -1600,7 +1580,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": Record<string, never>;
+                    "application/json;charset=UTF-8": components["schemas"]["ResMemberMyPageDto"];
                 };
             };
         };
@@ -1625,6 +1605,30 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["CartResponseDto"][];
+                };
+            };
+        };
+    };
+    confirmPayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
                 };
             };
         };
@@ -1695,6 +1699,28 @@ export interface operations {
             };
         };
     };
+    getAnswers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["GetResAnswersDto"];
+                };
+            };
+        };
+    };
     postAnswer: {
         parameters: {
             query?: never;
@@ -1716,54 +1742,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    searchBooks: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdminBookSearchDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["AdminBookSearchListDto"][];
-                };
-            };
-        };
-    };
-    registerBook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdminBookRegisterDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": string;
-                };
             };
         };
     };
@@ -1789,76 +1767,6 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["AdminDetailOrderDTO"];
-                };
-            };
-        };
-    };
-    getBookDetail: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                bookId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["AdminBookDetailDto"];
-                };
-            };
-        };
-    };
-    deleteBook_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                bookId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": string;
-                };
-            };
-        };
-    };
-    updateBookPart: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                bookId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdminBookUpdateDto"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["AdminBookDetailDto"];
                 };
             };
         };
@@ -1913,10 +1821,12 @@ export interface operations {
             };
         };
     };
-    getOrdersByMember: {
+    tossPaymentSuccess: {
         parameters: {
             query: {
-                pageable: components["schemas"]["Pageable"];
+                paymentKey: string;
+                orderId: string;
+                amount: number;
             };
             header?: never;
             path?: never;
@@ -1930,7 +1840,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["PageOrderDTO"];
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    tossPaymentFail: {
+        parameters: {
+            query: {
+                code: string;
+                message: string;
+                orderId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    loadImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: number;
+                fileNo: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };
@@ -1957,9 +1914,13 @@ export interface operations {
             };
         };
     };
-    payment: {
+    getPaymentInfo: {
         parameters: {
-            query?: never;
+            query: {
+                orderType: "CART" | "DIRECT";
+                bookId?: number;
+                quantity?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2043,7 +2004,7 @@ export interface operations {
             };
         };
     };
-    searchBooks_1: {
+    searchBooks: {
         parameters: {
             query: {
                 page?: number;
@@ -2085,6 +2046,28 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": Record<string, never>;
+                };
+            };
+        };
+    };
+    getMemberReviews: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["PageDtoReviewsResponseDto"];
                 };
             };
         };
@@ -2185,12 +2168,14 @@ export interface operations {
             };
         };
     };
-    getAnswers: {
+    deleteImageFile: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 questionId: number;
+                fileNo: number;
+                typeCode: string;
             };
             cookie?: never;
         };
@@ -2201,61 +2186,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["GetResAnswersDto"];
-                };
+                content?: never;
             };
         };
     };
-    getAllBooks_1: {
-        parameters: {
-            query?: {
-                page?: number;
-                pageSize?: number;
-                bookSortType?: "PUBLISHED_DATE" | "SALES_POINT" | "RATING" | "REVIEW_COUNT";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["PageAdminBookListDto"];
-                };
-            };
-        };
-    };
-    deleteOrder: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: number;
-            };
-            cookie?: {
-                accessToken?: string;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": string;
-                };
-            };
-        };
-    };
-    deleteQuestion: {
+    deleteQuestion_1: {
         parameters: {
             query?: never;
             header?: never;
