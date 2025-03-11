@@ -6,15 +6,19 @@ spring:
     multipart:
       max-request-size: 10MB
       max-file-size : 10MB
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   profiles:
     active: dev
     include: secret
 
   datasource:
-    url: jdbc:mysql://localhost:3306/the_book
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://localhost:3308/the_book
+    username: root
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -54,26 +58,16 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,caches
 
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
 aladin:
-  ttbkey: ${TTBKEY}
+  ttbkey: ttbpcyscott0129001
 
 custom:
   jwt:
-    secretKey: ${SECRETKEY}
+    secretKey: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
@@ -92,8 +86,3 @@ custom:
   genFile:
     dirPath: c:/temp/glog_dev
 
-payment:
-  toss:
-    secret-key: ${PAYMENT_KEY}
-    base-url: https://api.tosspayments.com/v1/payments
-    confirm-url: https://api.tosspayments.com/v1/payments/confirm

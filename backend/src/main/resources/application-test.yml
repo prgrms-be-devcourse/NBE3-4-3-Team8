@@ -7,6 +7,12 @@ spring:
       driver-class-name: org.h2.Driver
       username: sa
       password:
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   h2:
     console:
       enabled: true  # ✅ H2 콘솔 활성화 (http://localhost:8080/h2-console)
@@ -43,11 +49,11 @@ springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
 aladin:
-  ttbkey: ${TTBKEY}
+  ttbkey: ttbpcyscott0129001
 
 custom:
   jwt:
-    secretKey: ${SECRETKEY}
+    secretKey: w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq
   dev:
     cookieDomain: localhost
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
@@ -63,3 +69,9 @@ custom:
     name: Book
   accessToken:
     expirationSeconds: "#{60 * 20}"
+payment:
+  toss:
+    secret-key: "test_sk_dummy_value_for_testing"
+    client-key: "test_ck_dummy_value_for_testing"
+    success-url: "http://localhost:8080/payment/success"
+    fail-url: "http://localhost:8080/payment/fail"
