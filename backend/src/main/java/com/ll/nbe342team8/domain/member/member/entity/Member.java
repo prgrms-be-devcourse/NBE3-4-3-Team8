@@ -75,6 +75,7 @@ public class Member extends BaseTime implements UserDetails {
  	public void updateMemberInfo(PutReqMemberMyPageDto dto) {
 		this.name = dto.getName();
 		this.phoneNumber = dto.getPhoneNumber();
+		this.profileImageUrl = dto.getProfileImageUrl();
 	}
 
 	public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
@@ -127,13 +128,14 @@ public class Member extends BaseTime implements UserDetails {
 		return true;
 	}
 
-	private Member(String oAuthId, String email, String name, String phoneNumber, MemberType memberType, String password) {
+	private Member(String oAuthId, String email, String name, String phoneNumber, MemberType memberType, String password, String profileImageUrl) {
 		this.oAuthId = oAuthId;
 		this.email = email;
 		this.name = name;
 		this.phoneNumber = phoneNumber;
 		this.memberType = memberType;
 		this.password = password;
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	public static Member of(String oAuthId, String email, PutReqMemberMyPageDto dto) {
@@ -143,7 +145,8 @@ public class Member extends BaseTime implements UserDetails {
 				dto.getName(),
 				dto.getPhoneNumber() != null ? dto.getPhoneNumber() : "", // 전화번호가 없으면 빈 문자열 저장
 				MemberType.USER,
-				""
+				"",
+				dto.getProfileImageUrl()
 		);
 	}
 

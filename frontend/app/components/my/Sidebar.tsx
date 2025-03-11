@@ -11,7 +11,7 @@ const Sidebar = () => {
     <aside className="w-64 p-4 bg-gray-100 min-h-screen">
       <div className="flex flex-col items-center mb-6">
         <Image
-          src={user?.profileImage || '/images/default-profile.png'}
+          src={user?.profileImageUrl || '/images/default-profile.png'}
           alt="User Profile"
           width={80}
           height={80}
