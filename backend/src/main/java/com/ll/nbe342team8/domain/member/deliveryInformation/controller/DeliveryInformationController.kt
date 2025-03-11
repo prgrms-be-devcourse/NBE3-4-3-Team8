@@ -83,7 +83,7 @@ class DeliveryInformationController(
     @PutMapping("/my/deliveryInformation/{id}")
     fun putDeliveryInformation(
         @PathVariable id: Long,
-        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto,
+        @RequestBody @Valid reqDeliveryInformationDto: ReqDeliveryInformationDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
         val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
@@ -104,4 +104,11 @@ class DeliveryInformationController(
 
         return ResponseEntity.ok(resMemberMyPageDto)
     }
+
+
+
+
+
+
+
 }

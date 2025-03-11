@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.qna.question.service
 
 import com.ll.nbe342team8.domain.member.member.entity.Member
+import com.ll.nbe342team8.domain.qna.question.dto.CursorPageDto
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDto
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDtoProjection
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto
@@ -17,7 +18,9 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 @RequiredArgsConstructor
@@ -43,7 +46,38 @@ class QuestionService(
         return PageDto(pagingOrderDto)
     }
 
+    fun getCursorPage(member: Member, before: LocalDateTime?, after: LocalDateTime?,size:Int): CursorPageDto<QuestionListDto> {
+        val questions: List<Question>
+        val nextCursor: LocalDateTime?
+        val prevCursor: LocalDateTime?
 
+        when {
+            before != null -> { // 이전 페이지 (더 오래된 데이터)
+                questions = questionRepository.findByMemberAndCreatedAtBefore(member, before, size)
+                nextCursor = questions.minByOrNull { it.createDate }?.createDate
+                prevCursor = questions.maxByOrNull { it.createDate }?.createDate
+            }
+
+            after != null -> { // 이후 페이지 (더 최신 데이터)
+                questions = questionRepository.findByMemberAndCreatedAtAfter(member, after, size)
+                nextCursor = questions.minByOrNull { it.createDate }?.createDate
+                prevCursor = questions.maxByOrNull { it.createDate }?.createDate
+            }
+
+            else -> { // 기본적으로 최신 데이터 조회
+                questions = questionRepository.findLatestByMember(member, size)
+                nextCursor = questions.minByOrNull { it.createDate }?.createDate
+                prevCursor = questions.maxByOrNull { it.createDate }?.createDate
+            }
+        }
+
+        // DTO 변환 및 반환
+        return CursorPageDto(
+            items = questions.map { QuestionListDto(it) },
+            nextCursor = nextCursor,
+            prevCursor = prevCursor
+        )
+    }
 
 
 

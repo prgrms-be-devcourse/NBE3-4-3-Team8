@@ -15,6 +15,9 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 
@@ -171,5 +174,15 @@ public class Ut {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
             return simpleDateFormat.format(new Date());
         }
+
+        public static Instant toInstant(LocalDateTime localDateTime, ZoneId zoneId) {
+            return localDateTime.atZone(zoneId).toInstant();
+        }
+
+        // 기본 시간대를 사용하는 오버로드 메서드
+        public static Instant toInstant(LocalDateTime localDateTime) {
+            return toInstant(localDateTime, ZoneId.systemDefault());
+        }
+
     }
 }

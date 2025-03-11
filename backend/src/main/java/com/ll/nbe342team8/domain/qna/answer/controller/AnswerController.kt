@@ -93,7 +93,7 @@ class AnswerController (
     fun modifyAnswer(
         @PathVariable questionId: Long,
         @PathVariable answerId: Long,
-        @RequestBody @Valid reqAnswerDto: ReqAnswerDto,
+        @Valid @RequestBody  reqAnswerDto: ReqAnswerDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Void> {
         val admin: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }

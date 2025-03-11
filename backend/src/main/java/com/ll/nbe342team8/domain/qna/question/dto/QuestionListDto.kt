@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 data class QuestionListDto(
     val id: Long,
     val createDate: LocalDateTime,
-    val modifyDate: LocalDateTime,
     val title: String,
     val content: String,
     val isAnswer: Boolean
@@ -18,7 +17,6 @@ data class QuestionListDto(
     constructor(question: Question) : this(
         question.id,
         question.createDate,
-        question.modifyDate,
         question.title,
         question.content,
         question.isAnswer
@@ -27,7 +25,6 @@ data class QuestionListDto(
     constructor(questionListDtoProjection: QuestionListDtoProjection) : this(
         questionListDtoProjection.getId(),
         questionListDtoProjection.getCreateDate(),
-        questionListDtoProjection.getModifyDate(),
         questionListDtoProjection.getTitle(),
         questionListDtoProjection.getContent(),
         questionListDtoProjection.getIsAnswer()

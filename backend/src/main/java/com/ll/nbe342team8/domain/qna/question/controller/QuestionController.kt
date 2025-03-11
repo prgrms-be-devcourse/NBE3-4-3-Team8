@@ -3,6 +3,7 @@ package com.ll.nbe342team8.domain.qna.question.controller
 import com.ll.nbe342team8.domain.member.member.entity.Member
 import com.ll.nbe342team8.domain.member.member.service.MemberService
 import com.ll.nbe342team8.domain.oauth.SecurityUser
+import com.ll.nbe342team8.domain.qna.question.dto.CursorPageDto
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionDto
 import com.ll.nbe342team8.domain.qna.question.dto.QuestionListDto
 import com.ll.nbe342team8.domain.qna.question.dto.ReqQuestionDto
@@ -20,6 +21,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 
 
 @Tag(name = "QuestionController", description = " qna 질문 컨트롤러")
@@ -30,7 +33,7 @@ class QuestionController(
     private val questionService: QuestionService
 )  {
 
-
+    /*
     //20 ~30ms 데이터 100개 이하일때
     // 30 ~ 50ms 데이터 10000개 일때
     @Operation(summary = "사용자가 작성한 qna 질문 목록 조회")
@@ -43,6 +46,33 @@ class QuestionController(
         val pageDto = questionService.getPage(member, page)
         return ResponseEntity.ok(pageDto)
     }
+    */
+
+    @Operation(summary = "사용자가 작성한 QnA 질문 목록 조회 (페이지네이션 & 커서 페이징 지원)")
+    @GetMapping("/my/question")
+    fun getQuestions(
+        @RequestParam(name = "page", required = false) page: Int?,
+        @RequestParam(name = "before", required = false) before: LocalDateTime?,
+        @RequestParam(name = "after", required = false) after: LocalDateTime?,
+        @AuthenticationPrincipal securityUser: SecurityUser?
+    ): ResponseEntity<Any> {
+
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
+            ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
+
+        return if (page != null) {
+            // 일반 페이지네이션 방식
+            val pageDto = questionService.getPage(member, page)
+            ResponseEntity.ok(pageDto)
+        } else {
+            // 커서 페이징 방식
+            val cursorPageDto = questionService.getCursorPage(member, before, after, 10)
+            ResponseEntity.ok(cursorPageDto)
+        }
+    }
+
+
+
 
 
     @Operation(summary = "사용자의 특정 qna 질문 조회")
@@ -64,7 +94,7 @@ class QuestionController(
     @Operation(summary = "사용자가 qna 질문 등록")
     @PostMapping("/my/question")
     fun postQuestion(
-        @RequestBody reqQuestionDto: @Valid ReqQuestionDto,@AuthenticationPrincipal securityUser :SecurityUser?
+        @Valid @RequestBody reqQuestionDto: ReqQuestionDto,@AuthenticationPrincipal securityUser :SecurityUser?
     ): ResponseEntity<QuestionDto> {
         val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
@@ -81,7 +111,7 @@ class QuestionController(
     @PutMapping("/my/question/{id}")
     fun putQuestion(
         @PathVariable id: Long,
-        @RequestBody reqQuestionDto: @Valid ReqQuestionDto, @AuthenticationPrincipal securityUser :SecurityUser?
+        @Valid @RequestBody reqQuestionDto: ReqQuestionDto, @AuthenticationPrincipal securityUser :SecurityUser?
     ): ResponseEntity<Void> {
         val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")

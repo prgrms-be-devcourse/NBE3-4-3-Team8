@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
@@ -41,6 +42,29 @@ interface QuestionRepository : JpaRepository<Question, Long> {
 
     @Query("SELECT q FROM Question q JOIN FETCH q.member WHERE q.id = :id")
     fun findByIdWithMember(@Param("id") id: Long): Optional<Question>
+
+    // 이전 페이지 (더 오래된 질문 목록 조회)
+    @Query("SELECT q FROM Question q WHERE q.member = :member AND q.createDate < :before ORDER BY q.createDate DESC")
+    fun findByMemberAndCreatedAtBefore(
+        @Param("member") member: Member,
+        @Param("before") before: LocalDateTime,
+        @Param("size") size: Int
+    ): List<Question>
+
+    // 이후 페이지 (더 최신 질문 목록 조회)
+    @Query("SELECT q FROM Question q WHERE q.member = :member AND q.createDate > :after ORDER BY q.createDate ASC")
+    fun findByMemberAndCreatedAtAfter(
+        @Param("member") member: Member,
+        @Param("after") after: LocalDateTime,
+        @Param("size") size: Int
+    ): List<Question>
+
+    // 최신 데이터 조회 (초기 페이지)
+    @Query("SELECT q FROM Question q WHERE q.member = :member ORDER BY q.createDate DESC")
+    fun findLatestByMember(
+        @Param("member") member: Member,
+        @Param("size") size: Int
+    ): List<Question>
 
 
 

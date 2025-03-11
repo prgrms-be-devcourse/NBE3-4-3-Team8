@@ -11,15 +11,11 @@ import com.ll.nbe342team8.domain.order.detailOrder.entity.DeliveryStatus;
 import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
 import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
 import com.ll.nbe342team8.domain.order.order.dto.OrderCacheDto;
-import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
 import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto;
 import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
-import com.ll.nbe342team8.domain.order.order.entity.Order.OrderStatus;
 import com.ll.nbe342team8.domain.order.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderPayService {
     private final OrderRepository orderRepository;
     private final DetailOrderRepository detailOrderRepository;
     private final CartService cartService;
@@ -40,33 +36,6 @@ public class OrderService {
     private final MemberService memberService;
     private final OrderCacheService orderCacheService;
     private final Random random = new Random();
-
-    @Transactional(readOnly = true)
-    public Page<OrderDTO> getOrdersByMember(Member member, Pageable pageable) {
-        Page<Order> ordersPage = orderRepository.findByMember(member, pageable);
-        if (ordersPage.isEmpty()) {
-            throw new IllegalArgumentException("주문이 존재하지 않습니다.");
-        }
-
-        return ordersPage.map(order -> new OrderDTO(
-                order.getId(),
-                order.getOrderStatus().name(),
-                order.getTotalPrice(),
-                order.getCreateDate()));
-    }
-
-    @Transactional
-    public void deleteOrder(Long orderId, Member member) {
-        Order order = orderRepository.findByIdAndMember(orderId, member)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않거나 권한이 없습니다."));
-
-        if (order.getOrderStatus() != OrderStatus.COMPLETE) {
-            throw new IllegalStateException("주문이 완료되지 않아 삭제할 수 없습니다.");
-        }
-
-        detailOrderRepository.deleteByOrderId(orderId);
-        orderRepository.delete(order);
-    }
 
     /**
      * 통합된 주문 처리 메서드 - Redis 캐시 사용
@@ -154,9 +123,9 @@ public class OrderService {
         Member member = memberService.getMemberById(orderCacheDto.getMemberId());
 
         // Order 엔티티 생성 및 저장
-        Order order = Order.builder()
+        Order order = new Order.Builder()
                 .member(member)
-                .orderStatus(OrderStatus.ORDERED)
+                .orderStatus(Order.OrderStatus.ORDERED)
                 .fullAddress(orderCacheDto.getFullAddress())
                 .postCode(orderCacheDto.getPostCode())
                 .phone(orderCacheDto.getPhone())
@@ -172,10 +141,11 @@ public class OrderService {
         List<DetailOrder> detailOrders = new ArrayList<>();
         for (OrderCacheDto.DetailOrderCacheDto detailDto : orderCacheDto.getDetailOrders()) {
             Book book = bookService.getBookById(detailDto.getBookId());
-            DetailOrder detailOrder = DetailOrder.builder()
+            DetailOrder detailOrder = new DetailOrder.Builder()
                     .order(order)
                     .deliveryStatus(DeliveryStatus.PENDING)
                     .book(book)
+                    .member(member)
                     .bookQuantity(detailDto.getQuantity())
                     .build();
             detailOrders.add(detailOrder);
@@ -195,9 +165,9 @@ public class OrderService {
     }
 
     private Order buildOrder(Member member, OrderRequestDto dto, Long totalPrice) {
-        return Order.builder()
+        return new Order.Builder()
                 .member(member)
-                .orderStatus(OrderStatus.ORDERED)
+                .orderStatus(Order.OrderStatus.ORDERED)
                 .fullAddress(dto.fullAddress())
                 .postCode(dto.postCode())
                 .phone(dto.phone())
@@ -209,7 +179,7 @@ public class OrderService {
     }
 
     private DetailOrder buildDetailOrder(Order order, Book book, int quantity) {
-        return DetailOrder.builder()
+        return new DetailOrder.Builder()
                 .order(order)
                 .deliveryStatus(DeliveryStatus.PENDING)
                 .book(book)
