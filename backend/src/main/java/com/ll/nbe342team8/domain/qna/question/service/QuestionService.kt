@@ -9,6 +9,8 @@ import com.ll.nbe342team8.domain.qna.question.entity.Question
 import com.ll.nbe342team8.domain.qna.question.repository.QuestionRepository
 import com.ll.nbe342team8.global.exceptions.ServiceException
 import com.ll.nbe342team8.standard.PageDto.PageDto
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import org.springframework.transaction.annotation.Transactional
 import lombok.RequiredArgsConstructor
 import org.springframework.data.domain.Page
@@ -28,6 +30,8 @@ import java.util.*
 class QuestionService(
     private val questionRepository: QuestionRepository
 ) {
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
 
     @Transactional
     fun createQuestion(member: Member, dto: ReqQuestionDto): Question {
@@ -38,14 +42,15 @@ class QuestionService(
 
 
     @Transactional(readOnly = true)
-    fun getPage(member: Member, page: Int): PageDto<QuestionListDto> {
-        val pageable = PageRequest.of(page, 10, Sort.by("createDate").descending())
+    fun getPage(member: Member, page: Int, size: Int): PageDto<QuestionListDto> {
+        val pageable = PageRequest.of(page, size, Sort.by("createDate").descending())
         val paging: Page<QuestionListDtoProjection> = questionRepository.findByMember(pageable, member)
 
         val pagingOrderDto: Page<QuestionListDto> = paging.map { QuestionListDto(it) }
         return PageDto(pagingOrderDto)
     }
 
+    @Transactional(readOnly = true)
     fun getCursorPage(member: Member, before: LocalDateTime?, after: LocalDateTime?,size:Int): CursorPageDto<QuestionListDto> {
         val questions: List<Question>
         val nextCursor: LocalDateTime?
@@ -53,13 +58,23 @@ class QuestionService(
 
         when {
             before != null -> { // 이전 페이지 (더 오래된 데이터)
-                questions = questionRepository.findByMemberAndCreatedAtBefore(member, before, size)
+                //questions = questionRepository.findByMemberAndCreateDateBefore(member, before, size)
+                val query = entityManager.createQuery("SELECT q FROM Question q WHERE q.member = :member AND q.createDate < :before ORDER BY q.createDate DESC", Question::class.java)
+                query.setParameter("member", member)
+                query.setParameter("before", before)
+                query.maxResults = 10  // 10개의 항목만 가져옴
+                questions = query.resultList
                 nextCursor = questions.minByOrNull { it.createDate }?.createDate
                 prevCursor = questions.maxByOrNull { it.createDate }?.createDate
             }
 
             after != null -> { // 이후 페이지 (더 최신 데이터)
-                questions = questionRepository.findByMemberAndCreatedAtAfter(member, after, size)
+                //questions = questionRepository.findByMemberAndCreateDateAfter(member, after, size)
+                val query = entityManager.createQuery("SELECT q FROM Question q WHERE q.member = :member AND q.createDate > :after ORDER BY q.createDate ASC", Question::class.java)
+                query.setParameter("member", member)
+                query.setParameter("after", after)
+                query.maxResults = 10  // 10개의 항목만 가져옴
+                questions = query.resultList
                 nextCursor = questions.minByOrNull { it.createDate }?.createDate
                 prevCursor = questions.maxByOrNull { it.createDate }?.createDate
             }

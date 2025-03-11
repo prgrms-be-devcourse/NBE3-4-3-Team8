@@ -14,7 +14,7 @@ export default function Home() {
         title: "",
         content: "",
       });
-      const MAX_FILES = 510;
+      const MAX_FILES = 5;
     
       const [loading, setLoading] = useState(false); // 요청 중 상태
       const [message, setMessage] = useState<string | null>(null); // 성공/실패 메시지

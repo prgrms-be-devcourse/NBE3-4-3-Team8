@@ -45,25 +45,25 @@ interface QuestionRepository : JpaRepository<Question, Long> {
 
     // 이전 페이지 (더 오래된 질문 목록 조회)
     @Query("SELECT q FROM Question q WHERE q.member = :member AND q.createDate < :before ORDER BY q.createDate DESC")
-    fun findByMemberAndCreatedAtBefore(
+    fun findByMemberAndCreateDateBefore(
         @Param("member") member: Member,
         @Param("before") before: LocalDateTime,
-        @Param("size") size: Int
+        @Param("size") size: Int = 10
     ): List<Question>
 
     // 이후 페이지 (더 최신 질문 목록 조회)
     @Query("SELECT q FROM Question q WHERE q.member = :member AND q.createDate > :after ORDER BY q.createDate ASC")
-    fun findByMemberAndCreatedAtAfter(
+    fun findByMemberAndCreateDateAfter(
         @Param("member") member: Member,
         @Param("after") after: LocalDateTime,
-        @Param("size") size: Int
+        @Param("size") size: Int = 10
     ): List<Question>
 
     // 최신 데이터 조회 (초기 페이지)
     @Query("SELECT q FROM Question q WHERE q.member = :member ORDER BY q.createDate DESC")
     fun findLatestByMember(
         @Param("member") member: Member,
-        @Param("size") size: Int
+        @Param("size") size: Int = 10
     ): List<Question>
 
 

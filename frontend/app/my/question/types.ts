@@ -14,10 +14,10 @@ export interface PageDto<QuestionDto> {
     isAnswer: boolean;
   }
 
-  interface CursorPageDto<QuestionDto> {
+  export interface CursorPageDto<QuestionDto> {
     items: QuestionDto[]; // 데이터 목록
-    nextCursor: Date | null; // 다음 페이지를 위한 커서 값
-    prevCursor: Date | null; // 이전 페이지를 위한 커서 값
+    nextCursor: string | null; // 다음 페이지를 위한 커서 값
+    prevCursor: string | null; // 이전 페이지를 위한 커서 값
   }
   
     

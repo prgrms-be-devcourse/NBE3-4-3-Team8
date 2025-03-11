@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import lombok.RequiredArgsConstructor
+import org.hibernate.validator.constraints.Range
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -54,6 +55,7 @@ class QuestionController(
         @RequestParam(name = "page", required = false) page: Int?,
         @RequestParam(name = "before", required = false) before: LocalDateTime?,
         @RequestParam(name = "after", required = false) after: LocalDateTime?,
+        @RequestParam(defaultValue = "10") pageSize: @Range(min = 0, max = 100) Int,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<Any> {
 
@@ -62,11 +64,11 @@ class QuestionController(
 
         return if (page != null) {
             // 일반 페이지네이션 방식
-            val pageDto = questionService.getPage(member, page)
+            val pageDto = questionService.getPage(member, page,pageSize)
             ResponseEntity.ok(pageDto)
         } else {
             // 커서 페이징 방식
-            val cursorPageDto = questionService.getCursorPage(member, before, after, 10)
+            val cursorPageDto = questionService.getCursorPage(member, before, after, pageSize)
             ResponseEntity.ok(cursorPageDto)
         }
     }

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { GetMyPage } from "./api"; // API 함수 가져오기
-import { PageDto, QuestionListDto } from "./types";
+import { GetMyPage, GetMyPageCursor } from "./api"; // API 함수 가져오기
+import { PageDto, QuestionListDto, CursorPageDto } from "./types";
 import Sidebar from '@/app/components/my/Sidebar';
 import { useRouter } from 'next/navigation';
 
@@ -9,43 +9,35 @@ export default function Home() {
     const router = useRouter();
     const [pageData, setPageData] = useState<PageDto<QuestionListDto> | null>(null);
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
+
+    const [lastCursor, setLastCursor] = useState<string | null>(null);
+    const [FirstCursor, setFirstCursor] = useState<string | null>(null);
+    const [questions, setQuestions] = useState<QuestionListDto[]>([]);
+
+    const [isCursorPaging, setIsCursorPaging] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const pageSize = 5; // 한 번에 보여줄 페이지 개수
+    const pageSize = 10; // 한 번에 보여줄 페이지 개수
 
     useEffect(() => {
-      async function fetchData() {
-        setLoading(true);
-        setError(null);
-  
-        try {
-          const response = await GetMyPage(0);
-          if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
-  
-          const data: PageDto<QuestionListDto> = await response.json();
-          setPageData(data);
-        } catch (error) {
-          setError(error instanceof Error ? error.message : "알 수 없는 오류 발생");
-        } finally {
-          setLoading(false);
-        }
-      }
-  
-      fetchData();
+        fetchPageData(1);
     }, []);
 
-    // 🔹 페이지 데이터 가져오기
     const fetchPageData = async (page: number) => {
         setLoading(true);
         setError(null);
+        if(page >=100) {
+            alert("페이징 불가능!")
+            return
+        }
         try {
-            const response = await GetMyPage(page - 1); // 0부터 시작하는 페이지네이션
+            const adjustedPageSize = page === 97 ? 30 : page === 98 ? 20 : 10;
+            const response = await GetMyPage(page - 1, adjustedPageSize);
             if (!response.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
             const data: PageDto<QuestionListDto> = await response.json();
-            console.log("페이징 데이터")
-            console.log(data)
-            setPageData(data);
+            setPageData({ ...data, items: data.items.slice(0, 10) });
             setCurrentPage(page);
+            setLastCursor(data.items[data.items.length - 1]?.createDate || null);
         } catch (error) {
             setError(error instanceof Error ? error.message : "알 수 없는 오류 발생");
         } finally {
@@ -53,13 +45,40 @@ export default function Home() {
         }
     };
 
-    // ✅ 페이지네이션 버튼 렌더링
-    const renderPaginationButtons = () => {
+    async function fetchCursorPage({ before, after }: { before?: string; after?: string }) {
+        console.log("cursorfETCH")
+        console.log("after: "+after)
+        console.log("before: " + before)
+        try {
+            const response = await GetMyPageCursor({ before, after, pageSize: 10 });
+        const data: CursorPageDto<QuestionListDto> = await response.json();
+        console.log("resData")
+        console.log(data)
+        setQuestions(data.items);
+        setLastCursor(data.nextCursor);  // 다음 페이지(오래된 데이터)
+        setFirstCursor(data.prevCursor);
+
+        // pageData를 완전히 새로 설정
+        setPageData({
+            items: data.items,  // 기존 items는 제거하고 새로 받은 items로 갱신
+            currentPageNumber: 1,  // 커서 기반 페이지네이션에서는 1페이지로 시작
+            pageSize: 10,  // pageSize는 항상 10으로 고정
+            totalPages: Math.ceil(data.items.length / 10),  // totalPages 계산
+            totalItems: data.items.length,  // 전체 항목 수를 data.items.length로 설정
+        });
+        } catch (error) {
+            console.error("Error fetching cursor page:", error);
+        }
+    }
+    
+
+    const cursorPaginationButtons=() => {
+        
         if (!pageData) return null;
 
         const totalPages = pageData.totalPages;
-        if (totalPages <= 1) return null;
 
+        // 페이지 번호 계산
         const startPage = Math.floor((currentPage - 1) / pageSize) * pageSize + 1;
         const endPage = Math.min(startPage + pageSize - 1, totalPages);
 
@@ -72,47 +91,87 @@ export default function Home() {
                     className={`px-3 py-1 rounded-md transition ${currentPage === i ? "bg-blue-500 text-white font-bold" : "bg-gray-200 text-gray-700"}`}
                 >
                     {i}
-                </button>
+             </button>
             );
         }
 
-        return (
-            <div className="flex justify-center mt-6 gap-2">
-                <button
-                    disabled={currentPage === 1}
-                    onClick={() => fetchPageData(1)}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
-                >
-                    처음
-                </button>
-                <button
-                    disabled={currentPage === 1}
-                    onClick={() => fetchPageData(Math.max(1, currentPage - pageSize))}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
-                >
-                    이전
-                </button>
+        return(
+        <div className="flex justify-center mt-6 gap-2">
+             {currentPage < 100 && !isCursorPaging ? (
+                <>
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => fetchPageData(1)}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                    >
+                        처음
+                    </button>
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => fetchPageData(Math.max(1, currentPage - pageSize))}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                    >
+                        이전
+                    </button>
 
-                {pageNumbers}
+                    {pageNumbers}
 
+                    <button
+                        disabled={currentPage + pageSize > totalPages}
+                        onClick={() => fetchPageData(Math.min(totalPages, currentPage + pageSize))}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                    >
+                        다음
+                    </button>
+                    <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => fetchPageData(totalPages)}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                    >
+                        끝
+                    </button>
+
+                    {currentPage >= 97 && currentPage <= 99 && lastCursor && (
+                        <button
+                            onClick={() => {
+                                setIsCursorPaging(true);
+                                fetchCursorPage({ before: lastCursor });
+                            }}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded-md"
+                        >
+                            날짜로 조회
+                        </button>
+                    )}
+                </>
+            ) : (
+                    <>
                 <button
-                    disabled={currentPage + pageSize > totalPages}
-                    onClick={() => fetchPageData(Math.min(totalPages, currentPage + pageSize))}
+                    disabled={!FirstCursor}
+                    onClick={() => fetchCursorPage({ after: FirstCursor ? FirstCursor : undefined })}
                     className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
                 >
-                    다음
+                    뒤로 이동
                 </button>
                 <button
-                    disabled={currentPage + pageSize > totalPages}
-                    onClick={() => fetchPageData(totalPages)}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                    >
+                    {lastCursor?.slice(0, 19)}
+                </button>
+                <button
+                    disabled={!lastCursor}
+                    onClick={() => fetchCursorPage({ before: lastCursor ? lastCursor : undefined })}
                     className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
                 >
-                    처음
+                    앞으로 이동
                 </button>
-            </div>
+            </>
+            )}
+        </div>
         );
-    };
+    }
 
+
+    
     return (
         <div className="flex">
             <Sidebar />
@@ -149,7 +208,7 @@ export default function Home() {
                                     </li>
                                 ))}
                             </ul>
-                            {renderPaginationButtons()} 
+                            {cursorPaginationButtons()}
                         </>
                     )}
                 </div>
