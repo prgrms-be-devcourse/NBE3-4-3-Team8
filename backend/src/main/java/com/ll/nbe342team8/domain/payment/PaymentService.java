@@ -1,6 +1,7 @@
 package com.ll.nbe342team8.domain.payment;
 
 import com.ll.nbe342team8.domain.order.order.service.OrderCacheService;
+import com.ll.nbe342team8.domain.order.order.service.OrderPayService;
 import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,8 @@ import java.util.Base64;
 public class PaymentService {
     private final RestTemplate restTemplate;
     private final PaymentRepository paymentRepository;
-    private final OrderService orderService;
     private final OrderCacheService orderCacheService;
+    private final OrderPayService orderPayService;
 
     @Value("${payment.toss.secret-key}")
     private String secretKey;
@@ -81,7 +82,7 @@ public class PaymentService {
                 .method(response.getMethod())
                 .build());
 
-        orderService.completeOrderFromCache(response.getOrderId());
+        orderPayService.completeOrderFromCache(response.getOrderId());
         orderCacheService.deleteOrderFromCache(response.getOrderId());
     }
 

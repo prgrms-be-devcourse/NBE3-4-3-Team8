@@ -1,11 +1,13 @@
+package com.ll.nbe342team8.domain.order.order.dto
 
-package com.ll.nbe342team8.domain.order.order.dto;
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-
-public record OrderDTO(
-        Long orderId,
-        String orderStatus,
-        long totalPrice,
-        LocalDateTime createDate) {
-}
+data class OrderDTO(
+    val orderId: Long,
+    val orderStatus: String,
+    val totalPrice: Long,
+    val createDate: LocalDateTime,
+    val coverImage: String,
+    val title: String,
+    val Id: Long
+)

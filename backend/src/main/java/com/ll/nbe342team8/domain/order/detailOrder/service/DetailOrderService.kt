@@ -1,37 +1,38 @@
-package com.ll.nbe342team8.domain.order.detailOrder.service;
+package com.ll.nbe342team8.domain.order.detailOrder.service
 
-import com.ll.nbe342team8.domain.jwt.AuthService;
-import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.order.detailOrder.dto.DetailOrderDto;
-import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
-import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.ll.nbe342team8.domain.jwt.AuthService
+import com.ll.nbe342team8.domain.member.member.entity.Member
+import com.ll.nbe342team8.domain.order.detailOrder.dto.DetailOrderDto
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder
+import com.ll.nbe342team8.domain.order.detailOrder.repository.DetailOrderRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-public class DetailOrderService {
-    private final DetailOrderRepository detailOrderRepository;
-    private final AuthService authService;
+class DetailOrderService(
+    private val detailOrderRepository: DetailOrderRepository,
+    private val authService: AuthService
+) {
 
-    public DetailOrderService(DetailOrderRepository detailOrderRepository, AuthService authService) {
-        this.detailOrderRepository = detailOrderRepository;
-        this.authService = authService;
-    }
-
+    @Transactional
     // 주문상세조회
-    public List<DetailOrderDto> getDetailOrdersByOrderIdAndMember(Long orderId, Member member) {
-        // 레포지토리에서 orderId와 member로 주문 상세 조회
-        List<DetailOrder> detailOrders = detailOrderRepository.findByOrderId(orderId);
-        System.out.println("detailOrders = " + detailOrders.toString());
+    fun getDetailOrdersByOrderIdAndMember(orderId: Long, member: Member): List<DetailOrderDto> {
+
+        val detailOrders: List<DetailOrder> = detailOrderRepository.findByOrderId(orderId)
+
         // 주문 상세 정보를 DetailOrderDto로 변환하여 반환
-        return detailOrders.stream()
-                .map(detailOrder -> new DetailOrderDto(
-                        detailOrder.getOrder().getId(),
-                        detailOrder.getBook().getId(),
-                        detailOrder.getBookQuantity(),
-                        detailOrder.getDeliveryStatus()))
-                .collect(Collectors.toList());
+        return detailOrders.map { detailOrder ->
+            DetailOrderDto(
+                orderId = detailOrder.order.id!!,
+                bookTitle = detailOrder.book.title,
+                bookQuantity = detailOrder.bookQuantity,
+                totalPrice = detailOrder.order.totalPrice.toDouble(), // 총 금액 필드 사용
+                deliveryStatus = detailOrder.deliveryStatus.name,
+                coverImage = detailOrder.book.coverImage,
+                recipient = detailOrder.order.recipient ?: "",  // 수령인
+                phone = detailOrder.order.phone ?: "",          // 전화번호
+                fullAddress = detailOrder.order.fullAddress ?: "" // 배송 주소
+            )
+        }
     }
 }

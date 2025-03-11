@@ -1,63 +1,82 @@
-package com.ll.nbe342team8.domain.order.order.entity;
+package com.ll.nbe342team8.domain.order.order.entity
 
-import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder;
-import com.ll.nbe342team8.global.jpa.entity.BaseTime;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.ll.nbe342team8.domain.member.member.dto.PutReqMemberMyPageDto
+import com.ll.nbe342team8.domain.member.member.entity.Member
+import com.ll.nbe342team8.domain.order.detailOrder.entity.DetailOrder
+import com.ll.nbe342team8.global.jpa.entity.BaseTime
+import jakarta.persistence.*
 
 @Entity
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "orders")
-public class Order extends BaseTime {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+class Order private constructor(
+    @ManyToOne val member: Member,
+    @Enumerated(EnumType.STRING) val orderStatus: OrderStatus,
+    val totalPrice: Long,
+    val fullAddress: String? = null,
+    val postCode: String? = null,
+    val recipient: String? = null,
+    val phone: String? = null,
+    val paymentMethod: String? = null,
+    val tossOrderId: String? = null,
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val detailOrders: MutableList<DetailOrder> = mutableListOf()
+) : BaseTime() {
 
-	@Column(unique = true)
-	private String tossOrderId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null
 
-	@ManyToOne
-	private Member member;
+    enum class OrderStatus {
+        ORDERED,
+        CANCELLED,
+        COMPLETE
+    }
 
-	@Enumerated(EnumType.STRING)
-	private OrderStatus orderStatus;
+    // 빌더 패턴을 위한 Builder 클래스
+    class Builder {
+        private var member: Member? = null
+        private var orderStatus: OrderStatus = OrderStatus.ORDERED
+        private var totalPrice: Long = 0
+        private var fullAddress: String? = null
+        private var postCode: String? = null
+        private var recipient: String? = null
+        private var phone: String? = null
+        private var paymentMethod: String? = null
+        private var tossOrderId: String? = null
+        private var detailOrders: MutableList<DetailOrder> = mutableListOf()
 
-	private long totalPrice;
+        fun member(member: Member) = apply { this.member = member }
+        fun orderStatus(orderStatus: OrderStatus) = apply { this.orderStatus = orderStatus }
+        fun totalPrice(totalPrice: Long) = apply { this.totalPrice = totalPrice }
+        fun fullAddress(fullAddress: String?) = apply { this.fullAddress = fullAddress }
+        fun postCode(postCode: String?) = apply { this.postCode = postCode }
+        fun recipient(recipient: String?) = apply { this.recipient = recipient }
+        fun phone(phone: String?) = apply { this.phone = phone }
+        fun paymentMethod(paymentMethod: String?) = apply { this.paymentMethod = paymentMethod }
+        fun tossOrderId(tossOrderId: String?) = apply { this.tossOrderId = tossOrderId }
+        fun detailOrders(detailOrders: MutableList<DetailOrder>) = apply { this.detailOrders = detailOrders }
 
-	private String fullAddress;
+        fun build(): Order {
+            requireNotNull(member) { "Member cannot be null" }
 
-	private String postCode;
+            return Order(
+                member = member!!,
+                orderStatus = orderStatus,
+                totalPrice = totalPrice,
+                fullAddress = fullAddress,
+                postCode = postCode,
+                recipient = recipient,
+                phone = phone,
+                paymentMethod = paymentMethod,
+                tossOrderId = tossOrderId,
+                detailOrders = detailOrders
+            )
+        }
+    }
 
-	private String recipient;
-
-	private String phone;
-
-	private String paymentMethod;
-
-	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<DetailOrder> detailOrders = new ArrayList<>();
-
-	public enum OrderStatus {
-		ORDERED,
-		CANCELLED,
-		COMPLETE
-	}
-
-	public Order(Member member, OrderStatus orderStatus, long totalPrice) {
-		this.member = member;
-		this.orderStatus = orderStatus;
-		this.totalPrice = totalPrice;
-		this.detailOrders = new ArrayList<>();
-	}
+    companion object {
+        fun builder(): Builder {
+            return Builder()
+        }
+    }
 }
