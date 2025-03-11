@@ -3,14 +3,29 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest)  {
 
   const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get("page") || "0", 10); // 기본값 1
-    
+  const cookies = req.headers.get("cookie") || "";
+  
+  const page = searchParams.get("page");
+  const before = searchParams.get("before");
+  const after = searchParams.get("after");
+  
+  let apiUrl = "http://localhost:8080/my/question";
+
+  if (page !== null) {
+    apiUrl += `?page=${page}`;
+  } else if (before !== null) {
+    apiUrl += `?before=${before}`;
+  } else if (after !== null) {
+    apiUrl += `?after=${after}`;
+  }
+
   console.log("-----------------------------------------------");
   console.log("GET Questions");
+  console.log("Requested URL:", apiUrl);
   console.log("-----------------------------------------------");
-  const cookies = req.headers.get("cookie") || "";
+
      
-  const response = await fetch(`http://localhost:8080/my/question?page=${page}`, {
+  const response = await fetch(apiUrl, {
       method: "GET",
       headers: { "Content-Type": "application/json",
                  cookie: cookies,

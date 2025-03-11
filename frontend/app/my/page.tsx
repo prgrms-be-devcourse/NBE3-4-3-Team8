@@ -52,6 +52,49 @@ export default function Home() {
             .catch((error) => console.error("데이터 불러오기 실패:", error));
     }, []);
 
+     // Daum 주소 검색 API 스크립트 로드
+     const loadPostcodeScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+            script.onload = () => resolve(null);
+            document.head.appendChild(script);
+        });
+    };
+
+    // 주소 검색 실행
+    const handleAddressSearch = async () => {
+        if (!(window as any).daum || !(window as any).daum.Postcode) {
+            await loadPostcodeScript();
+        }
+        new (window as any).daum.Postcode({
+            oncomplete: function (data: any) {
+                setNewAddress((prevState) => ({
+                    ...prevState,
+                    postCode: data.zonecode,
+                    addressName: data.roadAddress,
+                    detailAddress: "",
+                }));
+                document.getElementById("detailAddress")?.focus();
+            },
+        }).open();
+    };
+
+    const handleEditedAddressSearch = async () => {
+        if (!(window as any).daum || !(window as any).daum.Postcode) {
+            await loadPostcodeScript();
+        }
+        new (window as any).daum.Postcode({
+            oncomplete: function (data: any) {
+                setEditedAddress((prevState) => ({
+                    ...prevState!,
+                    postCode: data.zonecode,
+                    addressName: data.roadAddress,
+                }));
+            },
+        }).open();
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
@@ -177,6 +220,8 @@ export default function Home() {
         }
     };
 
+    
+
     return (
         <div className="flex">
             <Sidebar />
@@ -248,6 +293,7 @@ export default function Home() {
                                                             name="addressName"
                                                             value={editedAddress?.addressName || ""}
                                                             onChange={handleEditedAddressChange}
+                                                            readOnly
                                                             className="border p-2 rounded-md w-full"
                                                         />
                                                         <input
@@ -255,8 +301,15 @@ export default function Home() {
                                                             name="postCode"
                                                             value={editedAddress?.postCode || ""}
                                                             onChange={handleEditedAddressChange}
+                                                            readOnly
                                                             className="border p-2 rounded-md w-full"
                                                         />
+                                                        <button
+                                                        onClick={handleEditedAddressSearch}
+                                                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                                                        >
+                                                        주소 검색
+                                                        </button>
                                                         <input
                                                             type="text"
                                                             name="detailAddress"
@@ -355,16 +408,26 @@ export default function Home() {
                                             type="text"
                                             name="addressName"
                                             placeholder="주소명"
+                                            value={newAddress.addressName}
                                             onChange={handleNewAddressChange}
+                                            readOnly
                                             className="border p-2 rounded-md w-full mb-2"
                                         />
                                         <input
                                             type="text"
                                             name="postCode"
                                             placeholder="우편번호"
+                                            value={newAddress.postCode}
                                             onChange={handleNewAddressChange}
+                                            readOnly
                                             className="border p-2 rounded-md w-full mb-2"
                                         />
+                                        <button
+                                            onClick={handleAddressSearch}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded-md mb-2"
+                                        >
+                                            주소 검색
+                                        </button>
                                         <input
                                             type="text"
                                             name="detailAddress"

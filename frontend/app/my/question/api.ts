@@ -12,3 +12,5 @@ export async function GetMyPage(page: number): Promise<Response> {
     console.log(`my/question/api.ts - GetQuestions (page: ${page})`);
     return apiRequest(`/api/my/question?page=${page}`, "GET");
 }
+
+

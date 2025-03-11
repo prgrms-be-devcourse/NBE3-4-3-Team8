@@ -1,10 +1,12 @@
 package com.ll.nbe342team8.domain.jwt;
 
 import com.ll.nbe342team8.domain.member.member.entity.Member;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
@@ -14,6 +16,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,6 +42,10 @@ public class JwtService {
                 .claim("id", member.getId())
                 .claim("email", member.getEmail())
                 .claim("name", member.getName())
+                .claim("authorities", member.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList()))
+                .claim("memberType", member.getMemberType().toString())
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(key)
@@ -95,6 +102,20 @@ public class JwtService {
                     .getSubject();
         } catch (Exception e) {
             log.error("토큰에서 카카오 ID 추출 실패: ", e);
+            throw e;
+        }
+    }
+
+    public Claims extractAllClaims(String token) {
+        try {
+            String decodedToken = URLDecoder.decode(token, StandardCharsets.UTF_8);
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(decodedToken)
+                    .getBody();
+        } catch (Exception e) {
+            log.error("토큰에서 클레임 추출 실패: ", e);
             throw e;
         }
     }
