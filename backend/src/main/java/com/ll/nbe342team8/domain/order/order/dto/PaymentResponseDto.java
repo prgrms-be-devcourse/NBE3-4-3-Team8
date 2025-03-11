@@ -9,6 +9,7 @@ import java.util.List;
 public record PaymentResponseDto (
         List<CartResponseDto> cartList,
         Long priceStandard,
-        Long pricesSales
+        Long pricesSales,
+        String orderId
 ){
 }

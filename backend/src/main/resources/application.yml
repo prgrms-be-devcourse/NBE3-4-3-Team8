@@ -1,6 +1,5 @@
 server:
   port: 8080
-
 spring:
   application:
     name: next-js-oauth2-2025-01-20
@@ -18,7 +17,7 @@ spring:
       client:
         registration:
           kakao:
-            clientId: 6d7b673f68e36faa4f581fbc771b861d
+            clientId: c47345d326ca974bf9ce4525ae5ddeef
             scope:
               - profile_nickname
               - profile_image
@@ -32,25 +31,8 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-  datasource:
-    url: jdbc:mysql://localhost:3306/test_db
-    username: root
-    password: jjevt3Hsy0331@
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
-        highlight-sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-    show-sql: true  # SQL 쿼리 로그를 출력
-
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
-
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -64,17 +46,18 @@ custom:
     frontUrl: "http://${custom.dev.cookieDomain}:3000"
     backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
   prod:
-    cookieDomain: book.oa.gg
+    cookieDomain: glog.oa.gg
     frontUrl: "https://www.${custom.prod.cookieDomain}"
     backUrl: "https://api.${custom.prod.cookieDomain}"
   site:
     cookieDomain: "${custom.dev.cookieDomain}"
     frontUrl: "${custom.dev.frontUrl}"
     backUrl: "${custom.dev.backUrl}"
-    name: Book
+    name: GLOG
   jwt:
-    secretKey: "w92mLzTnRJ6P1qfzX7KlmFdyvRk3NhGq"
-  genFile:
-    dirPath: c:/temp/glog_dev
+    secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+  accessToken:
+    expirationSeconds: "#{60 * 20}"
 aladin:
   ttbkey: "ttbkumjjick2245001"
+

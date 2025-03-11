@@ -3,8 +3,11 @@ package com.ll.nbe342team8.domain.order.order.controller
 import com.ll.nbe342team8.domain.jwt.AuthService
 import com.ll.nbe342team8.domain.member.member.entity.Member
 import com.ll.nbe342team8.domain.oauth.SecurityUser
-import com.ll.nbe342team8.domain.order.order.dto.*
-import com.ll.nbe342team8.domain.order.order.entity.Order
+import com.ll.nbe342team8.domain.order.order.dto.OrderDTO
+import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto
+import com.ll.nbe342team8.domain.order.order.dto.OrderRequestDto.OrderType
+import com.ll.nbe342team8.domain.order.order.dto.PaymentResponseDto
+import com.ll.nbe342team8.domain.order.order.service.OrderPayService
 import com.ll.nbe342team8.domain.order.order.service.OrderService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -18,7 +21,8 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin(origins = ["http://localhost:3000"])
 class OrderController(
     private val orderService: OrderService,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val orderPayService: OrderPayService
 ) {
 
     // 주문 조회
@@ -31,37 +35,34 @@ class OrderController(
         return orderService.getOrdersByMember(member, pageable)
     }
 
-    // 주문 등록 (일반 주문: 장바구니 기반)
-    @PostMapping("/create")
+    @PostMapping
     fun createOrder(
-        @RequestBody @Valid orderRequestDto: OrderRequestDto,
+        @RequestBody orderRequestDto: @Valid OrderRequestDto,
         @AuthenticationPrincipal securityUser: SecurityUser
-    ): ResponseEntity<OrderResponseDto> {
-        println("orderRequestDto = $orderRequestDto")
+    ): ResponseEntity<*> {
         val member: Member = securityUser.member
-        val order: Order = orderService.createOrder(member, orderRequestDto)
-        return ResponseEntity.ok(OrderResponseDto.from(order))
+        val tossOrderId = orderPayService.createOrder(member, orderRequestDto)
+
+        val response: MutableMap<String, String> = HashMap<String, String>()
+        response.put("orderId", tossOrderId)
+
+        return ResponseEntity.ok<MutableMap<String, String>>(response)
     }
 
-    // 주문 등록 (단일 상품 주문)
-    @PostMapping("/create/fast")
-    fun createFastOrder(
-        @RequestBody @Valid orderRequestDto: OrderRequestDto,
-        @RequestParam("bookId") bookId: Long,
-        @RequestParam("quantity") quantity: Int,
+    /**
+     * 통합된 결제 정보 조회 API
+     */
+    @GetMapping("/payment-info")
+    fun getPaymentInfo(
+        @RequestParam orderType: OrderType,
+        @RequestParam(required = false) bookId: Long,
+        @RequestParam(required = false) quantity: Int,
         @AuthenticationPrincipal securityUser: SecurityUser
-    ): ResponseEntity<OrderResponseDto> {
-
-        val member = securityUser.member // SecurityUser에서 member 가져오기
-        val order = orderService.createFastOrder(member, orderRequestDto, bookId, quantity)
-        return ResponseEntity.ok(OrderResponseDto.from(order))
-    }
-
-    // 결제 정보 조회
-    @GetMapping("/payment")
-    fun payment(@AuthenticationPrincipal securityUser: SecurityUser): ResponseEntity<PaymentResponseDto> {
+    ): ResponseEntity<PaymentResponseDto?> {
         val member: Member = securityUser.member
-        val paymentResponseDto: PaymentResponseDto = orderService.createPaymentInfo(member)
-        return ResponseEntity.ok(paymentResponseDto)
+        val paymentInfo = orderPayService.createPaymentInfo(
+            member, orderType, bookId, quantity
+        )
+        return ResponseEntity.ok<PaymentResponseDto>(paymentInfo)
     }
 }

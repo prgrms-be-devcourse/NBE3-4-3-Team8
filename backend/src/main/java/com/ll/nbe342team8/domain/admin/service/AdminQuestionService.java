@@ -1,4 +1,4 @@
-package com.ll.nbe342team8.domain.admin.service;
+/*package com.ll.nbe342team8.domain.admin.service;
 
 import com.ll.nbe342team8.domain.admin.dto.AdminQuestionDto;
 import com.ll.nbe342team8.domain.qna.question.entity.Question;
@@ -70,3 +70,4 @@ public class AdminQuestionService {
         questionRepository.delete(question);
     }
 }
+*/

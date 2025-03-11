@@ -48,7 +48,7 @@ public class Member extends BaseTime implements UserDetails {
 
 	public String username;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	public List<DeliveryInformation> deliveryInformations;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
@@ -78,6 +78,10 @@ public class Member extends BaseTime implements UserDetails {
 	}
 
 	public void addDeliveryInformation(DeliveryInformation deliveryInformation) {
+		if (this.deliveryInformations == null) {
+			this.deliveryInformations = new ArrayList<>();
+		}
+
 		this.deliveryInformations.add(deliveryInformation);
 	}
 

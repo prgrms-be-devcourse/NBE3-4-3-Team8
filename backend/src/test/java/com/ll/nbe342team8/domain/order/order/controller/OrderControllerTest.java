@@ -2,9 +2,7 @@ package com.ll.nbe342team8.domain.order.order.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.nbe342team8.domain.member.member.entity.Member;
-import com.ll.nbe342team8.domain.order.order.dto.OrderDTO;
 import com.ll.nbe342team8.domain.order.order.entity.Order;
-import com.ll.nbe342team8.domain.order.order.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

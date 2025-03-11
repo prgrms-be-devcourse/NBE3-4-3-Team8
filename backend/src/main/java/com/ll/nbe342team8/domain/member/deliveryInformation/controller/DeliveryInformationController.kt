@@ -18,11 +18,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
 
+
 @Tag(name = "DeliveryInformationController", description = "배송 정보 컨트롤러")
 @RestController
 @RequiredArgsConstructor
 class DeliveryInformationController(
     private val deliveryInformationService: DeliveryInformationService,
+    private val memberService: MemberService
 ) {
 
     // 배송 정보 등록. 5개 까지 등록 할 수 있으며 한번에 하나씩 등록한다.
@@ -30,10 +32,10 @@ class DeliveryInformationController(
     @Operation(summary = "배송 정보 등록(최대 5개)")
     @PostMapping("/my/deliveryInformation")
     fun postDeliveryInformation(
-        @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto,
+        @RequestBody @Valid reqDeliveryInformationDto: ReqDeliveryInformationDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // 단 시간 내 중복 등록 방지
@@ -59,7 +61,7 @@ class DeliveryInformationController(
         @PathVariable id: Long,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // 삭제할 배송 정보를 id로 탐색
@@ -84,7 +86,7 @@ class DeliveryInformationController(
         @RequestBody reqDeliveryInformationDto: @Valid ReqDeliveryInformationDto,
         @AuthenticationPrincipal securityUser: SecurityUser?
     ): ResponseEntity<ResMemberMyPageDto> {
-        val member: Member = securityUser?.member
+        val member: Member = securityUser?.member?.let { memberService.getMemberById(it.id) }
             ?: throw ServiceException(HttpStatus.BAD_REQUEST.value(), "올바른 요청이 아닙니다. 로그인 상태를 확인하세요.")
 
         // 갱신할 배송 정보를 id로 탐색
@@ -102,11 +104,4 @@ class DeliveryInformationController(
 
         return ResponseEntity.ok(resMemberMyPageDto)
     }
-
-
-
-
-
-
-
 }
