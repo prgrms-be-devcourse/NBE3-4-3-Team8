@@ -1,5 +1,6 @@
 package com.ll.nbe342team8.domain.admin.service
 
+import com.ll.nbe342team8.domain.admin.dto.AdminQuestionDto
 import com.ll.nbe342team8.domain.qna.question.entity.Question
 import com.ll.nbe342team8.domain.qna.question.repository.QuestionRepository
 import com.ll.nbe342team8.global.exceptions.ServiceException
